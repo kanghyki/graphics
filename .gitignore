@@ -1,0 +1,14 @@
+# build directory
+build
+
+# vscode
+.vscode
+
+# ctags
+tags
+
+# cache
+.cache
+
+# compilation database 
+compile_commands.json
