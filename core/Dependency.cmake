@@ -1,0 +1,14 @@
+include(ExternalProject)
+
+set(EXTERNAL_INSTALL_DIR ${PROJECT_BINARY_DIR}/${PROJECT_NAME}/install)
+set(EXTERNAL_INCLUDE_DIR ${EXTERNAL_INSTALL_DIR}/include)
+set(EXTERNAL_LIBRARY_DIR ${EXTERNAL_INSTALL_DIR}/lib)
+
+# spdlog
+ExternalProject_Add(dep-spdlog
+  GIT_REPOSITORY "https://github.com/gabime/spdlog.git"
+  GIT_TAG "v1.x"
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_DIR}
+)
+set(EXTERNAL_PROJECTS ${EXTERNAL_PROJECTS} dep-spdlog)
+set(EXTERNAL_LIBRARYS ${EXTERNAL_LIBRARYS} spdlog$<$<CONFIG:Debug>:d>)
