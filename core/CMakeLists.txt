@@ -29,3 +29,5 @@ target_link_libraries(${PROJECT_NAME}
 PUBLIC
   ${EXTERNAL_LIBRARYS}
 )
+
+add_dependencies(${PROJECT_NAME} ${EXTERNAL_PROJECTS})
