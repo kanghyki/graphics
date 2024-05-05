@@ -1,0 +1,88 @@
+#ifndef INCLUDED_TEXTURE_H
+#define INCLUDED_TEXTURE_H
+
+#include "image.h"
+#include "libopengl.h"
+#include "ptr.h"
+
+namespace image_util
+{
+GLenum ChannelCountToRGBAFormat(uint32_t channel_count);
+uint32_t RGBAFormatToChannelCount(GLenum format);
+}; // namespace image_util
+
+class BaseTexture
+{
+  public:
+    BaseTexture(uint32_t texture_type);
+    virtual ~BaseTexture();
+
+    void Bind() const;
+
+    void SetFilter(uint32_t min_filter, uint32_t mag_filter) const;
+    void SetWrap(uint32_t s_wrap, uint32_t t_wrap, uint32_t r_wrap = GL_NONE) const;
+
+    const uint32_t id() const
+    {
+        return id_;
+    }
+    const uint32_t texture_type() const
+    {
+        return texture_type_;
+    }
+
+  private:
+    uint32_t id_;
+    uint32_t texture_type_{GL_TEXTURE_2D};
+};
+
+CLASS_PTR(Texture2d);
+class Texture2d : public BaseTexture
+{
+  public:
+    static Texture2dPtr Create(const Image *image);
+    static Texture2dPtr Create(const std::string &filename);
+    static Texture2dPtr Create(int width, int height, uint32_t inner_format = GL_RGBA, uint32_t format = GL_RGBA,
+                               uint32_t type = GL_UNSIGNED_BYTE);
+    ~Texture2d();
+
+    void SetTextureFormat(int width, int height, uint32_t inner_format, uint32_t format, uint32_t type);
+    void SetBorderColor(const glm::vec4 &color) const;
+    unsigned char *GetTexImage() const;
+    std::array<uint8_t, 4> GetTexPixel(int x, int y) const;
+    bool SaveAsPng(const std::string &filename) const;
+
+    inline int width() const
+    {
+        return width_;
+    }
+    inline int height() const
+    {
+        return height_;
+    }
+    inline uint32_t inner_format() const
+    {
+        return inner_format_;
+    }
+    inline uint32_t format() const
+    {
+        return format_;
+    }
+    inline uint32_t type() const
+    {
+        return type_;
+    }
+
+  private:
+    Texture2d();
+
+    void SetTextureFromImage(const Image *image);
+
+    int width_;
+    int height_;
+    uint32_t inner_format_;
+    uint32_t format_;
+    uint32_t type_;
+};
+
+#endif

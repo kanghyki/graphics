@@ -12,3 +12,6 @@ tags
 
 # compilation database 
 compile_commands.json
+
+# mac
+.DS_Store
