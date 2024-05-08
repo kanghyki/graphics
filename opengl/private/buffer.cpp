@@ -18,7 +18,7 @@ BufferPtr Buffer::Create(uint32_t buffer_type, uint32_t usage, const void *data,
     auto buffer = BufferPtr(new Buffer());
     buffer->Init(buffer_type, usage, data, stride, count);
 
-    return std::move(buffer);
+    return buffer;
 }
 
 void Buffer::Bind() const

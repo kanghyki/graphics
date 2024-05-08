@@ -54,3 +54,38 @@ ExternalProject_Add(
       ${EXTERNAL_INCLUDE_DIR}/stb/stb_image_write.h
     )
 set(EXTERNAL_PROJECTS ${EXTERNAL_PROJECTS} dep_stb)
+
+
+# assimp
+ExternalProject_Add(
+  dep_assimp
+  GIT_REPOSITORY "https://github.com/assimp/assimp"
+  GIT_TAG "v5.0.1"
+  GIT_SHALLOW 1
+  UPDATE_COMMAND ""
+  PATCH_COMMAND ""
+  CMAKE_ARGS
+      -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_DIR}
+      -DBUILD_SHARED_LIBS=OFF
+      -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
+      -DASSIMP_BUILD_TESTS=OFF
+      -DASSIMP_INJECT_DEBUG_POSTFIX=OFF
+      -DASSIMP_BUILD_ZLIB=ON
+  TEST_COMMAND ""
+  )
+set(EXTERNAL_PROJECTS ${EXTERNAL_PROJECTS} dep_assimp)
+
+if (WINDOWS)
+
+set(EXTERNAL_LIBRARYS ${EXTERNAL_LIBRARYS}
+  assimp-vc143-mt$<$<CONFIG:Debug>:d>
+  zlibstatic$<$<CONFIG:Debug>:d>
+  IrrXML$<$<CONFIG:Debug>:d>
+)
+else ()
+set(EXTERNAL_LIBRARYS ${EXTERNAL_LIBRARYS}
+  assimp
+  zlibstatic
+  IrrXML
+)
+endif()

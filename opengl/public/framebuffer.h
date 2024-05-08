@@ -36,10 +36,10 @@ CLASS_PTR(Framebuffer);
 class Framebuffer : public BaseFramebuffer
 {
   public:
-    static FramebufferPtr Create(const std::vector<std::shared_ptr<Texture2d>> color_attachments);
+    static FramebufferPtr Create(const std::vector<Texture2dPtr> color_attachments);
     ~Framebuffer();
 
-    inline const std::shared_ptr<Texture2d> color_attachment(int i) const
+    const Texture2dPtr color_attachment(int i) const
     {
         if (i >= 0 && i < color_attachments_.size())
         {

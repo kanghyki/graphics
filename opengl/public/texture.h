@@ -20,7 +20,7 @@ class BaseTexture
     void Bind() const;
 
     void SetFilter(uint32_t min_filter, uint32_t mag_filter) const;
-    void SetWrap(uint32_t s_wrap, uint32_t t_wrap, uint32_t r_wrap = GL_NONE) const;
+    void SetWrap(uint32_t s_wrap, uint32_t t_wrap) const;
 
     const uint32_t id() const
     {

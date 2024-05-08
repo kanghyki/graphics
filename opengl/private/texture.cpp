@@ -75,14 +75,10 @@ void BaseTexture::SetFilter(uint32_t min_filter, uint32_t mag_filter) const
     glTexParameteri(texture_type_, GL_TEXTURE_MAG_FILTER, mag_filter);
 }
 
-void BaseTexture::SetWrap(uint32_t s_wrap, uint32_t t_wrap, uint32_t r_wrap) const
+void BaseTexture::SetWrap(uint32_t s_wrap, uint32_t t_wrap) const
 {
     glTexParameteri(texture_type_, GL_TEXTURE_WRAP_S, s_wrap);
     glTexParameteri(texture_type_, GL_TEXTURE_WRAP_T, t_wrap);
-    if (r_wrap != GL_NONE)
-    {
-        glTexParameteri(texture_type_, GL_TEXTURE_WRAP_T, r_wrap);
-    }
 }
 
 /*
@@ -107,7 +103,7 @@ Texture2dPtr Texture2d::Create(const Image *image)
     texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
     texture->SetTextureFromImage(image);
 
-    return std::move(texture);
+    return texture;
 }
 
 Texture2dPtr Texture2d::Create(const std::string &filename)
@@ -124,7 +120,7 @@ Texture2dPtr Texture2d::Create(const std::string &filename)
     texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
     texture->SetTextureFromImage(image.get());
 
-    return std::move(texture);
+    return texture;
 }
 
 Texture2dPtr Texture2d::Create(int width, int height, uint32_t inner_format, uint32_t format, uint32_t type)
@@ -135,7 +131,7 @@ Texture2dPtr Texture2d::Create(int width, int height, uint32_t inner_format, uin
     texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
     texture->SetTextureFormat(width, height, inner_format, format, type);
 
-    return std::move(texture);
+    return texture;
 }
 
 void Texture2d::SetTextureFromImage(const Image *image)

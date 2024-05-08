@@ -36,10 +36,10 @@ class Image
     bool LoadFile(const std::string &filepath, bool flip_vertical);
     bool Allocate(int width, int height, int channel_count);
 
-    int width_{0};
-    int height_{0};
-    int channel_count_{0};
-    uint8_t *data_{nullptr};
+    int width_;
+    int height_;
+    int channel_count_;
+    uint8_t *data_;
 };
 
 #endif

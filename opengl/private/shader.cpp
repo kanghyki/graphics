@@ -16,13 +16,13 @@ Shader::~Shader()
 
 ShaderPtr Shader::CreateFromFile(const std::string &filename, GLenum shader_type)
 {
-    auto shader = std::unique_ptr<Shader>(new Shader());
+    auto shader = ShaderPtr(new Shader());
     if (!shader->LoadFile(filename, shader_type))
     {
         return nullptr;
     }
 
-    return std::move(shader);
+    return shader;
 }
 
 bool Shader::LoadFile(const std::string &filename, GLenum shader_type)

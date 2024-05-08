@@ -1,6 +1,8 @@
 #include "mesh.h"
 
-Mesh::Mesh(uint32_t primitive_type) : primitive_type_(primitive_type)
+Mesh::Mesh(uint32_t primitive_type)
+    : primitive_type_(primitive_type), vertex_array_(nullptr), vertex_buffer_(nullptr), index_buffer_(nullptr),
+      material_(nullptr)
 {
 }
 
@@ -13,7 +15,7 @@ MeshPtr Mesh::Create(const std::vector<Vertex> &vertices, const std::vector<uint
     auto mesh = MeshPtr(new Mesh(primitive_type));
     mesh->Init(vertices, indices);
 
-    return std::move(mesh);
+    return mesh;
 }
 
 MeshPtr Mesh::CreateBox()
@@ -136,7 +138,6 @@ void Mesh::ComputeTangents(std::vector<Vertex> &vertices, const std::vector<uint
 
     std::vector<glm::vec3> tangents(vertices.size());
     memset(tangents.data(), 0, tangents.size() * sizeof(glm::vec3));
-
     for (size_t i = 0; i < indices.size(); i += 3)
     {
         auto i0 = indices[i];

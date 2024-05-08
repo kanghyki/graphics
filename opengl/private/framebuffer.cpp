@@ -58,7 +58,7 @@ Framebuffer::~Framebuffer()
     }
 }
 
-FramebufferPtr Framebuffer::Create(const std::vector<std::shared_ptr<Texture2d>> color_attachments)
+FramebufferPtr Framebuffer::Create(const std::vector<Texture2dPtr> color_attachments)
 {
     auto framebuffer = FramebufferPtr(new Framebuffer());
 
@@ -68,7 +68,7 @@ FramebufferPtr Framebuffer::Create(const std::vector<std::shared_ptr<Texture2d>>
         return nullptr;
     }
 
-    return std::move(framebuffer);
+    return framebuffer;
 }
 
 void Framebuffer::AttachTexture()

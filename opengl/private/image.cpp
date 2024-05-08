@@ -3,7 +3,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-Image::Image()
+Image::Image() : width_(0), height_(0), channel_count_(0), data_(nullptr)
 {
 }
 
@@ -23,7 +23,7 @@ ImagePtr Image::Load(const std::string &filepath, bool flip_vertical)
         return nullptr;
     }
 
-    return std::move(image);
+    return image;
 }
 
 ImagePtr Image::Create(int width, int height, int channel_count)
@@ -34,7 +34,7 @@ ImagePtr Image::Create(int width, int height, int channel_count)
         return nullptr;
     }
 
-    return std::move(image);
+    return image;
 }
 
 bool Image::Allocate(int width, int height, int channelCount)
@@ -65,7 +65,7 @@ ImagePtr Image::CreateSingleColorImage(int width, int height, const glm::vec4 &c
         memcpy(image->data_ + i * image->channel_count_, rgba, image->channel_count_);
     }
 
-    return std::move(image);
+    return image;
 }
 
 bool Image::LoadFile(const std::string &filepath, bool flip_vertical)

@@ -12,9 +12,9 @@ VertexArray::~VertexArray()
     }
 }
 
-std::unique_ptr<VertexArray> VertexArray::Create()
+VertexArrayUPtr VertexArray::Create()
 {
-    auto vertexLayout = std::unique_ptr<VertexArray>(new VertexArray());
+    auto vertexLayout = VertexArrayUPtr(new VertexArray());
     vertexLayout->Init();
 
     return std::move(vertexLayout);

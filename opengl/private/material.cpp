@@ -1,6 +1,6 @@
 #include "material.h"
 
-Material::Material() : diffuse_(nullptr), specular_(nullptr), uniform_({30.0f})
+Material::Material() : textures_{nullptr}
 {
 }
 
@@ -8,27 +8,23 @@ Material::~Material()
 {
 }
 
-std::shared_ptr<Material> Material::Create()
+MaterialPtr Material::Create()
 {
-    return std::shared_ptr<Material>(new Material());
+    return MaterialPtr(new Material());
 }
+
+const char *texture_type_uniform_name[TextureSize::SIZE] = {"material.ambient", "material.diffuse", "material.specular",
+                                                            "material.normal", "material.height"};
 
 void Material::SetToProgram(const Program *program) const
 {
     int textureCount = 0;
 
-    if (diffuse_)
+    for (size_t i = 0; i < static_cast<size_t>(TextureSize::SIZE); ++i)
     {
         glActiveTexture(GL_TEXTURE0 + textureCount);
-        program->SetUniform("material.diffuse", textureCount);
-        diffuse_->Bind();
-        ++textureCount;
-    }
-    if (specular_)
-    {
-        glActiveTexture(GL_TEXTURE0 + textureCount);
-        program->SetUniform("material.specular", textureCount);
-        specular_->Bind();
+        program->SetUniform(texture_type_uniform_name[i], textureCount);
+        textures_[i]->Bind();
         ++textureCount;
     }
     program->SetUniform("material.shininess", uniform_.shininess_);

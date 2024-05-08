@@ -4,10 +4,11 @@
 #include "libopengl.h"
 #include "ptr.h"
 
+CLASS_PTR(VertexArray);
 class VertexArray
 {
   public:
-    static std::unique_ptr<VertexArray> Create();
+    static VertexArrayUPtr Create();
     ~VertexArray();
 
     void Bind() const;

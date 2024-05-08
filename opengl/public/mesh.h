@@ -29,18 +29,6 @@ class Mesh
 
     void Draw(const Program *program) const;
 
-    inline const VertexArray *vertex_array() const
-    {
-        return vertex_array_.get();
-    }
-    inline BufferPtr vertex_buffer() const
-    {
-        return vertex_buffer_;
-    }
-    inline BufferPtr index_buffer() const
-    {
-        return index_buffer_;
-    }
     inline MaterialPtr material() const
     {
         return material_;
@@ -52,15 +40,16 @@ class Mesh
 
   private:
     Mesh(uint32_t primitive_type);
-    Mesh(const Mesh &mesh);
+    Mesh(const Mesh &);
+    Mesh &operator=(const Mesh &);
 
     void Init(const std::vector<Vertex> &vertices, const std::vector<uint32_t> &indices);
 
-    uint32_t primitive_type_{GL_TRIANGLES};
-    std::unique_ptr<VertexArray> vertex_array_{nullptr};
-    BufferPtr vertex_buffer_{nullptr};
-    BufferPtr index_buffer_{nullptr};
-    MaterialPtr material_{nullptr};
+    uint32_t primitive_type_;
+    VertexArrayUPtr vertex_array_;
+    BufferPtr vertex_buffer_;
+    BufferPtr index_buffer_;
+    MaterialPtr material_;
 };
 
 #endif

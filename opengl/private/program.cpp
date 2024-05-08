@@ -21,7 +21,7 @@ ProgramPtr Program::Create(const std::vector<ShaderPtr> &shaders)
         return nullptr;
     }
 
-    return std::move(program);
+    return program;
 }
 
 void Program::Use() const
