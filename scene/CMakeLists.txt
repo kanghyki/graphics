@@ -13,15 +13,18 @@ add_library(${PROJECT_NAME} ${SOURCE_FILES})
 target_include_directories(${PROJECT_NAME}
 PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/public
+    ${CMAKE_CURRENT_SOURCE_DIR}/public/component
 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/private
+    ${CMAKE_CURRENT_SOURCE_DIR}/private/component
 )
 
 target_link_libraries(${PROJECT_NAME}
-PUBLIC
+PRIVATE
     core
     opengl
     event
+PUBLIC
 )
 
 add_dependencies(${PROJECT_NAME}

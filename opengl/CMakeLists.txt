@@ -12,12 +12,22 @@ include(Dependency.cmake)
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/private/*.cpp)
 add_library(${PROJECT_NAME} ${SOURCE_FILES})
 
+target_compile_definitions(${PROJECT_NAME}
+PRIVATE
+    WINDOW_INIT_WIDTH=1920
+    WINDOW_INIT_HEIGHT=1080
+    WINDOW_NAME="Graphics"
+    SHADER_PATH="./shader"
+)
+
 target_include_directories(${PROJECT_NAME}
 PUBLIC
     ${EXTERNAL_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/public
+    ${CMAKE_CURRENT_SOURCE_DIR}/public/render
 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/private
+    ${CMAKE_CURRENT_SOURCE_DIR}/private/render
 )
 
 target_link_directories(${PROJECT_NAME}

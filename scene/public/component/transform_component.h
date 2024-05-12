@@ -1,15 +1,16 @@
-#ifndef INCLUDED_TRANSFORM_H
-#define INCLUDED_TRANSFORM_H
+#ifndef INCLUDED_TRANSFORM_COMPONENT_H
+#define INCLUDED_TRANSFORM_COMPONENT_H
 
+#include "component.h"
 #include "libmath.h"
 
-class Transform
+class TransformComponent : public Component
 {
   public:
-    Transform();
-    ~Transform();
-    Transform(const Transform &c);
-    Transform &operator=(const Transform &c);
+    TransformComponent();
+    ~TransformComponent();
+
+    void Tick() override;
 
     glm::vec3 position()
     {
@@ -29,6 +30,9 @@ class Transform
     }
 
   private:
+    TransformComponent(const TransformComponent &);
+    TransformComponent &operator=(const TransformComponent &);
+
     glm::vec3 position_;
     glm::vec3 scale_;
 };

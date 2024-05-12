@@ -11,16 +11,34 @@ if (APPLE)
     set(CMAKE_CXX_FLAGS "-framework Cocoa -framework IOKit -framework OpenGL -g")
 endif()
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME}
+    main.cpp
+    level_test.cpp
+)
+
+# set_target_properties(${PROJECT_NAME}
+# PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
+# )
+
+target_compile_definitions(${PROJECT_NAME}
+PRIVATE
+    RESOURCE_PATH="../asset"
+)
+
+target_include_directories(${PROJECT_NAME}
+PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/.
+)
 
 list(APPEND libraries
     core
     opengl
     scene
     event
+    resource
+    visual_effect
 )
 foreach(lib IN LISTS libraries)
-    message(STATUS "${lib}")
     add_subdirectory(${lib})
 endforeach()
 

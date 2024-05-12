@@ -12,7 +12,8 @@ OpenGLDevice *OpenGLDevice::GetInstance()
     return instance_;
 }
 
-OpenGLDevice ::OpenGLDevice() : width_(1920), height_(1080), window_name_("window"), glfw_window_(nullptr)
+OpenGLDevice ::OpenGLDevice()
+    : width_(WINDOW_INIT_WIDTH), height_(WINDOW_INIT_HEIGHT), window_name_(WINDOW_NAME), glfw_window_(nullptr)
 {
 }
 
