@@ -17,7 +17,7 @@ PRIVATE
     WINDOW_INIT_WIDTH=1920
     WINDOW_INIT_HEIGHT=1080
     WINDOW_NAME="Graphics"
-    SHADER_PATH="./shader"
+    SHADER_PATH="${CMAKE_CURRENT_SOURCE_DIR}/shader/"
 )
 
 target_include_directories(${PROJECT_NAME}

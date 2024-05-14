@@ -5,6 +5,7 @@
 #include "level_manager.h"
 #include "level_test.h"
 #include "mesh_component.h"
+#include "renderer.h"
 #include "transform_component.h"
 
 CreateTestLevel::CreateTestLevel()
@@ -24,7 +25,8 @@ void CreateTestLevel::Create()
     actor->SetComponent(new CameraComponent());
     actor->SetComponent(new TransformComponent());
     MeshComponent *mesh = new MeshComponent();
-    actor->SetComponent(new TransformComponent());
+    mesh->set_pso(Renderer::GetInstance()->GetPSO(GRAPHIC_PSO_TYPE::SIMPLE));
+    actor->SetComponent(mesh);
 
     layer00->AddActor(actor);
 

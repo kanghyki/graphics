@@ -4,6 +4,7 @@
 #include "level_manager.h"
 #include "level_test.h"
 #include "opengl_device.h"
+#include "renderer.h"
 #include "resource_manager.h"
 #include "time_manager.h"
 #include "visual_effector.h"
@@ -20,6 +21,8 @@ int main(void)
 
     device->Init();
     event::glfw_callback_init();
+    Renderer::GetInstance()->Init();
+
     input_manager->Init();
     level_manager->Init();
     time_manager->Reset();

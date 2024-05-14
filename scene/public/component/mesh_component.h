@@ -1,9 +1,9 @@
 #ifndef INCLUDED_MESH_COMPONENT_H
 #define INCLUDED_MESH_COMPONENT_H
 
-#include "component.h"
+#include "render_component.h"
 
-class MeshComponent : public Component
+class MeshComponent : public RenderComponent
 {
   public:
     MeshComponent();

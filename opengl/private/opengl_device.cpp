@@ -55,6 +55,12 @@ bool OpenGLDevice::Init()
     }
     glViewport(0, 0, width_, height_);
 
+    if (!glfwExtensionSupported("GL_ARB_shading_language_include"))
+    {
+        SPDLOG_ERROR("GL_ARB_shading_language_include is not supported");
+        return false;
+    }
+
     return true;
 }
 
