@@ -1,4 +1,5 @@
 #include "camera.h"
+#include <iostream>
 
 Camera::Camera()
     : pitch_(0.0f), yaw_(0.0f), fov_y_(45.0f), aspect_(16.0f / 9.0f),

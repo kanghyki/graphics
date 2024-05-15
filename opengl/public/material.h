@@ -10,11 +10,6 @@ struct MaterialUniform
     float shininess_{30.0f};
 };
 
-enum TextureSize
-{
-    SIZE = 5
-};
-
 enum class TextureType
 {
     AMBIENT = 0,
@@ -47,7 +42,13 @@ class Material
     Material(const Material &);
     Material &operator=(const Material &);
 
-    Texture2dPtr textures_[static_cast<int>(TextureSize::SIZE)];
+    enum
+    {
+        TextureSize = 5
+    };
+    const char *texture_type_uniform_name[TextureSize] = {"material.ambient", "material.diffuse", "material.specular",
+                                                          "material.normal", "material.height"};
+    Texture2dPtr textures_[TextureSize];
     struct MaterialUniform uniform_;
 };
 
