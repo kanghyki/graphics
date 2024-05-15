@@ -18,6 +18,7 @@ class LevelManager
     void RemoveLevel(const std::string &name);
     Level *FindLevel(const std::string &name);
     void SetCurrentLevel(const std::string &name);
+    Level *GetCurrentLevel();
 
   protected:
   private:

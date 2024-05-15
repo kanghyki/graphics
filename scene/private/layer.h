@@ -8,26 +8,26 @@ class Actor;
 class Layer
 {
   public:
-    Layer(const std::string &name);
+    Layer();
     ~Layer();
 
     void Tick();
-    void AddActor(Actor *actor);
+    void FinalTick();
 
-    std::string name() const
+    const std::vector<Actor *> &actors() const
     {
-        return name_;
+        return actors_;
     }
-    void set_name(const std::string &name)
+    std::vector<Actor *> actors()
     {
-        name_ = name;
+        return actors_;
     }
+    void AddActor(Actor *actor);
 
   private:
     Layer(const Layer &);
     Layer &operator=(const Layer &);
 
-    std::string name_;
     std::vector<Actor *> actors_;
 };
 

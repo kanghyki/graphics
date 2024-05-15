@@ -57,3 +57,8 @@ void LevelManager::SetCurrentLevel(const std::string &name)
     auto it = all_level_.find(name);
     cur_level_ = it->second;
 }
+
+Level *LevelManager::GetCurrentLevel()
+{
+    return cur_level_;
+}

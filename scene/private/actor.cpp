@@ -22,6 +22,17 @@ void Actor::Tick()
     }
 }
 
+void Actor::FinalTick()
+{
+    for (int i = 0; i < static_cast<int>(ComponentType::EOL); ++i)
+    {
+        if (components_[i])
+        {
+            components_[i]->FinalTick();
+        }
+    }
+}
+
 void Actor::Render()
 {
     if (render_component_)

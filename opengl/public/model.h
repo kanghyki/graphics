@@ -18,6 +18,7 @@ class Model
 {
   public:
     static ModelPtr Load(const std::string &filename);
+    static ModelPtr Create(const std::vector<MeshPtr> &meshes);
     ~Model();
 
     void Draw(const Program *program) const;

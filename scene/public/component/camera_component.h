@@ -1,9 +1,13 @@
 #ifndef INCLUDED_CAMERA_COMPONENT_H
 #define INCLUDED_CAMERA_COMPONENT_H
 
+#include "camera.h"
 #include "component.h"
 #include "libmath.h"
+#include "pso.h"
+#include <vector>
 
+class Actor;
 class CameraComponent : public Component
 {
   public:
@@ -11,24 +15,23 @@ class CameraComponent : public Component
     ~CameraComponent();
 
     void Tick() override;
+    void FinalTick() override;
     void Render() override;
+
+    void set_pso(const GraphicsPSO &pso)
+    {
+        pso_ = pso;
+    }
 
   private:
     CameraComponent(const CameraComponent &);
     CameraComponent &operator=(const CameraComponent &);
 
-    glm::mat4 CalcViewMatrix();
-    glm::mat4 CalcPerspectiveProjectionMatrix();
+    Camera camera_;
 
-    float pitch_;
-    float yaw_;
-    float fov_y_;
-    float aspect_;
-    float near_plane_;
-    float far_plane_;
-
-    glm::vec3 up_;
-    mutable glm::vec3 front_;
+    // uint32_t layer_mask_;
+    std::vector<Actor *> actors_;
+    GraphicsPSO pso_;
 };
 
 #endif

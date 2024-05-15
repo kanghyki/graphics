@@ -6,10 +6,23 @@ ModelPtr Model::Load(const std::string &filename)
 {
     auto model = ModelPtr(new Model());
 
-    if (!model->LoadByAssimp(filename))
+    if (!model || !model->LoadByAssimp(filename))
     {
         return nullptr;
     }
+    return model;
+}
+
+ModelPtr Model::Create(const std::vector<MeshPtr> &meshes)
+{
+    auto model = ModelPtr(new Model());
+
+    if (!model)
+    {
+        return nullptr;
+    }
+    model->meshes_ = meshes;
+
     return model;
 }
 

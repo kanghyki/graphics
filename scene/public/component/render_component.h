@@ -2,28 +2,30 @@
 #define INCLUDED_RENDER_COMPONENT_H
 
 #include "component.h"
-#include "pso.h"
+#include "model.h"
 
 class RenderComponent : public Component
 {
   public:
     RenderComponent(ComponentType type);
-    ~RenderComponent();
+    virtual ~RenderComponent();
 
-    GraphicsPSO pso()
+    void Render() override;
+
+    ModelPtr model()
     {
-        return pso_;
+        return model_;
     }
-    void set_pso(const GraphicsPSO &pso)
+    void set_model(const ModelPtr &model)
     {
-        pso_ = pso;
+        model_ = model;
     }
 
   private:
     RenderComponent(const RenderComponent &);
     RenderComponent &operator=(const RenderComponent &);
 
-    GraphicsPSO pso_;
+    ModelPtr model_;
 };
 
 #endif

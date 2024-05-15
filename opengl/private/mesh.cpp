@@ -111,7 +111,7 @@ MeshPtr Mesh::CreatePlane()
         Vertex{glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
     };
 
-    std::vector<uint32_t> indices = {0, 1, 3, 1, 2, 3};
+    std::vector<uint32_t> indices = {0, 3, 1, 3, 2, 1};
 
     return Create(vertices, indices, GL_TRIANGLES);
 }

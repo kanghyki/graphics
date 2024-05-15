@@ -3,6 +3,7 @@
 
 #include "component.h"
 #include "libmath.h"
+#include "transform.h"
 
 class TransformComponent : public Component
 {
@@ -12,29 +13,20 @@ class TransformComponent : public Component
 
     void Tick() override;
 
-    glm::vec3 position()
+    const Transform &transform() const
     {
-        return position_;
+        return transform_;
     }
-    void set_position(const glm::vec3 &position)
+    Transform &transform()
     {
-        position_ = position;
-    }
-    glm::vec3 scale()
-    {
-        return scale_;
-    }
-    void set_scale(const glm::vec3 &scale)
-    {
-        scale_ = scale;
+        return transform_;
     }
 
   private:
     TransformComponent(const TransformComponent &);
     TransformComponent &operator=(const TransformComponent &);
 
-    glm::vec3 position_;
-    glm::vec3 scale_;
+    Transform transform_;
 };
 
 #endif

@@ -1,7 +1,7 @@
 #include "actor.h"
 #include "layer.h"
 
-Layer::Layer(const std::string &name) : name_(name), actors_(0)
+Layer::Layer() : actors_(0)
 {
 }
 
@@ -11,9 +11,17 @@ Layer::~Layer()
 
 void Layer::Tick()
 {
-    for (const auto &object : actors_)
+    for (const auto &actor : actors_)
     {
-        object->Tick();
+        actor->Tick();
+    }
+}
+
+void Layer::FinalTick()
+{
+    for (const auto &actor : actors_)
+    {
+        actor->FinalTick();
     }
 }
 

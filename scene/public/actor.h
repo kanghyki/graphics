@@ -25,6 +25,7 @@ class Actor
     virtual ~Actor();
 
     void Tick();
+    void FinalTick();
     void Render();
 
     uint32_t id()

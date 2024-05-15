@@ -36,7 +36,6 @@ list(APPEND libraries
     scene
     event
     resource
-    visual_effect
 )
 foreach(lib IN LISTS libraries)
     add_subdirectory(${lib})
