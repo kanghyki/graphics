@@ -15,13 +15,13 @@ class CameraTransformComponent : public TransformComponent
   public:
     CameraTransformComponent()
     {
-        transform().set_position({0.0f, 0.0f, 2.0f});
+        transform().position_ = {0.0f, 0.0f, 2.0f};
     }
     void Tick() override
     {
         float dt = TimeManager::GetInstance()->delta_time();
 
-        glm::vec3 cur_position = transform().position();
+        glm::vec3 &cur_position = transform().position_;
         if (KEY_HOLD(Key::W))
         {
             cur_position.z -= speed * dt;
@@ -46,11 +46,27 @@ class CameraTransformComponent : public TransformComponent
         {
             cur_position.y += speed * dt;
         }
-        transform().set_position(cur_position);
+
+        glm::vec2 delta = InputManager::GetInstance()->delta_cursor();
+        float &yaw_ = transform().rotation_.x;
+        float &pitch_ = transform().rotation_.y;
+        yaw_ -= delta.x * rot_speed_;
+        pitch_ -= delta.y * rot_speed_;
+
+        if (yaw_ < 0.0f)
+            yaw_ += 360.0f;
+        if (yaw_ > 360.0f)
+            yaw_ -= 360.0f;
+
+        if (pitch_ > 89.0f)
+            pitch_ = 89.0f;
+        if (pitch_ < -89.0f)
+            pitch_ = -89.0f;
     }
 
   private:
     float speed = 1.0f;
+    float rot_speed_ = 0.15f;
 };
 
 class RotationTransformComponent : public TransformComponent
@@ -58,11 +74,11 @@ class RotationTransformComponent : public TransformComponent
   public:
     void Tick()
     {
-        float dt = TimeManager::GetInstance()->delta_time();
-        glm::vec3 rotation = transform().rotation();
-        rotation.x *= x_rotation_speed * dt;
-        rotation.y *= y_rotation_speed * dt;
-        transform().set_rotation(rotation);
+        // float dt = TimeManager::GetInstance()->delta_time();
+        // glm::vec3 rotation = transform().rotation();
+        // rotation.x *= x_rotation_speed * dt;
+        // rotation.y *= y_rotation_speed * dt;
+        // transform().set_rotation(rotation);
     }
 
   private:

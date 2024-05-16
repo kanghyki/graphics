@@ -1,4 +1,7 @@
-#version 330 core
+#version 430 core
+
+#include "include/default.incl"
+
 layout (location = 0) in vec3 aPos;
 
 layout (std140) uniform Camera {

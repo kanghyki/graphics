@@ -40,6 +40,7 @@ void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 
 void CursorCallback(GLFWwindow *window, double x, double y)
 {
+    InputManager::GetInstance()->UpdateCursor(x, y);
 }
 
 void MouseCallback(GLFWwindow *window, int button, int action, int modifier)

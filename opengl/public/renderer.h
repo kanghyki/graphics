@@ -4,10 +4,9 @@
 #include "buffer.h"
 #include "camera.h"
 #include "framebuffer.h"
+#include "graphics_pso.h"
 #include "model.h"
 #include "program.h"
-#include "pso.h"
-#include <array>
 
 enum class GRAPHIC_PSO_TYPE
 {

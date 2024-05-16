@@ -45,9 +45,10 @@ class InputManager
     void Update();
 
     void UpdateKey(int key, int action);
-    void UpdateMouse(double x, double y);
+    void UpdateCursor(double x, double y);
 
     InputState GetKeyInputState(Key key);
+    glm::vec2 delta_cursor() const;
 
   private:
     InputManager();
@@ -57,6 +58,7 @@ class InputManager
     static InputManager *instance_;
 
     std::vector<KeyInfo> key_infos_;
+    bool is_moved_{false};
     glm::vec2 cur_cursor_;
     glm::vec2 prev_cursor_;
 };

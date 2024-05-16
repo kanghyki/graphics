@@ -3,8 +3,8 @@
 
 #include "camera.h"
 #include "component.h"
+#include "graphics_pso.h"
 #include "libmath.h"
-#include "pso.h"
 #include <vector>
 
 class Actor;

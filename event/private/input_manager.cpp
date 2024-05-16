@@ -28,7 +28,7 @@ InputManager *InputManager::GetInstance()
     return instance_;
 }
 
-InputManager ::InputManager() : key_infos_(GLFW_KEY_LAST + 1)
+InputManager ::InputManager() : key_infos_(GLFW_KEY_LAST + 1), cur_cursor_(0.0f), prev_cursor_(0.0f)
 {
 }
 
@@ -44,6 +44,7 @@ void InputManager::Init()
         key_infos_[i].prev_press_ = false;
     }
 }
+
 void InputManager::Update()
 {
     for (int i = 0; i < GLFW_KEY_LAST; ++i)
@@ -80,4 +81,25 @@ InputState InputManager::GetKeyInputState(Key key)
 {
     int glfw_key = g_glfw_key_type_map[static_cast<int>(key)];
     return key_infos_[glfw_key].state_;
+}
+
+void InputManager::UpdateCursor(double x, double y)
+{
+    if (is_moved_)
+    {
+        prev_cursor_ = cur_cursor_;
+        cur_cursor_ = glm::vec2(x, y);
+    }
+    else
+    {
+        cur_cursor_ = glm::vec2(x, y);
+        prev_cursor_ = cur_cursor_;
+        is_moved_ = true;
+    }
+}
+
+glm::vec2 InputManager::delta_cursor() const
+{
+    // TODO:
+    return glm::vec2(0.0f);
 }

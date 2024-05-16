@@ -2,6 +2,7 @@
 layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 brightColor;
 
+
 struct Light {
     // Point & Spot
     vec3    position;
