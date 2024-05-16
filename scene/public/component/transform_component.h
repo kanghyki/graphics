@@ -13,6 +13,10 @@ class TransformComponent : public Component
 
     void Tick() override;
 
+    void set_transform(const Transform &t)
+    {
+        transform_ = t;
+    }
     const Transform &transform() const
     {
         return transform_;

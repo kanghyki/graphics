@@ -5,34 +5,17 @@
 #include "framebuffer.h"
 #include "program.h"
 
-struct BlendState
-{
-    bool is_active_;
-};
-
-struct DepthStencilState
-{
-};
+#include "libopengl.h"
 
 struct RasterizerState
 {
-    enum class Face
-    {
-        NONE = GL_NONE,
-        FACE = GL_FRONT,
-        BACK = GL_BACK,
-        FACE_AND_BACK = GL_FRONT_AND_BACK
-    };
-    enum class DrawType
-    {
-        DOT = GL_POINT,
-        WIRE = GL_LINE,
-        FILL = GL_FILL
-    };
-    Face draw_face_{Face::FACE_AND_BACK};
-    DrawType draw_type_{DrawType::FILL};
+    uint32_t polygon_mode{GL_FILL};
 
-    Face cull_face_{Face::BACK};
+    bool is_cull_face_{true};
+    bool is_depth_test_{true};
+    bool is_stencil_test_{false};
+    bool is_blend_{false};
+    uint32_t cull_face_{GL_BACK};
 };
 
 struct GraphicsPSO

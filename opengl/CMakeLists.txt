@@ -37,9 +37,8 @@ PUBLIC
 
 target_link_libraries(${PROJECT_NAME}
 PRIVATE
-    core
     ${EXTERNAL_LIBRARYS}
-PUBLIC
+    core
 )
 
 add_dependencies(${PROJECT_NAME}

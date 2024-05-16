@@ -7,11 +7,16 @@ class Transform
 {
   public:
     Transform();
-    Transform(const Transform &t2);
-    Transform &operator=(const Transform &t2);
+    Transform(const Transform &t);
+    Transform &operator=(const Transform &t);
     ~Transform();
 
-    glm::vec3 position()
+    glm::mat4 CalcModelMatrix() const;
+    glm::mat4 CalcScaleMatrix() const;
+    glm::mat4 CalcRotateMatrix() const;
+    glm::mat4 CalcTranslateMatrix() const;
+
+    glm::vec3 position() const
     {
         return position_;
     }
@@ -19,7 +24,7 @@ class Transform
     {
         position_ = position;
     }
-    glm::vec3 scale()
+    glm::vec3 scale() const
     {
         return scale_;
     }
@@ -27,7 +32,7 @@ class Transform
     {
         scale_ = scale;
     }
-    glm::vec3 rotation()
+    glm::vec3 rotation() const
     {
         return rotation_;
     }

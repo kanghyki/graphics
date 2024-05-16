@@ -52,8 +52,11 @@ class Renderer
     Renderer(const Renderer &);
     Renderer &operator=(const Renderer &);
 
+    void SetRaterizerState(const GraphicsPSO &pso);
+
     static Renderer *instance_;
 
+    // TODO:
     Camera *cur_camera_;
     GraphicsPSO cur_pso_;
 
