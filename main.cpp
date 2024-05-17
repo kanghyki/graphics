@@ -28,12 +28,12 @@ int main(void)
 
     while (!device->IsWindowClose())
     {
-        device->ClearFramebuffer();
         time_manager->Tick();
         input_manager->Update();
         camera_manager->ClearCamera();
         level_manager->Tick();
 
+        device->ClearFramebuffer();
         camera_manager->Render();
         device->SwapBuffer();
     }

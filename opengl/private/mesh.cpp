@@ -1,7 +1,8 @@
 #include "mesh.h"
 
 Mesh::Mesh(uint32_t primitive_type)
-    : primitive_type_(primitive_type), vertex_array_(nullptr), vertex_buffer_(nullptr), index_buffer_(nullptr)
+    : primitive_type_(primitive_type), vertex_array_(nullptr), vertex_buffer_(nullptr), index_buffer_(nullptr),
+      material_(nullptr)
 {
 }
 
@@ -175,8 +176,12 @@ void Mesh::Init(const std::vector<Vertex> &vertices, const std::vector<uint32_t>
     vertex_array_->SetAttrib(3, 3, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, tangent));
 }
 
-void Mesh::Draw() const
+void Mesh::Draw(const Program *program) const
 {
     vertex_array_->Bind();
+    if (material_)
+    {
+        material_->Setup(program);
+    }
     glDrawElements(primitive_type_, index_buffer_->count(), GL_UNSIGNED_INT, 0);
 }

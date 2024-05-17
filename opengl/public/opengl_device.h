@@ -16,12 +16,6 @@ enum class GRAPHIC_PSO_TYPE
     SIMPLE
 };
 
-enum class PROGRAM_TYPE
-{
-    LIGHTING,
-    SIMPLE
-};
-
 class OpenGLDevice
 {
   public:
@@ -47,18 +41,7 @@ class OpenGLDevice
             return simple_pso_;
         }
     }
-    ProgramPtr GetProgram(PROGRAM_TYPE type)
-    {
-        switch (type)
-        {
-        case PROGRAM_TYPE::LIGHTING:
-            return lighting_program_;
-        case PROGRAM_TYPE::SIMPLE:
-            return simple_program_;
-        default:
-            return simple_program_;
-        }
-    }
+
     void ApplyPSO(const GraphicsPSO &pso);
     BufferPtr matrices_ubo()
     {

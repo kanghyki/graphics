@@ -21,20 +21,36 @@ struct RasterizerState
 class GraphicsPSO
 {
   public:
-    GraphicsPSO();
-    GraphicsPSO(const GraphicsPSO &other);
-    GraphicsPSO &operator=(const GraphicsPSO &other);
-    ~GraphicsPSO();
+    GraphicsPSO()
+    {
+    }
 
-    ShaderPtr vs_;
-    ShaderPtr fs_;
-    ShaderPtr gs_;
+    GraphicsPSO(const GraphicsPSO &rhs)
+    {
+        program_ = rhs.program_;
+        rasterizer_state_ = rhs.rasterizer_state_;
+    }
 
-    ProgramPtr program_;
-    FramebufferPtr framebuffer_;
+    GraphicsPSO &operator=(const GraphicsPSO &rhs)
+    {
+        if (this != &rhs)
+        {
+            program_ = rhs.program_;
+            rasterizer_state_ = rhs.rasterizer_state_;
+        }
+        return *this;
+    }
+
+    ~GraphicsPSO()
+    {
+    }
+
+    ShaderPtr vs_{nullptr};
+    ShaderPtr fs_{nullptr};
+    ShaderPtr gs_{nullptr};
+
+    ProgramPtr program_{nullptr};
     RasterizerState rasterizer_state_;
-
-    BufferPtr camera_uniform_;
 };
 
 #endif

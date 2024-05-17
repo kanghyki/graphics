@@ -1,4 +1,5 @@
 #include "material.h"
+#include "opengl_device.h"
 
 Material::Material() : textures_{nullptr}
 {
@@ -13,8 +14,12 @@ MaterialPtr Material::Create()
     return MaterialPtr(new Material());
 }
 
-void Material::SetToProgram(const Program *program) const
+void Material::Setup(const Program *program) const
 {
+    OpenGLDevice::GetInstance()->material_ubo()->Bind();
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(MaterialUniform), &uniform_);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
     int textureCount = 0;
 
     for (size_t i = 0; i < static_cast<size_t>(TextureSize); ++i)
@@ -27,5 +32,4 @@ void Material::SetToProgram(const Program *program) const
             ++textureCount;
         }
     }
-    program->SetUniform("material.shininess", uniform_.m_float_0);
 }

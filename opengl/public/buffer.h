@@ -12,15 +12,15 @@ class Buffer
 
     void Bind() const;
 
-    inline const uint32_t id() const
+    const uint32_t id() const
     {
         return id_;
     }
-    inline size_t stride() const
+    size_t stride() const
     {
         return stride_;
     }
-    inline size_t count() const
+    size_t count() const
     {
         return count_;
     }

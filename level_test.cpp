@@ -4,6 +4,7 @@
 #include "input_manager.h"
 #include "level.h"
 #include "level_manager.h"
+#include "material.h"
 #include "mesh_component.h"
 #include "opengl_device.h"
 #include "time_manager.h"
@@ -15,7 +16,7 @@ class CameraTransformComponent : public TransformComponent
   public:
     CameraTransformComponent()
     {
-        transform().position_ = {0.0f, 0.0f, 2.0f};
+        transform().position_ = {0.0f, 1.0f, 5.0f};
     }
     void Tick() override
     {
@@ -72,18 +73,20 @@ class CameraTransformComponent : public TransformComponent
 class RotationTransformComponent : public TransformComponent
 {
   public:
+    RotationTransformComponent()
+    {
+        transform().scale_ = glm::vec3(0.5f);
+    }
     void Tick()
     {
-        // float dt = TimeManager::GetInstance()->delta_time();
-        // glm::vec3 rotation = transform().rotation();
-        // rotation.x *= x_rotation_speed * dt;
-        // rotation.y *= y_rotation_speed * dt;
-        // transform().set_rotation(rotation);
+        float dt = TimeManager::GetInstance()->delta_time();
+        transform().rotation_.x += x_rotation_speed * dt;
+        transform().rotation_.y += y_rotation_speed * dt;
     }
 
   private:
-    float x_rotation_speed = 180.f;
-    float y_rotation_speed = 90.f;
+    float x_rotation_speed = 45.0f;
+    float y_rotation_speed = 20.0f;
 };
 
 CreateTestLevel::CreateTestLevel()
@@ -98,21 +101,36 @@ void CreateTestLevel::Create()
 {
     Level *level = new Level("test_level");
 
-    Actor *actor = new Actor("my actor");
-    MeshComponent *mesh = new MeshComponent();
-    mesh->set_mesh(Mesh::CreateBox());
-    actor->SetComponent(mesh);
-    actor->SetComponent(new RotationTransformComponent());
+    auto box_material = Material::Create();
+    box_material->uniform().m_vec4_0 = glm::vec4(1.0f, 0.5f, 0.4f, 1.0f);
+    auto box_mesh = Mesh::CreateBox();
+    box_mesh->set_material(box_material);
 
-    Actor *camera_man = new Actor("Camera");
-    CameraComponent *cam = new CameraComponent();
-    cam->set_program(OpenGLDevice::GetInstance()->GetProgram(PROGRAM_TYPE::SIMPLE));
-    cam->set_pso(OpenGLDevice::GetInstance()->GetPSO(GRAPHIC_PSO_TYPE::SIMPLE));
-    camera_man->SetComponent(cam);
-    camera_man->SetComponent(new CameraTransformComponent());
+    auto sphere_material = Material::Create();
+    sphere_material->uniform().m_vec4_0 = glm::vec4(1.0f);
+    auto sphere_mesh = Mesh::CreateSphere(20, 20);
+    sphere_mesh->set_material(sphere_material);
 
-    level->AddActor(actor, LayerType::OBJECTS);
-    level->AddActor(camera_man, LayerType::PLAYER);
+    Actor *box = new Actor("Little box");
+    box->SetComponent(std::shared_ptr<Component>(new RotationTransformComponent()));
+    box->AddMeshComponent();
+    box->GetMeshComponent()->set_mesh(box_mesh);
+
+    Actor *sun = new Actor("My sun");
+    sun->AddLightComponent();
+    sun->AddMeshComponent();
+    sun->GetMeshComponent()->set_mesh(sphere_mesh);
+    sun->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 2.0f, 0.0f);
+    sun->GetTransformComponent()->transform().scale_ *= 0.2;
+
+    Actor *cam = new Actor("Camera man");
+    cam->SetComponent(std::shared_ptr<Component>(new CameraTransformComponent()));
+    cam->AddCameraComponent();
+    cam->GetCameraComponent()->set_pso(OpenGLDevice::GetInstance()->GetPSO(GRAPHIC_PSO_TYPE::SIMPLE));
+
+    level->AddActor(box, LayerType::OBJECTS);
+    level->AddActor(cam, LayerType::PLAYER);
+    level->AddActor(sun, LayerType::WORLD);
 
     LevelManager::GetInstance()->AddLevel(level);
     LevelManager::GetInstance()->SetCurrentLevel(level->name());

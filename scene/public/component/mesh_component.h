@@ -22,21 +22,11 @@ class MeshComponent : public RenderComponent
         mesh_ = mesh;
     }
 
-    MaterialPtr material()
-    {
-        return material_;
-    }
-    void set_material(const MaterialPtr &material)
-    {
-        material_ = material;
-    }
-
   private:
     MeshComponent(const MeshComponent &);
     MeshComponent &operator=(const MeshComponent &);
 
     MeshPtr mesh_;
-    MaterialPtr material_;
 };
 
 #endif

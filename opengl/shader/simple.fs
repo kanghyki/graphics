@@ -2,8 +2,9 @@
 out vec4 fragColor;
 
 #include "include/default.incl"
-uniform vec4 color;
+
+#define COLOR m_vec4_0
 
 void main() {
-    fragColor = color;
+    fragColor = COLOR;
 }

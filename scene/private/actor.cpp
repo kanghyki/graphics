@@ -42,23 +42,53 @@ void Actor::Render(ProgramPtr program)
     }
 }
 
-void Actor::SetComponent(Component *component)
+void Actor::SetComponent(std::shared_ptr<Component> component)
 {
     component->owner_ = this;
     components_[static_cast<int>(component->type())] = component;
     switch (component->type())
     {
     case ComponentType::MESH:
-    case ComponentType::SKY_BOX:
-    case ComponentType::LAND_SCAPE:
-        render_component_ = reinterpret_cast<RenderComponent *>(component);
+        render_component_ = std::reinterpret_pointer_cast<RenderComponent>(component);
         break;
     default:
         break;
     }
 }
 
-Component *Actor::GetComponent(ComponentType type)
+std::shared_ptr<Component> Actor::GetComponent(ComponentType type)
 {
     return components_[static_cast<int>(type)];
+}
+
+void Actor::AddCameraComponent()
+{
+    if (!components_[static_cast<int>(ComponentType::TRANSFORM)])
+    {
+        Actor::AddTransformComponent();
+    }
+    SetComponent(ComponentFactory().Generate(ComponentType::CAMERA));
+}
+
+void Actor::AddTransformComponent()
+{
+    SetComponent(ComponentFactory().Generate(ComponentType::TRANSFORM));
+}
+
+void Actor::AddMeshComponent()
+{
+    if (!components_[static_cast<int>(ComponentType::TRANSFORM)])
+    {
+        Actor::AddTransformComponent();
+    }
+    SetComponent(ComponentFactory().Generate(ComponentType::MESH));
+}
+
+void Actor::AddLightComponent()
+{
+    if (!components_[static_cast<int>(ComponentType::TRANSFORM)])
+    {
+        Actor::AddTransformComponent();
+    }
+    SetComponent(ComponentFactory().Generate(ComponentType::LIGHT));
 }

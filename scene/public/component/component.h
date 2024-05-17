@@ -1,15 +1,21 @@
 #ifndef INCLUDED_COMPONENT_H
 #define INCLUDED_COMPONENT_H
 
-#include "actor.h"
 #include "component_type.h"
+#include <memory>
 
-#define OWNER_COMPONENT_GETTER(className)                                                                              \
-    className *Get##className()                                                                                        \
+class TransformComponent;
+class CameraComponent;
+class LightComponent;
+class MeshComponent;
+#define OWNER_COMPONENT_GETTER_DECL(className) std::shared_ptr<className> Get##className() const;
+#define OWNER_COMPONENT_GETTER_IMPL(className)                                                                         \
+    std::shared_ptr<className> Component::Get##className() const                                                       \
     {                                                                                                                  \
         return owner_->Get##className();                                                                               \
     }
 
+class Actor;
 class Component
 {
     friend class Actor;
@@ -26,12 +32,10 @@ class Component
         return type_;
     }
 
-    OWNER_COMPONENT_GETTER(TransformComponent)
-    OWNER_COMPONENT_GETTER(CameraComponent)
-    OWNER_COMPONENT_GETTER(LightComponent)
-    OWNER_COMPONENT_GETTER(MeshComponent)
-    OWNER_COMPONENT_GETTER(SkyboxComponent)
-    OWNER_COMPONENT_GETTER(LandscapeComponent)
+    OWNER_COMPONENT_GETTER_DECL(TransformComponent)
+    OWNER_COMPONENT_GETTER_DECL(CameraComponent)
+    OWNER_COMPONENT_GETTER_DECL(LightComponent)
+    OWNER_COMPONENT_GETTER_DECL(MeshComponent)
 
   private:
     Component(const Component &);

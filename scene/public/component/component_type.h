@@ -8,8 +8,6 @@ enum class ComponentType
     LIGHT,
     /* Render component */
     MESH,
-    SKY_BOX,
-    LAND_SCAPE,
     EOL
 };
 

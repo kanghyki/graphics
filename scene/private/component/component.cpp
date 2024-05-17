@@ -1,4 +1,5 @@
 #include "component.h"
+#include "actor.h"
 
 Component::Component(ComponentType type) : type_(type), owner_(nullptr)
 {
@@ -15,3 +16,8 @@ void Component::Tick()
 void Component::FinalTick()
 {
 }
+
+OWNER_COMPONENT_GETTER_IMPL(TransformComponent)
+OWNER_COMPONENT_GETTER_IMPL(CameraComponent)
+OWNER_COMPONENT_GETTER_IMPL(LightComponent)
+OWNER_COMPONENT_GETTER_IMPL(MeshComponent)

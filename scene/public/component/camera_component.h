@@ -13,7 +13,7 @@ class NoInherit
     NoInherit()
     {
     }
-    ~NoInherit()
+    virtual ~NoInherit()
     {
     }
 
@@ -35,10 +35,6 @@ class CameraComponent : public Component, private NoInherit
     {
         pso_ = pso;
     }
-    void set_program(ProgramPtr program)
-    {
-        program_ = program;
-    }
 
   private:
     CameraComponent(const CameraComponent &);
@@ -49,7 +45,6 @@ class CameraComponent : public Component, private NoInherit
     // uint32_t layer_mask_;
     std::vector<Actor *> actors_;
     GraphicsPSO pso_;
-    ProgramPtr program_;
 };
 
 #endif

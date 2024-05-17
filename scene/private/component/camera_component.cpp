@@ -1,4 +1,5 @@
 #include "camera_component.h"
+#include "actor.h"
 #include "camera_manager.h"
 #include "level_manager.h"
 #include "opengl_device.h"
@@ -23,11 +24,9 @@ void CameraComponent::FinalTick()
     camera_.set_transform(GetTransformComponent()->transform());
 }
 
-#include <spdlog/spdlog.h>
-
 void CameraComponent::Render()
 {
-    // OpenGLDevice::GetInstance()->ApplyPSO(pso_);
+    OpenGLDevice::GetInstance()->ApplyPSO(pso_);
     OpenGLDevice::GetInstance()->matrices_ubo()->Bind();
     glBufferSubData(GL_UNIFORM_BUFFER, offsetof(MatricesUniform, t_view), sizeof(glm::mat4),
                     glm::value_ptr(camera_.CalcViewMatrix()));
@@ -35,11 +34,10 @@ void CameraComponent::Render()
                     glm::value_ptr(camera_.CalcPerspectiveProjectionMatrix()));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    program_->Use();
-    program_->SetUniform("color", glm::vec4(1.0f));
+    pso_.program_->Use();
 
     for (Actor *actor : actors_)
     {
-        actor->Render(program_);
+        actor->Render(pso_.program_);
     }
 }

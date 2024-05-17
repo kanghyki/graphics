@@ -83,6 +83,7 @@ bool OpenGLDevice::Init()
     glBindBufferBase(GL_UNIFORM_BUFFER, 2, lights_ubo_->id());
     glBindBufferBase(GL_UNIFORM_BUFFER, 3, global_ubo_->id());
 
+    // TODO: remove this
     // auto BindUniform = [](ProgramPtr program) {
     //     uint32_t matrices_block_index = glGetUniformBlockIndex(program->id(), "Matrices");
     //     uint32_t material_block_index = glGetUniformBlockIndex(program->id(), "Material");
@@ -102,12 +103,7 @@ bool OpenGLDevice::Init()
 
     /* PSO */
     lighting_pso_.program_ = lighting_program_;
-    lighting_pso_.framebuffer_ = main_framebuffer_;
-
     simple_pso_.program_ = simple_program_;
-    simple_pso_.framebuffer_ = main_framebuffer_;
-    simple_pso_.rasterizer_state_.polygon_mode = GL_LINE;
-
     post_processing_pso_.rasterizer_state_.is_depth_test_ = false;
 
     /* Post processing */
