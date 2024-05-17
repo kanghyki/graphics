@@ -27,5 +27,5 @@ void Material::SetToProgram(const Program *program) const
             ++textureCount;
         }
     }
-    program->SetUniform("material.shininess", uniform_.shininess_);
+    program->SetUniform("material.shininess", uniform_.m_float_0);
 }

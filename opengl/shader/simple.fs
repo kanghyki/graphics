@@ -1,7 +1,8 @@
 #version 430 core
-
-uniform vec4 color;
 out vec4 fragColor;
+
+#include "include/default.incl"
+uniform vec4 color;
 
 void main() {
     fragColor = color;

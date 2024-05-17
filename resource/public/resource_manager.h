@@ -2,7 +2,6 @@
 #define INCLUDED_RESOURCE_MANAGER_H
 
 #include "mesh.h"
-#include "model.h"
 #include "shader.h"
 #include "texture.h"
 #include <string>
@@ -18,7 +17,6 @@ class ResourceManager
     // TODO:
     Texture2dPtr LoadTexture(const std::string &relative_path) const;
     ShaderPtr LoadShader(const std::string &relative_path) const;
-    ModelPtr LoadModel(const std::string &relative_path) const;
 
   private:
     ResourceManager();

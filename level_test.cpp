@@ -5,7 +5,7 @@
 #include "level.h"
 #include "level_manager.h"
 #include "mesh_component.h"
-#include "renderer.h"
+#include "opengl_device.h"
 #include "time_manager.h"
 #include "transform_component.h"
 #include <iostream>
@@ -100,17 +100,18 @@ void CreateTestLevel::Create()
 
     Actor *actor = new Actor("my actor");
     MeshComponent *mesh = new MeshComponent();
-    mesh->set_model(Model::Create({Mesh::CreateBox()}));
+    mesh->set_mesh(Mesh::CreateBox());
     actor->SetComponent(mesh);
     actor->SetComponent(new RotationTransformComponent());
 
     Actor *camera_man = new Actor("Camera");
     CameraComponent *cam = new CameraComponent();
-    cam->set_pso(Renderer::GetInstance()->GetPSO(GRAPHIC_PSO_TYPE::SIMPLE));
+    cam->set_program(OpenGLDevice::GetInstance()->GetProgram(PROGRAM_TYPE::SIMPLE));
+    cam->set_pso(OpenGLDevice::GetInstance()->GetPSO(GRAPHIC_PSO_TYPE::SIMPLE));
     camera_man->SetComponent(cam);
     camera_man->SetComponent(new CameraTransformComponent());
 
-    level->AddActor(actor, LayerType::PLAYER);
+    level->AddActor(actor, LayerType::OBJECTS);
     level->AddActor(camera_man, LayerType::PLAYER);
 
     LevelManager::GetInstance()->AddLevel(level);

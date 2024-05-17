@@ -3,19 +3,18 @@
 |             Matrices              |
 |                                   |
 \***********************************/
-layout (std140, binding = 0) uniform Matrices {
+layout(binding = 0, std140) uniform Matrices {
     mat4 t_view;
     mat4 t_proj;
     mat4 t_model;
 };
-
 
 /***********************************\
 |                                   |
 |             Material              |
 |                                   |
 \***********************************/
-layout (std140, binding = 1) uniform Material {
+layout(binding = 1, std140) uniform Material {
     int         m_int_0;
     int         m_int_1;
     int         m_int_2;
@@ -76,7 +75,7 @@ struct Light {
     int     type;
 };
 
-layout (std140, binding = 2) uniform Lights {
+layout(binding = 2, std140) uniform Lights {
     int     l_light_count;
     Light   l_lights[32];
 };
@@ -87,9 +86,10 @@ layout (std140, binding = 2) uniform Lights {
 |             Global                |
 |                                   |
 \***********************************/
-layout (std140, binding = 3) uniform Global {
-    vec2    g_res;
-    float   g_dt;
+layout (binding = 3, std140) uniform Global {
+    vec2    g_resolution;
+    float   g_time;
+    float   g_delta_time;
 };
 
 uniform sampler2D g_texture_0;

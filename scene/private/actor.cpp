@@ -1,5 +1,6 @@
 #include "actor.h"
 #include "component.h"
+#include "render_component.h"
 
 uint32_t Actor::s_id_ = 1;
 
@@ -33,11 +34,11 @@ void Actor::FinalTick()
     }
 }
 
-void Actor::Render()
+void Actor::Render(ProgramPtr program)
 {
     if (render_component_)
     {
-        render_component_->Render();
+        render_component_->Render(program);
     }
 }
 
@@ -50,7 +51,7 @@ void Actor::SetComponent(Component *component)
     case ComponentType::MESH:
     case ComponentType::SKY_BOX:
     case ComponentType::LAND_SCAPE:
-        render_component_ = component;
+        render_component_ = reinterpret_cast<RenderComponent *>(component);
         break;
     default:
         break;

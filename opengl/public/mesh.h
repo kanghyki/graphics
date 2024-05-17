@@ -2,7 +2,7 @@
 #define INCLUDED_MESH_H
 
 #include "buffer.h"
-#include "material.h"
+#include "libmath.h"
 #include "ptr.h"
 #include "vertex_array.h"
 #include <vector>
@@ -27,16 +27,7 @@ class Mesh
     static void ComputeTangents(std::vector<Vertex> &vertices, const std::vector<uint32_t> &indices);
     ~Mesh();
 
-    void Draw(const Program *program) const;
-
-    inline MaterialPtr material() const
-    {
-        return material_;
-    }
-    inline void set_material(MaterialPtr material)
-    {
-        material_ = material;
-    }
+    void Draw() const;
 
   private:
     Mesh(uint32_t primitive_type);
@@ -49,7 +40,6 @@ class Mesh
     VertexArrayUPtr vertex_array_;
     BufferPtr vertex_buffer_;
     BufferPtr index_buffer_;
-    MaterialPtr material_;
 };
 
 #endif

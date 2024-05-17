@@ -7,8 +7,20 @@
 #include "libopengl.h"
 #include "mesh.h"
 #include "program.h"
-#include "uniform_buffer_struct.h"
+#include "uniform_struct.h"
 #include <string>
+
+enum class GRAPHIC_PSO_TYPE
+{
+    LIGHTING,
+    SIMPLE
+};
+
+enum class PROGRAM_TYPE
+{
+    LIGHTING,
+    SIMPLE
+};
 
 class OpenGLDevice
 {
@@ -20,7 +32,50 @@ class OpenGLDevice
     bool IsWindowClose();
     void SwapBuffer();
     void Terminate();
+    void ClearFramebuffer();
     GLFWwindow *glfw_window();
+
+    GraphicsPSO GetPSO(GRAPHIC_PSO_TYPE type)
+    {
+        switch (type)
+        {
+        case GRAPHIC_PSO_TYPE::LIGHTING:
+            return lighting_pso_;
+        case GRAPHIC_PSO_TYPE::SIMPLE:
+            return simple_pso_;
+        default:
+            return simple_pso_;
+        }
+    }
+    ProgramPtr GetProgram(PROGRAM_TYPE type)
+    {
+        switch (type)
+        {
+        case PROGRAM_TYPE::LIGHTING:
+            return lighting_program_;
+        case PROGRAM_TYPE::SIMPLE:
+            return simple_program_;
+        default:
+            return simple_program_;
+        }
+    }
+    void ApplyPSO(const GraphicsPSO &pso);
+    BufferPtr matrices_ubo()
+    {
+        return matrices_ubo_;
+    }
+    BufferPtr material_ubo()
+    {
+        return material_ubo_;
+    }
+    BufferPtr lights_ubo()
+    {
+        return lights_ubo_;
+    }
+    BufferPtr global_ubo()
+    {
+        return global_ubo_;
+    }
 
   private:
     OpenGLDevice();

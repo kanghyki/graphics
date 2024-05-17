@@ -4,7 +4,6 @@
 #include "level_manager.h"
 #include "level_test.h"
 #include "opengl_device.h"
-#include "renderer.h"
 #include "resource_manager.h"
 #include "time_manager.h"
 
@@ -16,11 +15,9 @@ int main(void)
     LevelManager *level_manager = LevelManager::GetInstance();
     CameraManager *camera_manager = CameraManager::GetInstance();
     ResourceManager *resource_manager = ResourceManager::GetInstance();
-    Renderer *renderer = Renderer::GetInstance();
 
     device->Init();
     event::glfw_callback_init();
-    renderer->Init();
 
     input_manager->Init();
     level_manager->Init();
@@ -31,14 +28,14 @@ int main(void)
 
     while (!device->IsWindowClose())
     {
+        device->ClearFramebuffer();
         time_manager->Tick();
         input_manager->Update();
         camera_manager->ClearCamera();
         level_manager->Tick();
-        renderer->ClearFramebuffer();
 
         camera_manager->Render();
-        renderer->Render();
+        device->SwapBuffer();
     }
     device->Terminate();
 

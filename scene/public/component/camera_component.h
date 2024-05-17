@@ -7,8 +7,21 @@
 #include "libmath.h"
 #include <vector>
 
+class NoInherit
+{
+  private:
+    NoInherit()
+    {
+    }
+    ~NoInherit()
+    {
+    }
+
+    friend CameraComponent;
+};
+
 class Actor;
-class CameraComponent : public Component
+class CameraComponent : public Component, private NoInherit
 {
   public:
     CameraComponent();
@@ -16,11 +29,15 @@ class CameraComponent : public Component
 
     void Tick() override;
     void FinalTick() override;
-    void Render() override;
+    void Render();
 
     void set_pso(const GraphicsPSO &pso)
     {
         pso_ = pso;
+    }
+    void set_program(ProgramPtr program)
+    {
+        program_ = program;
     }
 
   private:
@@ -32,6 +49,7 @@ class CameraComponent : public Component
     // uint32_t layer_mask_;
     std::vector<Actor *> actors_;
     GraphicsPSO pso_;
+    ProgramPtr program_;
 };
 
 #endif

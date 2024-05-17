@@ -15,7 +15,3 @@ void Component::Tick()
 void Component::FinalTick()
 {
 }
-
-void Component::Render()
-{
-}

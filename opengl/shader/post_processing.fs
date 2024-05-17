@@ -1,17 +1,14 @@
-#version 330 core
-in vec4 vertexColor;
+#version 430 core
 in vec2 texCoord;
-
 out vec4 fragColor;
 
-struct Material {
-    sampler2D ambient;
-};
-uniform Material material;
+#include "include/default.incl"
+
+#define main_texture m_ambient
 uniform float gamma;
 
 void main() {
-  vec3 pixel = texture(material.ambient, texCoord).xyz;
+  vec3 pixel = texture(main_texture, texCoord).xyz;
   vec3 result = pow(pixel.rgb, vec3(gamma));
 
   fragColor = vec4(result, 1.0);

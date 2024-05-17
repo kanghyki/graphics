@@ -4,11 +4,7 @@
 #include "program.h"
 #include "ptr.h"
 #include "texture.h"
-
-struct MaterialUniform
-{
-    float shininess_{30.0f};
-};
+#include "uniform_struct.h"
 
 enum class TextureType
 {
@@ -27,11 +23,16 @@ class Material
     ~Material();
 
     void SetToProgram(const Program *program) const;
+
+    void set_shineness(float shineness)
+    {
+        uniform_.m_float_0 = shineness;
+    }
+
     Texture2dPtr texture(TextureType type)
     {
         return textures_[static_cast<int>(type)];
     }
-
     void set_texture(TextureType type, Texture2dPtr texture)
     {
         textures_[static_cast<int>(type)] = texture;
@@ -46,10 +47,10 @@ class Material
     {
         TextureSize = 5
     };
-    const char *texture_type_uniform_name[TextureSize] = {"material.ambient", "material.diffuse", "material.specular",
-                                                          "material.normal", "material.height"};
+    const char *texture_type_uniform_name[TextureSize] = {"m_ambient", "m_diffuse", "m_specular", "m_normal",
+                                                          "m_height"};
     Texture2dPtr textures_[TextureSize];
-    struct MaterialUniform uniform_;
+    MaterialUniform uniform_;
 };
 
 #endif

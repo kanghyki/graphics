@@ -1,16 +1,16 @@
-#ifndef INCLUDED_UNIFORM_BUFFER_STRUCT_H
-#define INCLUDED_UNIFORM_BUFFER_STRUCT_H
+#ifndef INCLUDED_UNIFORM_STRUCT_H
+#define INCLUDED_UNIFORM_STRUCT_H
 
 #include "libmath.h"
 
-struct MatricesUBO
+struct MatricesUniform
 {
     glm::mat4 t_view;
     glm::mat4 t_proj;
     glm::mat4 t_model;
 };
 
-struct MaterialUBO
+struct MaterialUniform
 {
     int m_int_0;
     int m_int_1;
@@ -60,16 +60,17 @@ struct LightGLSL
     int type;
 };
 
-struct LightsUBO
+struct LightsUniform
 {
     int l_light_count;
     LightGLSL l_lights[32];
 };
 
-struct GlobalUBO
+struct GlobalUniform
 {
-    glm::vec2 g_res;
-    float g_dt;
+    glm::vec2 g_resolution;
+    float g_time;
+    float g_delta_time;
 };
 
 #endif

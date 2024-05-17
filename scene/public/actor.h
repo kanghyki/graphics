@@ -2,8 +2,10 @@
 #define INCLUDED_ACTOR_H
 
 #include "component_type.h"
+#include "program.h"
 #include <string>
 
+class RenderComponent;
 class TransformComponent;
 class CameraComponent;
 class LightComponent;
@@ -26,7 +28,7 @@ class Actor
 
     void Tick();
     void FinalTick();
-    void Render();
+    void Render(ProgramPtr program);
 
     uint32_t id()
     {
@@ -52,7 +54,7 @@ class Actor
     const uint32_t id_;
     std::string name_;
     Component *components_[static_cast<int>(ComponentType::EOL)];
-    Component *render_component_;
+    RenderComponent *render_component_;
 };
 
 #endif

@@ -19,7 +19,6 @@ class Component
     virtual ~Component();
 
     virtual void Tick();
-    virtual void Render();
     virtual void FinalTick();
 
     ComponentType type()

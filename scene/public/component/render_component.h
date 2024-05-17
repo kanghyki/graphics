@@ -2,7 +2,7 @@
 #define INCLUDED_RENDER_COMPONENT_H
 
 #include "component.h"
-#include "model.h"
+#include "program.h"
 
 class RenderComponent : public Component
 {
@@ -10,22 +10,11 @@ class RenderComponent : public Component
     RenderComponent(ComponentType type);
     virtual ~RenderComponent();
 
-    void Render() override;
-
-    ModelPtr model()
-    {
-        return model_;
-    }
-    void set_model(const ModelPtr &model)
-    {
-        model_ = model;
-    }
+    virtual void Render(ProgramPtr program) = 0;
 
   private:
     RenderComponent(const RenderComponent &);
     RenderComponent &operator=(const RenderComponent &);
-
-    ModelPtr model_;
 };
 
 #endif
