@@ -1,126 +1,62 @@
 #version 330 core
 layout (location = 0) out vec4 fragColor;
-layout (location = 1) out vec4 brightColor;
-
-
-struct Light {
-    // Point & Spot
-    vec3    position;
-    float   constant;
-    float   linear;
-    float   quadratic;
-
-    // Directional & Spot
-    vec3    direction;
-
-    // Spot
-    vec2    cutoff;
-
-    // All
-    vec3    ambient;
-    vec3    diffuse;
-    vec3    specular;
-
-    int     type;
-};
-uniform Light light;
-
-struct Material {
-    sampler2D   ambient;
-    sampler2D   diffuse;
-    sampler2D   specular;
-    sampler2D   normal;
-    sampler2D   height;
-    sampler2D   tangent;
-    float       shininess;
-};
-uniform Material material;
 
 in VS_OUT {
   vec3 position;
   vec3 normal;
   vec2 texCoord;
-  vec4 lightPosition; // directional shadow
 } fs_in;
 
-uniform vec3 viewPos;
-uniform bool isBlinn;
+#include "include/default.incl"
 
-// directional shadow
-uniform sampler2D depthMap;
+#define texture_ambient m_ambient
+#define texture_diffuse m_diffuse
+#define texture_specular m_specular
+#define texture_normal m_normal
+#define texture_height m_height
+#define texture_tangent m_tangent
 
-// omni-directional shadow
-uniform samplerCube depthMap3d;
-uniform float far_plane;
+#define m_shininess m_float_0
 
-float ShadowCalculation2d(vec3 normal, vec3 lightDir) {
-    vec3  depthMapCoords  = (fs_in.lightPosition.xyz / fs_in.lightPosition.w) * 0.5 + 0.5;
-    float closestDepth    = texture(depthMap, depthMapCoords.xy).r;
-    float currentDepth    = depthMapCoords.z;
-    float bias            = max(0.02 * (1.0 - dot(normal, lightDir)), 0.001);
-    float shadow          = 0.0;
-    vec2  texelSize       = 1.0 / textureSize(depthMap, 0);
-    int   count           = 1;
+#define light l_lights
 
-    for(int x = -1; x <= 1; ++x) {
-        for (int y = -1; y <= 1; ++y) {
-            float pcfDepth = texture(depthMap, depthMapCoords.xy + vec2(x, y) * texelSize).r;
-            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
-            ++count;
-        }
-    }
-    shadow /= count;
+#define DIRECTIONAL (0)
+#define POINT (1)
+#define SPOT (2)
 
-    return shadow;
-}
-
-float ShadowCalculation3d()
-{
-    vec3  toLight       = fs_in.position - light.position;
-    float closestDepth  = texture(depthMap3d, normalize(toLight)).r * far_plane;
-    float currentDepth  = length(toLight);
-    float bias          = 0.05; 
-    float shadow        = currentDepth -  bias > closestDepth ? 1.0 : 0.0;
-
-    return shadow;
-}  
+vec3 viewPos = vec3(0.0, 1.0, 5.0);
 
 vec3 calcAmbient(vec3 texColor) {
     return texColor * light.ambient;
 }
 
 vec3 calcDiffuse(vec3 normal, vec3 texColor, vec3 lightDir) {
-    float   diff      = max(dot(normal, lightDir), 0.0);
+    float diff = max(dot(normal, lightDir), 0.0);
 
     return diff * texColor * light.diffuse;
 }
 
 vec3 calcSpecular(vec3 normal, vec3 lightDir) {
-    vec3    specColor = texture(material.specular, fs_in.texCoord).xyz;
+    vec3    specColor = texture(texture_specular, fs_in.texCoord).xyz;
     float   spec      = 0.0;
     vec3    viewDir   = normalize(viewPos - fs_in.position);
-    if (isBlinn) {
-      vec3 halfDir    = normalize(lightDir + viewDir);
-      spec            = pow(max(dot(halfDir, normal), 0.0), material.shininess);
-    } else {
-      vec3 reflectDir = reflect(-lightDir, normal);
-      spec            = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    }
+    vec3    halfDir   = normalize(lightDir + viewDir);
+
+    spec = pow(max(dot(halfDir, normal), 0.0), m_shininess);
 
     return spec * specColor * light.specular;
 }
 
 vec3 directionalLight() {
-    vec3  texColor = texture(material.diffuse, fs_in.texCoord).xyz;
+    vec3  texColor = texture(texture_diffuse, fs_in.texCoord).xyz;
     vec3  lightDir = normalize(-light.direction);
     vec3  normal   = normalize(fs_in.normal);
 
     vec3  ambient  = calcAmbient(texColor);
     vec3  diffuse  = calcDiffuse(normal, texColor, lightDir);
     vec3  specular = calcSpecular(normal, lightDir);
-    float shadow   = ShadowCalculation2d(normal, lightDir);
 
-    return ambient + (diffuse + specular) * (1.0 - shadow);
+    return ambient + diffuse + specular;
 }
 
 float calcAttenuation(float dist) {
@@ -128,7 +64,7 @@ float calcAttenuation(float dist) {
 }
 
 vec3 pointLight() {
-    vec3    texColor    = texture(material.diffuse, fs_in.texCoord).xyz;
+    vec3    texColor    = texture(texture_diffuse, fs_in.texCoord).xyz;
     float   dist        = length(light.position - fs_in.position);
     float   attenuation = calcAttenuation(dist);
     vec3    lightDir    = (light.position - fs_in.position) / dist;
@@ -137,13 +73,12 @@ vec3 pointLight() {
     vec3    ambient   = calcAmbient(texColor);
     vec3    diffuse   = calcDiffuse(normal, texColor, lightDir);
     vec3    specular  = calcSpecular(normal, lightDir);
-    float   shadow    = ShadowCalculation3d();
 
-    return (ambient + (diffuse + specular) * (1.0 - shadow)) * attenuation;
+    return (ambient + diffuse + specular) * attenuation;
 }
 
 vec3 spotLight() {
-    vec3    texColor    = texture(material.diffuse, fs_in.texCoord).xyz;
+    vec3    texColor    = texture(texture_diffuse, fs_in.texCoord).xyz;
     float   dist        = length(light.position - fs_in.position);
     float   attenuation = calcAttenuation(dist);
     vec3    lightDir    = (light.position - fs_in.position) / dist;
@@ -158,8 +93,7 @@ vec3 spotLight() {
         vec3  normal    = normalize(fs_in.normal);
         vec3  diffuse   = calcDiffuse(normal, texColor, lightDir);
         vec3  specular  = calcSpecular(normal, lightDir);
-        float shadow    = ShadowCalculation2d(normal, lightDir);
-        result += (diffuse + specular) * intensity * (1.0 - shadow);
+        result += (diffuse + specular) * intensity;
     }
     result *= attenuation;
 
@@ -169,21 +103,13 @@ vec3 spotLight() {
 void main() {
     vec3 result;
 
-    if (light.type == 0) {
+    if (light.type == DIRECTIONAL) {
         result = directionalLight();
-    } else if (light.type == 1) {
+    } else if (light.type == POINT) {
         result = pointLight();
     } else {
         result = spotLight();
     }
 
     fragColor = vec4(result, 1.0);
-
-    float brightness = dot(fragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
-    if(brightness > 0.85) {
-        brightColor = vec4(fragColor.rgb, 1.0);
-    }
-    else {
-        brightColor = vec4(0.0, 0.0, 0.0, 1.0);
-    }
 }

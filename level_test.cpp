@@ -1,15 +1,15 @@
-#include "level_test.h"
 #include "actor.h"
 #include "camera_component.h"
 #include "input_manager.h"
 #include "level.h"
 #include "level_manager.h"
+#include "level_test.h"
+#include "light_component.h"
 #include "material.h"
 #include "mesh_component.h"
 #include "opengl_device.h"
 #include "time_manager.h"
 #include "transform_component.h"
-#include <iostream>
 
 class CameraTransformComponent : public TransformComponent
 {
@@ -101,13 +101,22 @@ void CreateTestLevel::Create()
 {
     Level *level = new Level("test_level");
 
+    auto diffuse_tex = Texture2d::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.7f, 0.7f, 0.7f, 1.0f)).get());
+    auto specular_tex = Texture2d::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
+
     auto box_material = Material::Create();
+    box_material->set_texture(TextureType::DIFFUSE, diffuse_tex);
+    box_material->set_texture(TextureType::SPECULAR, specular_tex);
+    box_material->set_shineness(30.0f);
     box_material->uniform().m_vec4_0 = glm::vec4(1.0f, 0.5f, 0.4f, 1.0f);
     auto box_mesh = Mesh::CreateBox();
     box_mesh->set_material(box_material);
 
     auto sphere_material = Material::Create();
+    sphere_material->set_texture(TextureType::DIFFUSE, diffuse_tex);
+    sphere_material->set_texture(TextureType::SPECULAR, specular_tex);
     sphere_material->uniform().m_vec4_0 = glm::vec4(1.0f);
+    sphere_material->set_shineness(30.0f);
     auto sphere_mesh = Mesh::CreateSphere(20, 20);
     sphere_mesh->set_material(sphere_material);
 
@@ -126,7 +135,7 @@ void CreateTestLevel::Create()
     Actor *cam = new Actor("Camera man");
     cam->SetComponent(std::shared_ptr<Component>(new CameraTransformComponent()));
     cam->AddCameraComponent();
-    cam->GetCameraComponent()->set_pso(OpenGLDevice::GetInstance()->GetPSO(GRAPHIC_PSO_TYPE::SIMPLE));
+    cam->GetCameraComponent()->set_pso(OpenGLDevice::GetInstance()->GetPSO(GRAPHIC_PSO_TYPE::LIGHTING));
 
     level->AddActor(box, LayerType::OBJECTS);
     level->AddActor(cam, LayerType::PLAYER);

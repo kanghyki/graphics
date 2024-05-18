@@ -72,9 +72,16 @@ ExternalProject_Add(
   TEST_COMMAND ""
   )
 set(EXTERNAL_PROJECTS ${EXTERNAL_PROJECTS} dep_assimp)
+if (WINDOWS)
 set(EXTERNAL_LIBRARYS ${EXTERNAL_LIBRARYS}
   assimp-vc143-mt$<$<CONFIG:Debug>:d>
   zlibstatic$<$<CONFIG:Debug>:d>
   IrrXML$<$<CONFIG:Debug>:d>
 )
-
+else ()
+set(EXTERNAL_LIBRARYS ${EXTERNAL_LIBRARYS}
+  assimp
+  zlibstatic
+  IrrXML
+)
+endif()

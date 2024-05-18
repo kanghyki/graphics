@@ -1,8 +1,8 @@
-#version 430 core
+// TODO: 330 -> 430
+#version 330 core
+layout (location = 0) in vec3 aPos;
 
 #include "include/default.incl"
-
-layout (location = 0) in vec3 aPos;
 
 #define proj t_proj
 #define view t_view

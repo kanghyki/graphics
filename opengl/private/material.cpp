@@ -1,8 +1,9 @@
 #include "material.h"
 #include "opengl_device.h"
 
-Material::Material() : textures_{nullptr}
+Material::Material()
 {
+    textures_.fill(nullptr);
 }
 
 Material::~Material()
@@ -16,9 +17,7 @@ MaterialPtr Material::Create()
 
 void Material::Setup(const Program *program) const
 {
-    OpenGLDevice::GetInstance()->material_ubo()->Bind();
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(MaterialUniform), &uniform_);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    uniform_.Sub();
 
     int textureCount = 0;
 

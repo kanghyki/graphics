@@ -3,7 +3,8 @@
 |             Matrices              |
 |                                   |
 \***********************************/
-layout(binding = 0, std140) uniform Matrices {
+// layout(binding = 0, std140) uniform Matrices {
+layout (std140) uniform Matrices {
     mat4 t_view;
     mat4 t_proj;
     mat4 t_model;
@@ -14,7 +15,8 @@ layout(binding = 0, std140) uniform Matrices {
 |             Material              |
 |                                   |
 \***********************************/
-layout(binding = 1, std140) uniform Material {
+// layout(binding = 1, std140) uniform Material {
+layout (std140) uniform Material {
     int         m_int_0;
     int         m_int_1;
     int         m_int_2;
@@ -41,12 +43,12 @@ layout(binding = 1, std140) uniform Material {
     mat4        m_mat4_3;
 };
 
-uniform sampler2D   m_ambient;
-uniform sampler2D   m_diffuse;
-uniform sampler2D   m_specular;
-uniform sampler2D   m_normal;
-uniform sampler2D   m_height;
-uniform sampler2D   m_tangent;
+uniform sampler2D m_ambient;
+uniform sampler2D m_diffuse;
+uniform sampler2D m_specular;
+uniform sampler2D m_normal;
+uniform sampler2D m_height;
+uniform sampler2D m_tangent;
 
 
 /***********************************\
@@ -55,11 +57,13 @@ uniform sampler2D   m_tangent;
 |                                   |
 \***********************************/
 struct Light {
+    int     type;
     // Point & Spot
-    vec3    position;
     float   constant;
     float   linear;
     float   quadratic;
+
+    vec3    position;
 
     // Directional & Spot
     vec3    direction;
@@ -71,13 +75,15 @@ struct Light {
     vec3    ambient;
     vec3    diffuse;
     vec3    specular;
-
-    int     type;
 };
 
-layout(binding = 2, std140) uniform Lights {
-    int     l_light_count;
-    Light   l_lights[32];
+// layout(binding = 2, std140) uniform Lights {
+// layout(std140) uniform Lights {
+//     int     l_light_count;
+//     Light   l_lights[32];
+// };
+layout (std140) uniform Lights {
+    Light   l_lights;
 };
 
 
@@ -86,7 +92,8 @@ layout(binding = 2, std140) uniform Lights {
 |             Global                |
 |                                   |
 \***********************************/
-layout (binding = 3, std140) uniform Global {
+// layout(binding = 3, std140) uniform Global {
+layout (std140) uniform Global {
     vec2    g_resolution;
     float   g_time;
     float   g_delta_time;

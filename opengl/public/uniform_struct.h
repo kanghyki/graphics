@@ -3,8 +3,14 @@
 
 #include "libmath.h"
 
+/*
+ * "include/defualt.incl"
+ * Must keep in sync with GLSL
+ */
+
 struct MatricesUniform
 {
+    void Sub() const;
     glm::mat4 t_view;
     glm::mat4 t_proj;
     glm::mat4 t_model;
@@ -12,6 +18,7 @@ struct MatricesUniform
 
 struct MaterialUniform
 {
+    void Sub() const;
     int m_int_0;
     int m_int_1;
     int m_int_2;
@@ -38,36 +45,43 @@ struct MaterialUniform
     glm::mat4 m_mat4_3;
 };
 
-struct LightGLSL
+struct LightUniform
 {
+    void Sub() const;
     // Point & Spot
-    glm::vec3 position;
-    float constant;
-    float linear;
-    float quadratic;
+    int type;        // 4
+    float constant;  // 4
+    float linear;    // 4
+    float quadratic; // 4 (16)
+
+    glm::vec3 position; // 12
+    float padding1;
 
     // Directional & Spot
-    glm::vec3 direction;
+    glm::vec3 direction; // 12
+    float padding2;
 
     // Spot
-    glm::vec2 cutoff;
+    glm::vec2 cutoff; // 8
+    float padding3[2];
 
     // All
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-
-    int type;
+    glm::vec3 ambient; // 12
+    float padding4;
+    glm::vec3 diffuse; // 12
+    float padding5;
+    glm::vec3 specular; // 12
+    float padding6;
 };
 
 struct LightsUniform
 {
-    int l_light_count;
-    LightGLSL l_lights[32];
+    LightUniform l_lights;
 };
 
 struct GlobalUniform
 {
+    void Sub() const;
     glm::vec2 g_resolution;
     float g_time;
     float g_delta_time;

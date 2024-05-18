@@ -83,20 +83,21 @@ bool OpenGLDevice::Init()
     glBindBufferBase(GL_UNIFORM_BUFFER, 2, lights_ubo_->id());
     glBindBufferBase(GL_UNIFORM_BUFFER, 3, global_ubo_->id());
 
-    // TODO: remove this
-    // auto BindUniform = [](ProgramPtr program) {
-    //     uint32_t matrices_block_index = glGetUniformBlockIndex(program->id(), "Matrices");
-    //     uint32_t material_block_index = glGetUniformBlockIndex(program->id(), "Material");
-    //     uint32_t lights_block_index = glGetUniformBlockIndex(program->id(), "Lights");
-    //     uint32_t global_block_index = glGetUniformBlockIndex(program->id(), "Global");
-    //     SPDLOG_INFO("{} {} {} {}", matrices_block_index, material_block_index, lights_block_index,
-    //     global_block_index); glUniformBlockBinding(program->id(), matrices_block_index, 0);
-    //     glUniformBlockBinding(program->id(), material_block_index, 1);
-    //     glUniformBlockBinding(program->id(), lights_block_index, 2);
-    //     glUniformBlockBinding(program->id(), global_block_index, 3);
-    // };
-    // uniform_bind(lighting_program_->id());
-    // BindUniform(simple_program_);
+// for GLSL version 330
+#ifdef __APPLE__
+    auto BindUniform = [](ProgramPtr program) {
+        uint32_t matrices_block_index = glGetUniformBlockIndex(program->id(), "Matrices");
+        uint32_t material_block_index = glGetUniformBlockIndex(program->id(), "Material");
+        uint32_t lights_block_index = glGetUniformBlockIndex(program->id(), "Lights");
+        uint32_t global_block_index = glGetUniformBlockIndex(program->id(), "Global");
+        glUniformBlockBinding(program->id(), matrices_block_index, 0);
+        glUniformBlockBinding(program->id(), material_block_index, 1);
+        glUniformBlockBinding(program->id(), lights_block_index, 2);
+        glUniformBlockBinding(program->id(), global_block_index, 3);
+    };
+    BindUniform(lighting_program_);
+    BindUniform(simple_program_);
+#endif
 
     /* framebuffer */
     main_framebuffer_ = Framebuffer::Create({Texture2d::Create(width_, height_)});
@@ -147,25 +148,57 @@ GLFWwindow *OpenGLDevice::glfw_window()
 
 void OpenGLDevice::ApplyPSO(const GraphicsPSO &pso)
 {
-    uint32_t enabled = 0;
+    /*
+     * cull face
+     */
     if (pso.rasterizer_state_.is_cull_face_)
     {
-        enabled |= GL_CULL_FACE;
+        glEnable(GL_CULL_FACE);
         glCullFace(pso.rasterizer_state_.cull_face_);
     }
+    else
+    {
+        glDisable(GL_CULL_FACE);
+    }
+
+    /*
+     * blend
+     */
     if (pso.rasterizer_state_.is_blend_)
     {
-        enabled |= GL_BLEND;
+        glEnable(GL_BLEND);
     }
+    else
+    {
+        glDisable(GL_BLEND);
+    }
+
+    /*
+     * depth test
+     */
     if (pso.rasterizer_state_.is_depth_test_)
     {
-        enabled |= GL_DEPTH_TEST;
+        glEnable(GL_DEPTH_TEST);
     }
+    else
+    {
+        glDisable(GL_DEPTH_TEST);
+    }
+
+    /*
+     * stencil test
+     */
     if (pso.rasterizer_state_.is_stencil_test_)
     {
-        enabled |= GL_STENCIL;
+        glEnable(GL_STENCIL_TEST);
     }
-    glDisable(GL_CULL_FACE | GL_BLEND | GL_DEPTH_TEST | GL_STENCIL);
-    glEnable(enabled);
+    else
+    {
+        glDisable(GL_STENCIL_TEST);
+    }
+
+    /*
+     * Polygon
+     */
     glPolygonMode(GL_FRONT_AND_BACK, pso.rasterizer_state_.polygon_mode);
 }

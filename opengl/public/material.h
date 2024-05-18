@@ -5,6 +5,7 @@
 #include "ptr.h"
 #include "texture.h"
 #include "uniform_struct.h"
+#include <array>
 
 enum class TextureType
 {
@@ -12,7 +13,8 @@ enum class TextureType
     DIFFUSE,
     SPECULAR,
     NORMAL,
-    HEIGHT
+    HEIGHT,
+    TANGENT
 };
 
 CLASS_PTR(Material);
@@ -54,11 +56,11 @@ class Material
 
     enum
     {
-        TextureSize = 5
+        TextureSize = 6
     };
-    const char *texture_type_uniform_name[TextureSize] = {"m_ambient", "m_diffuse", "m_specular", "m_normal",
-                                                          "m_height"};
-    Texture2dPtr textures_[TextureSize];
+    const char *texture_type_uniform_name[TextureSize] = {"m_ambient", "m_diffuse", "m_specular",
+                                                          "m_normal",  "m_height",  "m_tangent"};
+    std::array<Texture2dPtr, TextureSize> textures_;
     MaterialUniform uniform_;
 };
 
