@@ -1,4 +1,5 @@
 #include "camera_manager.h"
+#include "editor.h"
 #include "event_callback.h"
 #include "input_manager.h"
 #include "level_manager.h"
@@ -17,6 +18,10 @@ int main(void)
     ResourceManager *resource_manager = ResourceManager::GetInstance();
 
     device->Init();
+#ifdef EDITOR
+    Editor *editor = Editor::GetInstance();
+    editor->Init(device->glfw_window());
+#endif
     event::glfw_callback_init();
 
     input_manager->Init();
@@ -35,6 +40,11 @@ int main(void)
 
         device->ClearFramebuffer();
         camera_manager->Render();
+#ifdef EDITOR
+        editor->NewFrame();
+        editor->Render();
+#endif
+
         device->SwapBuffer();
     }
     device->Terminate();

@@ -3,8 +3,7 @@
 |             Matrices              |
 |                                   |
 \***********************************/
-// layout(binding = 0, std140) uniform Matrices {
-layout (std140) uniform Matrices {
+layout(binding = 0, std140) uniform Matrices {
     mat4 t_view;
     mat4 t_proj;
     mat4 t_model;
@@ -15,8 +14,7 @@ layout (std140) uniform Matrices {
 |             Material              |
 |                                   |
 \***********************************/
-// layout(binding = 1, std140) uniform Material {
-layout (std140) uniform Material {
+layout(binding = 1, std140) uniform Material {
     int         m_int_0;
     int         m_int_1;
     int         m_int_2;
@@ -77,12 +75,11 @@ struct Light {
     vec3    specular;
 };
 
-// layout(binding = 2, std140) uniform Lights {
 // layout(std140) uniform Lights {
 //     int     l_light_count;
 //     Light   l_lights[32];
 // };
-layout (std140) uniform Lights {
+layout(binding = 2, std140) uniform Lights {
     Light   l_lights;
 };
 
@@ -92,8 +89,7 @@ layout (std140) uniform Lights {
 |             Global                |
 |                                   |
 \***********************************/
-// layout(binding = 3, std140) uniform Global {
-layout (std140) uniform Global {
+layout(binding = 3, std140) uniform Global {
     vec2    g_resolution;
     float   g_time;
     float   g_delta_time;

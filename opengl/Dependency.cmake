@@ -72,7 +72,7 @@ ExternalProject_Add(
   TEST_COMMAND ""
   )
 set(EXTERNAL_PROJECTS ${EXTERNAL_PROJECTS} dep_assimp)
-if (WINDOWS)
+if (WIN32)
 set(EXTERNAL_LIBRARYS ${EXTERNAL_LIBRARYS}
   assimp-vc143-mt$<$<CONFIG:Debug>:d>
   zlibstatic$<$<CONFIG:Debug>:d>

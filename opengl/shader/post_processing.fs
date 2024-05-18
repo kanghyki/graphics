@@ -1,5 +1,4 @@
-// TODO: 330 -> 430
-#version 330 core
+#version 430 core
 in vec2 texCoord;
 out vec4 fragColor;
 

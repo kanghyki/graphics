@@ -55,12 +55,6 @@ bool OpenGLDevice::Init()
     }
     glViewport(0, 0, width_, height_);
 
-    if (!glfwExtensionSupported("GL_ARB_shading_language_include"))
-    {
-        SPDLOG_ERROR("GL_ARB_shading_language_include is not supported");
-        return false;
-    }
-
     std::string shader_dir(SHADER_PATH);
     /* shader */
     lighting_vs_ = Shader::CreateFromFile(shader_dir + "lighting.vs", GL_VERTEX_SHADER);
@@ -83,22 +77,6 @@ bool OpenGLDevice::Init()
     glBindBufferBase(GL_UNIFORM_BUFFER, 2, lights_ubo_->id());
     glBindBufferBase(GL_UNIFORM_BUFFER, 3, global_ubo_->id());
 
-// for GLSL version 330
-#ifdef __APPLE__
-    auto BindUniform = [](ProgramPtr program) {
-        uint32_t matrices_block_index = glGetUniformBlockIndex(program->id(), "Matrices");
-        uint32_t material_block_index = glGetUniformBlockIndex(program->id(), "Material");
-        uint32_t lights_block_index = glGetUniformBlockIndex(program->id(), "Lights");
-        uint32_t global_block_index = glGetUniformBlockIndex(program->id(), "Global");
-        glUniformBlockBinding(program->id(), matrices_block_index, 0);
-        glUniformBlockBinding(program->id(), material_block_index, 1);
-        glUniformBlockBinding(program->id(), lights_block_index, 2);
-        glUniformBlockBinding(program->id(), global_block_index, 3);
-    };
-    BindUniform(lighting_program_);
-    BindUniform(simple_program_);
-#endif
-
     /* framebuffer */
     main_framebuffer_ = Framebuffer::Create({Texture2d::Create(width_, height_)});
 
@@ -109,8 +87,6 @@ bool OpenGLDevice::Init()
 
     /* Post processing */
     plane_mesh_ = Mesh::CreatePlane();
-    // plane_mesh_->set_material(Material::Create());
-    // plane_mesh_->material()->set_texture(TextureType::AMBIENT, main_framebuffer_->color_attachment(0));
     post_processing_vs_ = Shader::CreateFromFile(shader_dir + "post_processing.vs", GL_VERTEX_SHADER);
     post_processing_fs_ = Shader::CreateFromFile(shader_dir + "post_processing.fs", GL_FRAGMENT_SHADER);
     post_processing_program_ = Program::Create({post_processing_vs_, post_processing_fs_});
@@ -141,12 +117,20 @@ void OpenGLDevice::ClearFramebuffer()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-GLFWwindow *OpenGLDevice::glfw_window()
+GraphicsPSO OpenGLDevice::GetPSO(GRAPHIC_PSO_TYPE type)
 {
-    return glfw_window_;
+    switch (type)
+    {
+    case GRAPHIC_PSO_TYPE::LIGHTING:
+        return lighting_pso_;
+    case GRAPHIC_PSO_TYPE::SIMPLE:
+        return simple_pso_;
+    default:
+        return simple_pso_;
+    }
 }
 
-void OpenGLDevice::ApplyPSO(const GraphicsPSO &pso)
+void OpenGLDevice::ApplyPSO(const GraphicsPSO &pso) const
 {
     /*
      * cull face

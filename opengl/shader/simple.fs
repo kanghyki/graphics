@@ -1,5 +1,4 @@
-// TODO: 330 -> 430
-#version 330 core
+#version 430 core
 out vec4 fragColor;
 
 #include "include/default.incl"

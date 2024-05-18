@@ -24,10 +24,8 @@ target_include_directories(${PROJECT_NAME}
 PUBLIC
     ${EXTERNAL_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/public
-    ${CMAKE_CURRENT_SOURCE_DIR}/public/render
 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/private
-    ${CMAKE_CURRENT_SOURCE_DIR}/private/render
 )
 
 target_link_directories(${PROJECT_NAME}

@@ -37,6 +37,15 @@ list(APPEND libraries
     event
     resource
 )
+
+# Editor
+if (TRUE)
+add_compile_definitions(
+    EDITOR=true
+)
+list (APPEND libraries editor)
+endif()
+
 foreach(lib IN LISTS libraries)
     add_subdirectory(${lib})
 endforeach()

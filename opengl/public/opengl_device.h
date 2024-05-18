@@ -27,22 +27,15 @@ class OpenGLDevice
     void SwapBuffer();
     void Terminate();
     void ClearFramebuffer();
-    GLFWwindow *glfw_window();
 
-    GraphicsPSO GetPSO(GRAPHIC_PSO_TYPE type)
+    GLFWwindow *glfw_window()
     {
-        switch (type)
-        {
-        case GRAPHIC_PSO_TYPE::LIGHTING:
-            return lighting_pso_;
-        case GRAPHIC_PSO_TYPE::SIMPLE:
-            return simple_pso_;
-        default:
-            return simple_pso_;
-        }
+        return glfw_window_;
     }
 
-    void ApplyPSO(const GraphicsPSO &pso);
+    GraphicsPSO GetPSO(GRAPHIC_PSO_TYPE type);
+    void ApplyPSO(const GraphicsPSO &pso) const;
+
     BufferPtr matrices_ubo()
     {
         return matrices_ubo_;

@@ -1,5 +1,4 @@
-// TODO: 330 -> 430
-#version 330 core
+#version 430 core
 layout (location = 0) in vec3 aPos;
 
 #include "include/default.incl"
