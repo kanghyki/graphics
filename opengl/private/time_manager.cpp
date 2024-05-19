@@ -1,5 +1,5 @@
-#include "opengl_device.h"
 #include "time_manager.h"
+#include "opengl_device.h"
 
 float GetTime()
 {
@@ -50,11 +50,8 @@ void TimeManager::Start()
 
 void TimeManager::Stop()
 {
-    if (is_stopped_)
-    {
-        stop_time_ = GetTime();
-        is_stopped_ = true;
-    }
+    stop_time_ = GetTime();
+    is_stopped_ = true;
 }
 
 void TimeManager::Tick()

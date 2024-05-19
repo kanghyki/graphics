@@ -20,11 +20,6 @@ add_executable(${PROJECT_NAME}
 # PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
 # )
 
-target_compile_definitions(${PROJECT_NAME}
-PRIVATE
-    RESOURCE_PATH="../asset"
-)
-
 target_include_directories(${PROJECT_NAME}
 PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/.

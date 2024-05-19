@@ -1,6 +1,8 @@
 #include "editor.h"
-#include "opengl_device.h"
-#include <string>
+#include "main_menu.h"
+#include "render_ui.h"
+#include "resource_ui.h"
+#include "scene_ui.h"
 
 Editor *Editor::instance_ = nullptr;
 
@@ -16,6 +18,11 @@ Editor *Editor::GetInstance()
 
 Editor::Editor()
 {
+    ui_ = std::unique_ptr<EditorUI>(new EditorUI());
+    ui_->AddUI(std::unique_ptr<EditorUI>(new MainMenu()));
+    ui_->AddUI(std::unique_ptr<EditorUI>(new SceneUI()));
+    ui_->AddUI(std::unique_ptr<EditorUI>(new ResourceUI()));
+    ui_->AddUI(std::unique_ptr<EditorUI>(new RenderUI()));
 }
 
 Editor::~Editor()
@@ -39,17 +46,14 @@ void Editor::Init(void *window)
 
 void Editor::NewFrame()
 {
+    ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 }
 
 void Editor::Render()
 {
-    if (ImGui::Begin("Test"))
-    {
-    }
-    ImGui::End();
-
+    ui_->Render();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

@@ -12,6 +12,11 @@ MeshComponent::~MeshComponent()
 
 void MeshComponent::Render(ProgramPtr program)
 {
+    // TODO:
+    if (!mesh_)
+    {
+        return;
+    }
     OpenGLDevice::GetInstance()->matrices_ubo()->Bind();
     glBufferSubData(GL_UNIFORM_BUFFER, offsetof(MatricesUniform, t_model), sizeof(glm::mat4),
                     glm::value_ptr(GetTransformComponent()->transform().CalcModelMatrix()));

@@ -1,8 +1,11 @@
 #ifndef INCLUDED_EDITOR_H
 #define INCLUDED_EDITOR_H
 
+#include "editor_ui.h"
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <memory>
+#include <vector>
 
 class Editor
 {
@@ -21,7 +24,9 @@ class Editor
 
     static Editor *instance_;
     /* ImGui */
-    ImGuiContext *imgui_context_;
+    ImGuiContext *imgui_context_{nullptr};
+
+    std::unique_ptr<EditorUI> ui_;
 };
 
 #endif

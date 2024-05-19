@@ -36,6 +36,7 @@ PUBLIC
 target_link_libraries(${PROJECT_NAME}
 PRIVATE
     ${EXTERNAL_LIBRARYS}
+PUBLIC
     core
 )
 

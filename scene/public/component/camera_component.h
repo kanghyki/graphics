@@ -31,7 +31,16 @@ class CameraComponent : public Component, private NoInherit
     void FinalTick() override;
     void Render();
 
-    void set_pso(const GraphicsPSO &pso)
+    Camera &camera()
+    {
+        return camera_;
+    }
+    const Camera &camera() const
+    {
+        return camera_;
+    }
+
+    void set_pso(GraphicsPSOPtr pso)
     {
         pso_ = pso;
     }
@@ -44,7 +53,7 @@ class CameraComponent : public Component, private NoInherit
 
     // uint32_t layer_mask_;
     std::vector<Actor *> actors_;
-    GraphicsPSO pso_;
+    GraphicsPSOPtr pso_;
 };
 
 #endif

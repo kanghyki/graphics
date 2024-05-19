@@ -56,6 +56,23 @@ void Actor::SetComponent(std::shared_ptr<Component> component)
     }
 }
 
+void Actor::RemoveComponent(ComponentType type)
+{
+    if (type == ComponentType::TRANSFORM)
+    {
+        if (GetCameraComponent() || GetLightComponent() || GetMeshComponent())
+        {
+            return;
+        }
+    }
+    if (type == ComponentType::MESH)
+    {
+
+        render_component_ = nullptr;
+    }
+    components_[static_cast<int>(type)] = nullptr;
+}
+
 std::shared_ptr<Component> Actor::GetComponent(ComponentType type)
 {
     return components_[static_cast<int>(type)];

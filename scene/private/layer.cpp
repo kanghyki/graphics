@@ -1,7 +1,7 @@
-#include "actor.h"
 #include "layer.h"
+#include "actor.h"
 
-Layer::Layer() : actors_(0)
+Layer::Layer(const std::string &name) : name_(name), actors_(0)
 {
 }
 

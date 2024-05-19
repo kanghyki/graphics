@@ -81,9 +81,13 @@ bool OpenGLDevice::Init()
     main_framebuffer_ = Framebuffer::Create({Texture2d::Create(width_, height_)});
 
     /* PSO */
-    lighting_pso_.program_ = lighting_program_;
-    simple_pso_.program_ = simple_program_;
-    post_processing_pso_.rasterizer_state_.is_depth_test_ = false;
+    lighting_pso_ = GraphicsPSO::Create();
+    simple_pso_ = GraphicsPSO::Create();
+    post_processing_pso_ = GraphicsPSO::Create();
+
+    lighting_pso_->program_ = lighting_program_;
+    simple_pso_->program_ = simple_program_;
+    post_processing_pso_->rasterizer_state_.is_depth_test_ = false;
 
     /* Post processing */
     plane_mesh_ = Mesh::CreatePlane();
@@ -117,7 +121,7 @@ void OpenGLDevice::ClearFramebuffer()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-GraphicsPSO OpenGLDevice::GetPSO(GRAPHIC_PSO_TYPE type)
+GraphicsPSOPtr OpenGLDevice::GetPSO(GRAPHIC_PSO_TYPE type)
 {
     switch (type)
     {
@@ -130,15 +134,15 @@ GraphicsPSO OpenGLDevice::GetPSO(GRAPHIC_PSO_TYPE type)
     }
 }
 
-void OpenGLDevice::ApplyPSO(const GraphicsPSO &pso) const
+void OpenGLDevice::ApplyPSO(GraphicsPSOPtr pso) const
 {
     /*
      * cull face
      */
-    if (pso.rasterizer_state_.is_cull_face_)
+    if (pso->rasterizer_state_.is_cull_face_)
     {
         glEnable(GL_CULL_FACE);
-        glCullFace(pso.rasterizer_state_.cull_face_);
+        glCullFace(pso->rasterizer_state_.cull_face_);
     }
     else
     {
@@ -148,7 +152,7 @@ void OpenGLDevice::ApplyPSO(const GraphicsPSO &pso) const
     /*
      * blend
      */
-    if (pso.rasterizer_state_.is_blend_)
+    if (pso->rasterizer_state_.is_blend_)
     {
         glEnable(GL_BLEND);
     }
@@ -160,7 +164,7 @@ void OpenGLDevice::ApplyPSO(const GraphicsPSO &pso) const
     /*
      * depth test
      */
-    if (pso.rasterizer_state_.is_depth_test_)
+    if (pso->rasterizer_state_.is_depth_test_)
     {
         glEnable(GL_DEPTH_TEST);
     }
@@ -172,7 +176,7 @@ void OpenGLDevice::ApplyPSO(const GraphicsPSO &pso) const
     /*
      * stencil test
      */
-    if (pso.rasterizer_state_.is_stencil_test_)
+    if (pso->rasterizer_state_.is_stencil_test_)
     {
         glEnable(GL_STENCIL_TEST);
     }
@@ -184,5 +188,5 @@ void OpenGLDevice::ApplyPSO(const GraphicsPSO &pso) const
     /*
      * Polygon
      */
-    glPolygonMode(GL_FRONT_AND_BACK, pso.rasterizer_state_.polygon_mode);
+    glPolygonMode(GL_FRONT_AND_BACK, pso->rasterizer_state_.polygon_mode);
 }

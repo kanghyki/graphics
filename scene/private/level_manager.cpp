@@ -1,4 +1,5 @@
 #include "level_manager.h"
+#include <algorithm>
 
 LevelManager *LevelManager::instance_ = nullptr;
 
@@ -17,9 +18,9 @@ LevelManager ::LevelManager() : all_level_(), cur_level_(nullptr)
 
 LevelManager ::~LevelManager()
 {
-    for (const auto &it : all_level_)
+    for (const auto &level : all_level_)
     {
-        delete it.second;
+        delete level;
     }
 }
 
@@ -34,31 +35,52 @@ void LevelManager::Tick()
 
 void LevelManager::AddLevel(Level *level)
 {
-    all_level_.insert({level->name(), level});
+    all_level_.push_back(level);
 }
 
 void LevelManager::RemoveLevel(const std::string &name)
 {
-    all_level_.erase(name);
+    auto it = std::find_if(all_level_.begin(), all_level_.end(), [&name](Level *level) {
+        if (level->name() == name)
+        {
+            return true;
+        }
+        return false;
+    });
+    if (it != all_level_.end())
+    {
+        all_level_.erase(it);
+        delete *it;
+    }
 }
 
 Level *LevelManager::FindLevel(const std::string &name)
 {
-    auto it = all_level_.find(name);
-    if (it == all_level_.end())
+    auto it = std::find_if(all_level_.begin(), all_level_.end(), [&name](Level *level) {
+        if (level->name() == name)
+        {
+            return true;
+        }
+        return false;
+    });
+    if (it != all_level_.end())
     {
-        return nullptr;
+        return *it;
     }
-    return it->second;
+    return nullptr;
 }
 
 void LevelManager::SetCurrentLevel(const std::string &name)
 {
-    auto it = all_level_.find(name);
-    cur_level_ = it->second;
+    cur_level_ = FindLevel(name);
 }
 
 Level *LevelManager::GetCurrentLevel()
 {
     return cur_level_;
+}
+
+std::vector<Level *> LevelManager::GetAllLevel()
+{
+    return all_level_;
 }

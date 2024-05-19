@@ -33,8 +33,8 @@ class OpenGLDevice
         return glfw_window_;
     }
 
-    GraphicsPSO GetPSO(GRAPHIC_PSO_TYPE type);
-    void ApplyPSO(const GraphicsPSO &pso) const;
+    GraphicsPSOPtr GetPSO(GRAPHIC_PSO_TYPE type);
+    void ApplyPSO(GraphicsPSOPtr pso) const;
 
     BufferPtr matrices_ubo()
     {
@@ -70,8 +70,8 @@ class OpenGLDevice
     FramebufferPtr main_framebuffer_;
 
     /* PSO */
-    GraphicsPSO lighting_pso_;
-    GraphicsPSO simple_pso_;
+    GraphicsPSOPtr lighting_pso_;
+    GraphicsPSOPtr simple_pso_;
 
     /* shader */
     ShaderPtr lighting_vs_;
@@ -95,7 +95,7 @@ class OpenGLDevice
     ShaderPtr post_processing_vs_;
     ShaderPtr post_processing_fs_;
     ProgramPtr post_processing_program_;
-    GraphicsPSO post_processing_pso_;
+    GraphicsPSOPtr post_processing_pso_;
 };
 
 #endif

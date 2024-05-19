@@ -5,6 +5,7 @@
 #include "framebuffer.h"
 #include "libopengl.h"
 #include "program.h"
+#include "ptr.h"
 #include "shader.h"
 
 struct RasterizerState
@@ -18,11 +19,13 @@ struct RasterizerState
     uint32_t cull_face_{GL_BACK};
 };
 
+CLASS_PTR(GraphicsPSO);
 class GraphicsPSO
 {
   public:
-    GraphicsPSO()
+    static GraphicsPSOPtr Create()
     {
+        return GraphicsPSOPtr(new GraphicsPSO());
     }
 
     GraphicsPSO(const GraphicsPSO &rhs)
@@ -51,6 +54,11 @@ class GraphicsPSO
 
     ProgramPtr program_{nullptr};
     RasterizerState rasterizer_state_;
+
+  private:
+    GraphicsPSO()
+    {
+    }
 };
 
 #endif

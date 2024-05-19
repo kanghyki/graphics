@@ -29,12 +29,22 @@ class Actor
     void FinalTick();
     void Render(ProgramPtr program);
 
-    uint32_t id()
+    uint32_t id() const
     {
         return id_;
     }
 
+    void set_name(const std::string &name)
+    {
+        name_ = name;
+    }
+    std::string name() const
+    {
+        return name_;
+    }
+
     void SetComponent(std::shared_ptr<Component> component);
+    void RemoveComponent(ComponentType type);
     void AddCameraComponent();
     void AddTransformComponent();
     void AddMeshComponent();

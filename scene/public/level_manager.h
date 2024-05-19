@@ -2,7 +2,6 @@
 #define INCLUDED_LEVEL_MANAGER_H
 
 #include "level.h"
-#include <unordered_map>
 #include <vector>
 
 class LevelManager
@@ -19,6 +18,7 @@ class LevelManager
     Level *FindLevel(const std::string &name);
     void SetCurrentLevel(const std::string &name);
     Level *GetCurrentLevel();
+    std::vector<Level *> GetAllLevel();
 
   protected:
   private:
@@ -27,7 +27,7 @@ class LevelManager
     LevelManager &operator=(const LevelManager &c);
 
     static LevelManager *instance_;
-    std::unordered_map<std::string, Level *> all_level_;
+    std::vector<Level *> all_level_;
     Level *cur_level_;
 };
 

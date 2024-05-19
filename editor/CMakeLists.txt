@@ -18,6 +18,10 @@ PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/public
 PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/private
+  ${CMAKE_CURRENT_SOURCE_DIR}/private/scene
+  ${CMAKE_CURRENT_SOURCE_DIR}/private/main_menu
+  ${CMAKE_CURRENT_SOURCE_DIR}/private/resource
+  ${CMAKE_CURRENT_SOURCE_DIR}/private/render
 )
 
 target_link_directories(${PROJECT_NAME}

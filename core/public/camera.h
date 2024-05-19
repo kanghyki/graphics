@@ -10,12 +10,17 @@ class Camera
     Camera();
     ~Camera();
 
-    void set_transform(Transform transform)
+    void set_transform(const Transform &transform)
     {
         transform_ = transform;
     }
     glm::mat4 CalcViewMatrix();
     glm::mat4 CalcPerspectiveProjectionMatrix();
+
+    float fov_y_;
+    float aspect_;
+    float near_plane_;
+    float far_plane_;
 
   private:
     Camera(const Camera &);
@@ -23,15 +28,7 @@ class Camera
 
     Transform transform_;
 
-    // float pitch_;
-    // float yaw_;
-    float fov_y_;
-    float aspect_;
-    float near_plane_;
-    float far_plane_;
-
     glm::vec3 up_;
-    // mutable glm::vec3 front_;
 };
 
 #endif

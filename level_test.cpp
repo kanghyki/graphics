@@ -1,9 +1,10 @@
+#include "level_test.h"
 #include "actor.h"
 #include "camera_component.h"
 #include "input_manager.h"
+#include "layer.h"
 #include "level.h"
 #include "level_manager.h"
-#include "level_test.h"
 #include "light_component.h"
 #include "material.h"
 #include "mesh_component.h"
@@ -137,10 +138,16 @@ void CreateTestLevel::Create()
     cam->AddCameraComponent();
     cam->GetCameraComponent()->set_pso(OpenGLDevice::GetInstance()->GetPSO(GRAPHIC_PSO_TYPE::LIGHTING));
 
-    level->AddActor(box, LayerType::OBJECTS);
-    level->AddActor(cam, LayerType::PLAYER);
-    level->AddActor(sun, LayerType::WORLD);
+    auto layer00 = level->AddLayer("object");
+    layer00->AddActor(box);
+    auto layer01 = level->AddLayer("player");
+    layer01->AddActor(cam);
+    auto layer02 = level->AddLayer("light");
+    layer02->AddActor(sun);
 
     LevelManager::GetInstance()->AddLevel(level);
     LevelManager::GetInstance()->SetCurrentLevel(level->name());
+
+    Level *main = new Level("main");
+    LevelManager::GetInstance()->AddLevel(main);
 }

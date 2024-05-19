@@ -77,6 +77,15 @@ class LightComponent : public Component
     LightComponent();
     ~LightComponent();
 
+    Light &light()
+    {
+        return light_;
+    }
+    const Light &light() const
+    {
+        return light_;
+    }
+
   private:
     LightComponent(const LightComponent &);
     LightComponent &operator=(const LightComponent &);
