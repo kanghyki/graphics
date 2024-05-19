@@ -7,30 +7,46 @@ class Resource
 {
   public:
     Resource();
-    ~Resource();
+    virtual ~Resource();
 
+    void Load(const std::string &relative_path)
+    {
+        relative_path_ = relative_path;
+        size_t i = relative_path_.find_last_of('/');
+        if (i == std::string::npos)
+        {
+            name_ = relative_path_;
+        }
+        else
+        {
+            name_ = relative_path_.substr(i + 1);
+        }
+        LoadImpl(std::string(RESOURCE_DIR_PATH) + relative_path);
+    }
+
+    uint32_t id()
+    {
+        return id_;
+    }
     std::string name()
     {
         return name_;
     }
-    void set_name(const std::string &name)
-    {
-        name_ = name;
-    }
-
     std::string relative_path()
     {
         return relative_path_;
     }
-    void set_relative_path(const std::string &relative_path)
-    {
-        relative_path_ = relative_path;
-    }
+
+  protected:
+    virtual void LoadImpl(const std::string &full_path) = 0;
 
   private:
     Resource(const Resource &);
     Resource &operator=(const Resource &);
 
+    static uint32_t kId;
+
+    uint32_t id_;
     std::string name_;
     std::string relative_path_;
 };

@@ -5,10 +5,8 @@
 
 class RenderUI : public EditorUI
 {
-  public:
-    void RenderImpl() override;
-
   private:
+    void RenderImpl() override;
 };
 
 #endif

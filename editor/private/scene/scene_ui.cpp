@@ -26,13 +26,18 @@ void SceneUI::Scene()
     {
         SceneList();
 
-        ImGui::Spacing();
         ImGui::Separator();
-        ImGui::Spacing();
+        static char layer_name[512];
+        ImGui::InputText("", layer_name, 512);
+        ImGui::SameLine();
+        if (ImGui::Button("Add Layer"))
+        {
+            level_current->AddLayer(layer_name);
+        }
 
         ActorList();
-        ImGui::End();
     }
+    ImGui::End();
 }
 
 void SceneUI::SceneList()
@@ -63,12 +68,6 @@ void SceneUI::SceneList()
         }
     }
     ImGui::EndTable();
-    static char layer_name[512];
-    ImGui::InputText("", layer_name, 512);
-    if (ImGui::Button("Add layer"))
-    {
-        level_current->AddLayer(layer_name);
-    }
 }
 
 void SceneUI::ActorList()
@@ -79,11 +78,6 @@ void SceneUI::ActorList()
     {
         ImGui::TableSetupColumn("Actors");
         ImGui::TableHeadersRow();
-        static char buf[512];
-        if (ImGui::InputText("", buf, 512))
-        {
-            SPDLOG_INFO("input");
-        }
         for (int i = 0; i < Level::LayerMax; ++i)
         {
             auto layer = level_current->GetLayer(i);

@@ -1,10 +1,11 @@
 #ifndef INCLUDED_RESOURCE_MANAGER_H
 #define INCLUDED_RESOURCE_MANAGER_H
 
-#include "mesh.h"
-#include "shader.h"
-#include "texture.h"
+#include "directory.h"
+#include "opengl_device.h"
+#include "texture_resource.h"
 #include <string>
+#include <vector>
 
 class ResourceManager
 {
@@ -14,9 +15,8 @@ class ResourceManager
 
     void Init();
 
-    // TODO:
-    Texture2dPtr LoadTexture(const std::string &relative_path) const;
-    ShaderPtr LoadShader(const std::string &relative_path) const;
+    uint32_t LoadTexture(const std::string &relative_path);
+    uint32_t LoadModel(const std::string &relative_path);
 
   private:
     ResourceManager();
@@ -24,6 +24,7 @@ class ResourceManager
     ResourceManager &operator=(const ResourceManager &);
 
     static ResourceManager *instance_;
+    DirectoryPtr root_;
 };
 
 #endif

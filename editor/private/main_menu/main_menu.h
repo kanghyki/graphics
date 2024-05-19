@@ -5,10 +5,8 @@
 
 class MainMenu : public EditorUI
 {
-  public:
-    void RenderImpl() override;
-
   private:
+    void RenderImpl() override;
 };
 
 #endif

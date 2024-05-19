@@ -21,15 +21,17 @@ class EditorUI
         }
     };
 
+    void AddUI(std::unique_ptr<EditorUI> ui)
+    {
+        children_.emplace_back(std::move(ui));
+    }
+
+  protected:
     virtual void Update()
     {
     }
     virtual void RenderImpl()
     {
-    }
-    void AddUI(std::unique_ptr<EditorUI> ui)
-    {
-        children_.emplace_back(std::move(ui));
     }
 
   private:

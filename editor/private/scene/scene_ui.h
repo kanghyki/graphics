@@ -11,11 +11,10 @@ class Light;
 class Mesh;
 class SceneUI : public EditorUI
 {
-  public:
+  private:
     void Update() override;
     void RenderImpl() override;
 
-  private:
     void Scene();
     void SceneList();
     void ActorList();
