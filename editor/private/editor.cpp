@@ -3,6 +3,7 @@
 #include "render_ui.h"
 #include "resource_ui.h"
 #include "scene_ui.h"
+#include <memory>
 
 Editor *Editor::instance_ = nullptr;
 
@@ -18,11 +19,16 @@ Editor *Editor::GetInstance()
 
 Editor::Editor()
 {
-    ui_ = std::unique_ptr<EditorUI>(new EditorUI());
-    ui_->AddUI(std::unique_ptr<EditorUI>(new MainMenu()));
-    ui_->AddUI(std::unique_ptr<EditorUI>(new SceneUI()));
-    ui_->AddUI(std::unique_ptr<EditorUI>(new ResourceUI()));
-    ui_->AddUI(std::unique_ptr<EditorUI>(new RenderUI()));
+    ui_ = std::shared_ptr<EditorUI>(new EditorUI());
+    auto main_menu = std::shared_ptr<MainMenu>(new MainMenu());
+    auto resource_ui = std::shared_ptr<ResourceUI>(new ResourceUI());
+    auto scene_ui = std::shared_ptr<SceneUI>(new SceneUI());
+    resource_ui->Register(scene_ui.get());
+    auto render_ui = std::shared_ptr<RenderUI>(new RenderUI());
+    ui_->AddUI(std::reinterpret_pointer_cast<EditorUI>(main_menu));
+    ui_->AddUI(std::reinterpret_pointer_cast<EditorUI>(scene_ui));
+    ui_->AddUI(std::reinterpret_pointer_cast<EditorUI>(resource_ui));
+    ui_->AddUI(std::reinterpret_pointer_cast<EditorUI>(render_ui));
 }
 
 Editor::~Editor()

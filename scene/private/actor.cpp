@@ -92,7 +92,7 @@ void Actor::AddTransformComponent()
     SetComponent(ComponentFactory().Generate(ComponentType::TRANSFORM));
 }
 
-void Actor::AddMeshComponent()
+void Actor::AddModelComponent()
 {
     if (!components_[static_cast<int>(ComponentType::TRANSFORM)])
     {

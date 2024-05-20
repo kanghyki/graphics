@@ -23,7 +23,7 @@ class Model
 
     void Draw(const Program *program) const;
 
-    MeshPtr mesh(int i)
+    MeshPtr mesh(size_t i)
     {
         if (i >= 0 && i < meshes_.size())
         {

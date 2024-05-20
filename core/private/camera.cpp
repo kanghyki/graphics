@@ -3,7 +3,7 @@
 Camera::Camera()
     : fov_y_(45.0f), aspect_(16.0f / 9.0f),
 
-      near_plane_(0.1f), far_plane_(200.0f), up_(0.0f, 1.0f, 0.0f)
+      near_plane_(0.1f), far_plane_(200.0f)
 {
 }
 
@@ -15,12 +15,9 @@ glm::mat4 Camera::CalcViewMatrix()
 {
     glm::vec3 front = glm::rotate(glm::mat4(1.0f), glm::radians(transform_.rotation_.x), glm::vec3(0.0f, 1.0f, 0.0f)) *
                       glm::rotate(glm::mat4(1.0f), glm::radians(transform_.rotation_.y), glm::vec3(1.0f, 0.0f, 0.0f)) *
-                      glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
-    // front_ = glm::rotate(glm::mat4(1.0f), glm::radians(yaw_), glm::vec3(0.0f, 1.0f, 0.0f)) *
-    //          glm::rotate(glm::mat4(1.0f), glm::radians(pitch_), glm::vec3(1.0f, 0.0f, 0.0f)) *
-    //          glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+                      transform_.direction_;
 
-    return glm::lookAt(transform_.position_, transform_.position_ + front, up_);
+    return glm::lookAt(transform_.position_, transform_.position_ + front, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 glm::mat4 Camera::CalcPerspectiveProjectionMatrix()

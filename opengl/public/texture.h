@@ -40,8 +40,8 @@ CLASS_PTR(Texture2d);
 class Texture2d : public BaseTexture
 {
   public:
+    static Texture2dPtr Load(const std::string &filename);
     static Texture2dPtr Create(const Image *image);
-    static Texture2dPtr Create(const std::string &filename);
     static Texture2dPtr Create(int width, int height, uint32_t inner_format = GL_RGBA, uint32_t format = GL_RGBA,
                                uint32_t type = GL_UNSIGNED_BYTE);
     ~Texture2d();

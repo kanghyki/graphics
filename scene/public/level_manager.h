@@ -13,7 +13,7 @@ class LevelManager
     void Init();
     void Tick();
 
-    void AddLevel(Level *level);
+    Level *AddLevel(const std::string &name);
     void RemoveLevel(const std::string &name);
     Level *FindLevel(const std::string &name);
     void SetCurrentLevel(const std::string &name);

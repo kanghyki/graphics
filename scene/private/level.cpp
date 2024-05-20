@@ -67,13 +67,14 @@ Layer *Level::AddLayer(const std::string &name)
     {
         return nullptr;
     }
-    if (find_if(layers_.begin(), layers_.end(), [&name](Layer *layer) {
-            if (!layer)
-            {
-                return false;
-            }
-            return layer->name() == name;
-        }) != layers_.end())
+    auto it = find_if(layers_.begin(), layers_.end(), [&name](Layer *layer) {
+        if (!layer)
+        {
+            return false;
+        }
+        return layer->name() == name;
+    });
+    if (it != layers_.end())
     {
         return nullptr;
     }

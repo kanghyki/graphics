@@ -27,8 +27,6 @@ class Camera
     Camera &operator=(const Camera &);
 
     Transform transform_;
-
-    glm::vec3 up_;
 };
 
 #endif

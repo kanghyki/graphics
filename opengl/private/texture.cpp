@@ -95,18 +95,7 @@ Texture2d::~Texture2d()
 {
 }
 
-Texture2dPtr Texture2d::Create(const Image *image)
-{
-    auto texture = Texture2dPtr(new Texture2d());
-    texture->Bind();
-    texture->SetFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-    texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
-    texture->SetTextureFromImage(image);
-
-    return texture;
-}
-
-Texture2dPtr Texture2d::Create(const std::string &filename)
+Texture2dPtr Texture2d::Load(const std::string &filename)
 {
     auto image = Image::Load(filename);
     if (!image)
@@ -119,6 +108,17 @@ Texture2dPtr Texture2d::Create(const std::string &filename)
     texture->SetFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
     texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
     texture->SetTextureFromImage(image.get());
+
+    return texture;
+}
+
+Texture2dPtr Texture2d::Create(const Image *image)
+{
+    auto texture = Texture2dPtr(new Texture2d());
+    texture->Bind();
+    texture->SetFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    texture->SetTextureFromImage(image);
 
     return texture;
 }

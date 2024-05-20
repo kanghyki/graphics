@@ -82,7 +82,15 @@ class RotationTransformComponent : public TransformComponent
     {
         float dt = TimeManager::GetInstance()->delta_time();
         transform().rotation_.x += x_rotation_speed * dt;
+        if (transform().rotation_.x >= 360.0f)
+        {
+            transform().rotation_.x -= 360.0f;
+        }
         transform().rotation_.y += y_rotation_speed * dt;
+        if (transform().rotation_.y >= 360.0f)
+        {
+            transform().rotation_.y -= 360.0f;
+        }
     }
 
   private:
@@ -100,7 +108,8 @@ CreateTestLevel::~CreateTestLevel()
 
 void CreateTestLevel::Create()
 {
-    Level *level = new Level("test_level");
+
+    Level *level = LevelManager::GetInstance()->AddLevel("test_level");
 
     auto diffuse_tex = Texture2d::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.7f, 0.7f, 0.7f, 1.0f)).get());
     auto specular_tex = Texture2d::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
@@ -123,12 +132,12 @@ void CreateTestLevel::Create()
 
     Actor *box = new Actor("Little box");
     box->SetComponent(std::shared_ptr<Component>(new RotationTransformComponent()));
-    box->AddMeshComponent();
+    box->AddModelComponent();
     box->GetModelComponent()->set_model(Model::Create({box_mesh}));
 
     Actor *sun = new Actor("My sun");
     sun->AddLightComponent();
-    sun->AddMeshComponent();
+    sun->AddModelComponent();
     sun->GetModelComponent()->set_model(Model::Create({sphere_mesh}));
     sun->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 2.0f, 0.0f);
     sun->GetTransformComponent()->transform().scale_ *= 0.2;
@@ -145,9 +154,7 @@ void CreateTestLevel::Create()
     auto layer02 = level->AddLayer("light");
     layer02->AddActor(sun);
 
-    LevelManager::GetInstance()->AddLevel(level);
     LevelManager::GetInstance()->SetCurrentLevel(level->name());
 
-    Level *main = new Level("main");
-    LevelManager::GetInstance()->AddLevel(main);
+    LevelManager::GetInstance()->AddLevel("main");
 }

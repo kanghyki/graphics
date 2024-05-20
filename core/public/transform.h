@@ -15,10 +15,12 @@ class Transform
     glm::mat4 CalcScaleMatrix() const;
     glm::mat4 CalcRotateMatrix() const;
     glm::mat4 CalcTranslateMatrix() const;
+    glm::vec3 direction() const;
 
     glm::vec3 position_;
     glm::vec3 scale_;
     glm::vec3 rotation_;
+    glm::vec4 direction_;
 };
 
 #endif

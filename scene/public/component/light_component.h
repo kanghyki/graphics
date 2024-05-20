@@ -54,8 +54,7 @@ class Light
     // Directional & Spot
     glm::vec3 direction() const
     {
-
-        return transform_.CalcRotateMatrix() * glm::vec4(direction_, 0.0f);
+        return transform_.direction();
     }
 
     // Spot
@@ -66,7 +65,6 @@ class Light
     glm::vec3 ambient_{glm::vec3(1.0f, 1.0f, 1.0f)};
     glm::vec3 diffuse_{glm::vec3(1.0f, 1.0f, 1.0f)};
     glm::vec3 specular_{glm::vec3(1.0f, 1.0f, 1.0f)};
-    glm::vec3 direction_{glm::vec3(0.0f, -1.0f, 0.0f)};
 
     LightType type_{LightType::DIRECTIONAL};
 };

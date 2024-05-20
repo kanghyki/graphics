@@ -20,8 +20,7 @@ class EditorUI
             child->Render();
         }
     };
-
-    void AddUI(std::unique_ptr<EditorUI> ui)
+    void AddUI(std::shared_ptr<EditorUI> ui)
     {
         children_.emplace_back(std::move(ui));
     }
@@ -38,7 +37,7 @@ class EditorUI
     EditorUI(const EditorUI &rhs);
     EditorUI &operator=(const EditorUI &rhs);
 
-    std::vector<std::unique_ptr<EditorUI>> children_;
+    std::vector<std::shared_ptr<EditorUI>> children_;
 };
 
 #endif

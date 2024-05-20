@@ -33,9 +33,27 @@ void LevelManager::Tick()
     cur_level_->Tick();
 }
 
-void LevelManager::AddLevel(Level *level)
+Level *LevelManager::AddLevel(const std::string &name)
 {
+    if (name.empty())
+    {
+        return nullptr;
+    }
+    auto it = std::find_if(all_level_.begin(), all_level_.end(), [&name](Level *level) {
+        if (level->name() == name)
+        {
+            return true;
+        }
+        return false;
+    });
+    if (it != all_level_.end())
+    {
+        return nullptr;
+    }
+    Level *level = new Level(name);
     all_level_.push_back(level);
+
+    return level;
 }
 
 void LevelManager::RemoveLevel(const std::string &name)

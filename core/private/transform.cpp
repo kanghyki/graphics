@@ -1,6 +1,6 @@
 #include "transform.h"
 
-Transform::Transform() : position_(0.0f), scale_(1.0f), rotation_(0.0f)
+Transform::Transform() : position_(0.0f), scale_(1.0f), rotation_(0.0f), direction_(0.0f, 0.0f, -1.0f, 0.0f)
 {
 }
 
@@ -9,6 +9,7 @@ Transform::Transform(const Transform &t)
     position_ = t.position_;
     scale_ = t.scale_;
     rotation_ = t.rotation_;
+    direction_ = t.direction_;
 }
 
 Transform &Transform::operator=(const Transform &t)
@@ -18,6 +19,7 @@ Transform &Transform::operator=(const Transform &t)
         position_ = t.position_;
         scale_ = t.scale_;
         rotation_ = t.rotation_;
+        direction_ = t.direction_;
     }
     return *this;
 }
@@ -43,4 +45,9 @@ glm::mat4 Transform::CalcRotateMatrix() const
 glm::mat4 Transform::CalcTranslateMatrix() const
 {
     return glm::translate(glm::mat4(1.0f), position_);
+}
+
+glm::vec3 Transform::direction() const
+{
+    return CalcRotateMatrix() * direction_;
 }

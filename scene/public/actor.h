@@ -47,7 +47,7 @@ class Actor
     void RemoveComponent(ComponentType type);
     void AddCameraComponent();
     void AddTransformComponent();
-    void AddMeshComponent();
+    void AddModelComponent();
     void AddLightComponent();
 
     COMPONENT_GETTER(TRANSFORM, TransformComponent)

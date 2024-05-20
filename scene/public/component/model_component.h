@@ -16,7 +16,7 @@ class ModelComponent : public RenderComponent
     {
         return model_;
     }
-    void set_model(const ModelPtr &model)
+    void set_model(ModelPtr model)
     {
         model_ = model;
     }

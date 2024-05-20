@@ -24,11 +24,18 @@ void SceneUI::Scene()
 {
     if (ImGui::Begin("Scene"))
     {
+        static char scene_name[512];
+        ImGui::InputText("##scene_actor", scene_name, 512);
+        ImGui::SameLine();
+        if (ImGui::Button("Add scene"))
+        {
+            LevelManager::GetInstance()->AddLevel(scene_name);
+        }
         SceneList();
 
         ImGui::Separator();
         static char layer_name[512];
-        ImGui::InputText("", layer_name, 512);
+        ImGui::InputText("##add_layer", layer_name, 512);
         ImGui::SameLine();
         if (ImGui::Button("Add Layer"))
         {
@@ -46,7 +53,7 @@ void SceneUI::SceneList()
                           ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable |
                               ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody))
     {
-        ImGui::TableSetupColumn("List");
+        ImGui::TableSetupColumn("Scenes");
         ImGui::TableHeadersRow();
         for (const auto &level : LevelManager::GetInstance()->GetAllLevel())
         {
@@ -87,6 +94,20 @@ void SceneUI::ActorList()
             }
             if (ImGui::TreeNodeEx(layer->name().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
             {
+                {
+                    static char actor_name[512];
+                    std::string add_actor_id("##" + layer->name());
+                    ImGui::InputText(add_actor_id.c_str(), actor_name, 512);
+                    ImGui::SameLine();
+                    if (ImGui::Button("Add actor"))
+                    {
+                        layer_selected->AddActor(new Actor(actor_name));
+                    }
+                }
+                if (ImGui::IsItemClicked())
+                {
+                    layer_selected = layer;
+                }
                 const auto &actors = layer->actors();
                 for (Actor *actor : actors)
                 {
@@ -134,7 +155,7 @@ void SceneUI::ActorDetail()
         CameraDetail();
         TransformDetail();
         LightDetail();
-        MeshDetail();
+        ModelDetail();
     }
     ImGui::End();
 }
@@ -228,7 +249,7 @@ void SceneUI::LightDetail()
     }
 }
 
-void SceneUI::MeshDetail()
+void SceneUI::ModelDetail()
 {
     std::shared_ptr<ModelComponent> comp = actor_selected->GetModelComponent();
     if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_DefaultOpen))
@@ -237,14 +258,86 @@ void SceneUI::MeshDetail()
         {
             if (ImGui::Button("Create##3"))
             {
-                actor_selected->AddMeshComponent();
+                actor_selected->AddModelComponent();
             }
             return;
         }
         auto model = comp->model();
+        if (model)
+        {
+            for (uint32_t i = 0; i < model->meshes_count(); ++i)
+            {
+                auto mesh = model->mesh(i);
+                if (!mesh->material())
+                {
+                    if (ImGui::Button("Create material"))
+                    {
+                        mesh->set_material(Material::Create());
+                    }
+                    ImGui::SameLine();
+                    ImGui::Text(" : (None)");
+                    return;
+                }
+                ImGui::Text("Ambient");
+                MeshTextureDetail(mesh, TextureType::AMBIENT);
+                ImGui::Text("Diffuse");
+                MeshTextureDetail(mesh, TextureType::DIFFUSE);
+                ImGui::Text("Specular");
+                MeshTextureDetail(mesh, TextureType::SPECULAR);
+                ImGui::Text("Normal");
+                MeshTextureDetail(mesh, TextureType::NORMAL);
+                ImGui::Text("Height");
+                MeshTextureDetail(mesh, TextureType::HEIGHT);
+                ImGui::Text("Tangent");
+                MeshTextureDetail(mesh, TextureType::TANGENT);
+            }
+        }
+        if (model_selected)
+        {
+            if (ImGui::Button("Add model"))
+            {
+                actor_selected->GetModelComponent()->set_model(model_selected);
+            }
+        }
         if (ImGui::Button("Remove##3"))
         {
             actor_selected->RemoveComponent(ComponentType::MODEL);
+        }
+    }
+}
+
+void SceneUI::MeshTextureDetail(MeshPtr mesh, TextureType type)
+{
+    auto tex = mesh->material()->texture(type);
+    if (!tex)
+    {
+        ImGui::SameLine();
+        ImGui::Text(" : (None)");
+
+        if (texture2d_selected)
+        {
+            ImGui::SameLine();
+            std::string label("Set texture##" + std::to_string((int)type));
+            if (ImGui::Button(label.c_str()))
+            {
+                mesh->material()->set_texture(type, texture2d_selected);
+            }
+        }
+        return;
+    }
+    ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(tex->id())), ImVec2(100, 100));
+    std::string label("Remove texture##" + std::to_string((int)type));
+    if (ImGui::Button(label.c_str()))
+    {
+        mesh->material()->set_texture(type, nullptr);
+    }
+
+    if (texture2d_selected)
+    {
+        std::string label("Change texture##" + std::to_string((int)type));
+        if (ImGui::Button(label.c_str()))
+        {
+            mesh->material()->set_texture(type, texture2d_selected);
         }
     }
 }

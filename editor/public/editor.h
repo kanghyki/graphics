@@ -26,7 +26,7 @@ class Editor
     /* ImGui */
     ImGuiContext *imgui_context_{nullptr};
 
-    std::unique_ptr<EditorUI> ui_;
+    std::shared_ptr<EditorUI> ui_;
 };
 
 #endif
