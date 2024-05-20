@@ -7,7 +7,7 @@
 #include "level_manager.h"
 #include "light_component.h"
 #include "material.h"
-#include "mesh_component.h"
+#include "model_component.h"
 #include "opengl_device.h"
 #include "time_manager.h"
 #include "transform_component.h"
@@ -124,12 +124,12 @@ void CreateTestLevel::Create()
     Actor *box = new Actor("Little box");
     box->SetComponent(std::shared_ptr<Component>(new RotationTransformComponent()));
     box->AddMeshComponent();
-    box->GetMeshComponent()->set_mesh(box_mesh);
+    box->GetModelComponent()->set_model(Model::Create({box_mesh}));
 
     Actor *sun = new Actor("My sun");
     sun->AddLightComponent();
     sun->AddMeshComponent();
-    sun->GetMeshComponent()->set_mesh(sphere_mesh);
+    sun->GetModelComponent()->set_model(Model::Create({sphere_mesh}));
     sun->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 2.0f, 0.0f);
     sun->GetTransformComponent()->transform().scale_ *= 0.2;
 

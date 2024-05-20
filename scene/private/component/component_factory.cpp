@@ -1,7 +1,7 @@
-#include "camera_component.h"
 #include "component_factory.h"
+#include "camera_component.h"
 #include "light_component.h"
-#include "mesh_component.h"
+#include "model_component.h"
 #include "transform_component.h"
 
 ComponentFactory::ComponentFactory()
@@ -21,8 +21,8 @@ std::shared_ptr<Component> ComponentFactory::Generate(ComponentType type) const
         return std::shared_ptr<Component>(new LightComponent());
     case ComponentType::TRANSFORM:
         return std::shared_ptr<Component>(new TransformComponent());
-    case ComponentType::MESH:
-        return std::shared_ptr<Component>(new MeshComponent());
+    case ComponentType::MODEL:
+        return std::shared_ptr<Component>(new ModelComponent());
     default:
         return nullptr;
     }

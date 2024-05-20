@@ -5,7 +5,7 @@
 #include "level.h"
 #include "level_manager.h"
 #include "light_component.h"
-#include "mesh_component.h"
+#include "model_component.h"
 #include "transform_component.h"
 #include <spdlog/spdlog.h>
 
@@ -230,7 +230,7 @@ void SceneUI::LightDetail()
 
 void SceneUI::MeshDetail()
 {
-    std::shared_ptr<MeshComponent> comp = actor_selected->GetMeshComponent();
+    std::shared_ptr<ModelComponent> comp = actor_selected->GetModelComponent();
     if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (!comp)
@@ -241,10 +241,10 @@ void SceneUI::MeshDetail()
             }
             return;
         }
-        std::shared_ptr<Mesh> mesh = comp->mesh();
+        auto model = comp->model();
         if (ImGui::Button("Remove##3"))
         {
-            actor_selected->RemoveComponent(ComponentType::MESH);
+            actor_selected->RemoveComponent(ComponentType::MODEL);
         }
     }
 }

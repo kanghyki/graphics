@@ -7,7 +7,7 @@ enum class ComponentType
     CAMERA,
     LIGHT,
     /* Render component */
-    MESH,
+    MODEL,
     EOL
 };
 

@@ -10,7 +10,7 @@
 class TransformComponent;
 class CameraComponent;
 class LightComponent;
-class MeshComponent;
+class ModelComponent;
 #define COMPONENT_GETTER(ENUM_TYPE_NAME, className)                                                                    \
     std::shared_ptr<className> Get##className()                                                                        \
     {                                                                                                                  \
@@ -53,7 +53,7 @@ class Actor
     COMPONENT_GETTER(TRANSFORM, TransformComponent)
     COMPONENT_GETTER(CAMERA, CameraComponent)
     COMPONENT_GETTER(LIGHT, LightComponent)
-    COMPONENT_GETTER(MESH, MeshComponent)
+    COMPONENT_GETTER(MODEL, ModelComponent)
 
   private:
     Actor(const Actor &c);

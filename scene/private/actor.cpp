@@ -48,7 +48,7 @@ void Actor::SetComponent(std::shared_ptr<Component> component)
     components_[static_cast<int>(component->type())] = component;
     switch (component->type())
     {
-    case ComponentType::MESH:
+    case ComponentType::MODEL:
         render_component_ = std::reinterpret_pointer_cast<RenderComponent>(component);
         break;
     default:
@@ -60,12 +60,12 @@ void Actor::RemoveComponent(ComponentType type)
 {
     if (type == ComponentType::TRANSFORM)
     {
-        if (GetCameraComponent() || GetLightComponent() || GetMeshComponent())
+        if (GetCameraComponent() || GetLightComponent() || GetModelComponent())
         {
             return;
         }
     }
-    if (type == ComponentType::MESH)
+    if (type == ComponentType::MODEL)
     {
 
         render_component_ = nullptr;
@@ -98,7 +98,7 @@ void Actor::AddMeshComponent()
     {
         Actor::AddTransformComponent();
     }
-    SetComponent(ComponentFactory().Generate(ComponentType::MESH));
+    SetComponent(ComponentFactory().Generate(ComponentType::MODEL));
 }
 
 void Actor::AddLightComponent()

@@ -7,7 +7,7 @@
 class TransformComponent;
 class CameraComponent;
 class LightComponent;
-class MeshComponent;
+class ModelComponent;
 #define OWNER_COMPONENT_GETTER_DECL(className) std::shared_ptr<className> Get##className() const;
 #define OWNER_COMPONENT_GETTER_IMPL(className)                                                                         \
     std::shared_ptr<className> Component::Get##className() const                                                       \
@@ -35,7 +35,7 @@ class Component
     OWNER_COMPONENT_GETTER_DECL(TransformComponent)
     OWNER_COMPONENT_GETTER_DECL(CameraComponent)
     OWNER_COMPONENT_GETTER_DECL(LightComponent)
-    OWNER_COMPONENT_GETTER_DECL(MeshComponent)
+    OWNER_COMPONENT_GETTER_DECL(ModelComponent)
 
   private:
     Component(const Component &);

@@ -1,19 +1,19 @@
-#include "mesh_component.h"
+#include "model_component.h"
 #include "opengl_device.h"
 #include "transform_component.h"
 
-MeshComponent::MeshComponent() : RenderComponent(ComponentType::MESH)
+ModelComponent::ModelComponent() : RenderComponent(ComponentType::MODEL)
 {
 }
 
-MeshComponent::~MeshComponent()
+ModelComponent::~ModelComponent()
 {
 }
 
-void MeshComponent::Render(ProgramPtr program)
+void ModelComponent::Render(ProgramPtr program)
 {
     // TODO:
-    if (!mesh_)
+    if (!model_)
     {
         return;
     }
@@ -21,5 +21,5 @@ void MeshComponent::Render(ProgramPtr program)
     glBufferSubData(GL_UNIFORM_BUFFER, offsetof(MatricesUniform, t_model), sizeof(glm::mat4),
                     glm::value_ptr(GetTransformComponent()->transform().CalcModelMatrix()));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    mesh()->Draw(program.get());
+    model()->Draw(program.get());
 }
