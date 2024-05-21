@@ -49,7 +49,7 @@ Texture2dPtr LoadTexture(const std::string &dirname, aiMaterial *ai_material, ai
         return nullptr;
     }
     aiString filepath;
-    ai_material->GetTexture(aiTextureType_DIFFUSE, 0, &filepath);
+    ai_material->GetTexture(ai_texture_type, 0, &filepath);
     auto image = Image::Load(fmt::format(dirname + "/" + filepath.C_Str()));
     if (!image)
     {
@@ -68,7 +68,8 @@ bool Model::LoadByAssimp(const std::string &filename)
         SPDLOG_ERROR("failed to load model: {}", filename);
         return false;
     }
-    auto dirname = filename.substr(0, filename.find_last_of("/"));
+    // FIXME: path
+    auto dirname = filename.substr(0, filename.find_last_of("\\"));
     for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
     {
         MaterialPtr material = Material::Create();
@@ -108,16 +109,19 @@ void Model::ProcessMesh(aiMesh *ai_mesh, const aiScene *ai_scene)
     for (uint32_t i = 0; i < ai_mesh->mNumVertices; ++i)
     {
         Vertex &vertex = vertices[i];
-        vertex.position = glm::vec3(ai_mesh->mVertices[i].x, ai_mesh->mVertices[i].y, ai_mesh->mVertices[i].z);
-        if (ai_mesh->mNormals)
+        if (ai_mesh->HasPositions())
+        {
+            vertex.position = glm::vec3(ai_mesh->mVertices[i].x, ai_mesh->mVertices[i].y, ai_mesh->mVertices[i].z);
+        }
+        if (ai_mesh->HasNormals())
         {
             vertex.normal = glm::vec3(ai_mesh->mNormals[i].x, ai_mesh->mNormals[i].y, ai_mesh->mNormals[i].z);
         }
-        if (ai_mesh->mTextureCoords[0])
+        if (ai_mesh->HasTextureCoords(0))
         {
-            vertex.tex_coord = glm::vec2(ai_mesh->mTextureCoords[0][i].x, ai_mesh->mTextureCoords[0][i].y);
+            vertex.uv = glm::vec2(ai_mesh->mTextureCoords[0][i].x, ai_mesh->mTextureCoords[0][i].y);
         }
-        if (ai_mesh->mTangents)
+        if (ai_mesh->HasTangentsAndBitangents())
         {
             vertex.tangent = glm::vec3(ai_mesh->mTangents[i].x, ai_mesh->mTangents[i].y, ai_mesh->mTangents[i].z);
         }

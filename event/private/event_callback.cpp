@@ -59,4 +59,5 @@ void MouseCallback(GLFWwindow *window, int button, int action, int modifier)
 #ifdef EDITOR
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, modifier);
 #endif
+    InputManager::GetInstance()->UpdateMouse(button, action);
 }

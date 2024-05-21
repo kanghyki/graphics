@@ -2,7 +2,7 @@
 #include "actor.h"
 #include "camera_manager.h"
 #include "level_manager.h"
-#include "opengl_device.h"
+#include "renderer.h"
 #include "transform_component.h"
 
 CameraComponent::CameraComponent() : Component(ComponentType::CAMERA)
@@ -26,23 +26,24 @@ void CameraComponent::FinalTick()
 
 void CameraComponent::Render()
 {
-    // TODO:
-    if (!pso_)
-    {
-        return;
-    }
-    OpenGLDevice::GetInstance()->ApplyPSO(pso_);
-    OpenGLDevice::GetInstance()->matrices_ubo()->Bind();
+    Renderer::GetInstance()->GetUBO(UBOType::CAMERA)->Bind();
+    glBufferSubData(GL_UNIFORM_BUFFER, offsetof(CameraUniform, c_view_position), sizeof(glm::vec3),
+                    glm::value_ptr(camera_.transform_.position_));
+
+    Renderer::GetInstance()->GetUBO(UBOType::MATRICES)->Bind();
     glBufferSubData(GL_UNIFORM_BUFFER, offsetof(MatricesUniform, t_view), sizeof(glm::mat4),
                     glm::value_ptr(camera_.CalcViewMatrix()));
     glBufferSubData(GL_UNIFORM_BUFFER, offsetof(MatricesUniform, t_proj), sizeof(glm::mat4),
                     glm::value_ptr(camera_.CalcPerspectiveProjectionMatrix()));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    pso_->program_->Use();
-
+    Renderer::GetInstance()->GetFramebuffer(FramebufferType::G_BUFFER)->Bind();
+    GraphicsPSOPtr g_buffer_pso = Renderer::GetInstance()->GetPSO(PsoType::G_BUFFER);
+    Renderer::GetInstance()->ApplyPSO(g_buffer_pso);
+    g_buffer_pso->program_->Use();
     for (Actor *actor : actors_)
     {
-        actor->Render(pso_->program_);
+        actor->Render(g_buffer_pso->program_);
     }
+    glUseProgram(0);
 }

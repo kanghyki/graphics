@@ -28,7 +28,7 @@ class Material
 
     void set_shineness(float shineness)
     {
-        uniform_.m_float_0 = shineness;
+        shineness_ = shineness;
     }
 
     Texture2dPtr texture(TextureType type)
@@ -38,15 +38,6 @@ class Material
     void set_texture(TextureType type, Texture2dPtr texture)
     {
         textures_[static_cast<int>(type)] = texture;
-    }
-
-    MaterialUniform &uniform()
-    {
-        return uniform_;
-    }
-    const MaterialUniform &uniform() const
-    {
-        return uniform_;
     }
 
   private:
@@ -61,7 +52,7 @@ class Material
     const char *texture_type_uniform_name[TextureSize] = {"m_ambient", "m_diffuse", "m_specular",
                                                           "m_normal",  "m_height",  "m_tangent"};
     std::array<Texture2dPtr, TextureSize> textures_;
-    MaterialUniform uniform_;
+    float shineness_{30.0f};
 };
 
 #endif

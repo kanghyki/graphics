@@ -4,6 +4,7 @@
 #include "model.h"
 #include "texture.h"
 #include <string>
+#include <utility>
 #include <vector>
 
 class ResourceManager
@@ -14,7 +15,7 @@ class ResourceManager
 
     void Init();
 
-    std::vector<ModelPtr> models()
+    std::vector<std::pair<std::string, ModelPtr>> models()
     {
         return models_;
     }
@@ -30,7 +31,7 @@ class ResourceManager
 
     static ResourceManager *instance_;
 
-    std::vector<ModelPtr> models_;
+    std::vector<std::pair<std::string, ModelPtr>> models_;
     std::vector<Texture2dPtr> texture2ds_;
 };
 

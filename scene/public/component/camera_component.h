@@ -3,8 +3,10 @@
 
 #include "camera.h"
 #include "component.h"
+#include "framebuffer.h"
 #include "graphics_pso.h"
 #include "libmath.h"
+#include <utility>
 #include <vector>
 
 class NoInherit
@@ -40,9 +42,9 @@ class CameraComponent : public Component, private NoInherit
         return camera_;
     }
 
-    void set_pso(GraphicsPSOPtr pso)
+    void set_render(const std::pair<GraphicsPSOPtr, FramebufferPtr> &render)
     {
-        pso_ = pso;
+        render_ = render;
     }
 
   private:
@@ -53,7 +55,7 @@ class CameraComponent : public Component, private NoInherit
 
     // uint32_t layer_mask_;
     std::vector<Actor *> actors_;
-    GraphicsPSOPtr pso_;
+    std::pair<GraphicsPSOPtr, FramebufferPtr> render_;
 };
 
 #endif

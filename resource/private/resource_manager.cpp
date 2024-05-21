@@ -39,15 +39,19 @@ void ResourceManager::Init()
             texture2ds_.push_back(texture2d);
         }
     }
-    /* Model */
 
-    models_.push_back(Model::Create({Mesh::CreateBox()}));
-    models_.push_back(Model::Create({Mesh::CreateSphere(30, 30)}));
-    models_.push_back(Model::Create({Mesh::CreatePlane()}));
-    for (const auto &entry : std::filesystem::directory_iterator(path + "/model"))
+    /* Model */
+    models_.push_back({"box", Model::Create({Mesh::CreateBox()})});
+    models_.push_back({"sphere", Model::Create({Mesh::CreateSphere(30, 30)})});
+    models_.push_back({"plane", Model::Create({Mesh::CreatePlane()})});
+    for (const auto &entry : std::filesystem::directory_iterator(path + "model"))
     {
         if (entry.is_regular_file())
         {
+            if (entry.path().string().find(".obj") == std::string::npos)
+            {
+                continue;
+            }
             auto model = Model::Load(entry.path().string());
             if (!model)
             {
@@ -55,7 +59,7 @@ void ResourceManager::Init()
                 continue;
             }
             SPDLOG_INFO("Loaded Model : {}", entry.path().filename().string());
-            models_.push_back(model);
+            models_.push_back({entry.path().filename().string(), model});
         }
     }
 }

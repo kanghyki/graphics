@@ -1,0 +1,170 @@
+#include "renderer.h"
+#include "opengl_device.h"
+#include <spdlog/spdlog.h>
+
+Renderer *Renderer::instance_ = nullptr;
+
+Renderer *Renderer::GetInstance()
+{
+    if (!instance_)
+    {
+        instance_ = new Renderer();
+    }
+    return instance_;
+}
+
+Renderer::Renderer()
+{
+}
+
+Renderer::~Renderer()
+{
+}
+
+void Renderer::Init()
+{
+    int width = OpenGLDevice::GetInstance()->width();
+    int height = OpenGLDevice::GetInstance()->height();
+    /* framebuffer */
+    main_framebuffer_ = Framebuffer::Create({Texture2d::Create(width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE)});
+    g_buffer_ = Framebuffer::Create({Texture2d::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT),
+                                     Texture2d::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT),
+                                     Texture2d::Create(width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE)});
+
+    /* shader */
+    std::string shader_dir(SHADER_PATH);
+    g_buffer_vs_ = Shader::CreateFromFile(shader_dir + "g_buffer.vs", GL_VERTEX_SHADER);
+    g_buffer_fs_ = Shader::CreateFromFile(shader_dir + "g_buffer.fs", GL_FRAGMENT_SHADER);
+    deffered_shading_vs_ = Shader::CreateFromFile(shader_dir + "deffered_shading.vs", GL_VERTEX_SHADER);
+    deffered_shading_fs_ = Shader::CreateFromFile(shader_dir + "deffered_shading.fs", GL_FRAGMENT_SHADER);
+    post_processing_vs_ = Shader::CreateFromFile(shader_dir + "post_processing.vs", GL_VERTEX_SHADER);
+    post_processing_fs_ = Shader::CreateFromFile(shader_dir + "post_processing.fs", GL_FRAGMENT_SHADER);
+
+    /* program */
+    g_buffer_program_ = Program::Create({g_buffer_vs_, g_buffer_fs_});
+    deffered_shading_program_ = Program::Create({deffered_shading_vs_, deffered_shading_fs_});
+    post_processing_program_ = Program::Create({post_processing_vs_, post_processing_fs_});
+
+    /* PSO */
+    g_buffer_pso_ = GraphicsPSO::Create();
+    deffered_shading_pso_ = GraphicsPSO::Create();
+    post_processing_pso_ = GraphicsPSO::Create();
+
+    g_buffer_pso_->program_ = g_buffer_program_;
+    deffered_shading_pso_->program_ = deffered_shading_program_;
+    post_processing_pso_->program_ = post_processing_program_;
+    post_processing_pso_->rasterizer_state_.is_depth_test_ = false;
+
+    /* uniform buffer object */
+    camera_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(CameraUniform), 1);
+    matrices_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(MatricesUniform), 1);
+    lights_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(LightsUniform), 1);
+    global_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(GlobalUniform), 1);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, camera_ubo_->id());
+    glBindBufferBase(GL_UNIFORM_BUFFER, 1, matrices_ubo_->id());
+    glBindBufferBase(GL_UNIFORM_BUFFER, 2, lights_ubo_->id());
+    glBindBufferBase(GL_UNIFORM_BUFFER, 3, global_ubo_->id());
+
+    /* For render */
+    plane_mesh_ = Mesh::CreatePlane();
+}
+
+void Renderer::ClearFramebuffer()
+{
+    main_framebuffer_->Bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    g_buffer_->Bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    Framebuffer::BindToDefault();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+}
+
+void Renderer::Render()
+{
+    main_framebuffer_->Bind();
+    ApplyPSO(deffered_shading_pso_);
+    deffered_shading_program_->Use();
+    deffered_shading_program_->SetUniform("model", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    glActiveTexture(GL_TEXTURE0);
+    g_buffer_->color_attachment(0)->Bind();
+    deffered_shading_program_->SetUniform("gPosition", 0);
+    glActiveTexture(GL_TEXTURE1);
+    g_buffer_->color_attachment(1)->Bind();
+    deffered_shading_program_->SetUniform("gNormal", 1);
+    glActiveTexture(GL_TEXTURE2);
+    g_buffer_->color_attachment(2)->Bind();
+    deffered_shading_program_->SetUniform("gAlbedoSpec", 2);
+
+    plane_mesh_->Draw(nullptr);
+}
+
+void Renderer::PostProcessing()
+{
+    Framebuffer::BindToDefault();
+    ApplyPSO(post_processing_pso_);
+    post_processing_program_->Use();
+    post_processing_program_->SetUniform("model", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    post_processing_program_->SetUniform("gamma", gamma_);
+    post_processing_program_->SetUniform("is_gray_scale", gray_scale_);
+    glActiveTexture(GL_TEXTURE0);
+    main_framebuffer_->color_attachment(0)->Bind();
+    post_processing_program_->SetUniform("main_texture", 0);
+    plane_mesh_->Draw(nullptr);
+}
+
+void Renderer::ApplyPSO(const GraphicsPSOPtr &pso) const
+{
+    /*
+     * cull face
+     */
+    if (pso->rasterizer_state_.is_cull_face_)
+    {
+        glEnable(GL_CULL_FACE);
+        glCullFace(pso->rasterizer_state_.cull_face_);
+    }
+    else
+    {
+        glDisable(GL_CULL_FACE);
+    }
+
+    /*
+     * blend
+     */
+    if (pso->rasterizer_state_.is_blend_)
+    {
+        glEnable(GL_BLEND);
+    }
+    else
+    {
+        glDisable(GL_BLEND);
+    }
+
+    /*
+     * depth test
+     */
+    if (pso->rasterizer_state_.is_depth_test_)
+    {
+        glEnable(GL_DEPTH_TEST);
+    }
+    else
+    {
+        glDisable(GL_DEPTH_TEST);
+    }
+
+    /*
+     * stencil test
+     */
+    if (pso->rasterizer_state_.is_stencil_test_)
+    {
+        glEnable(GL_STENCIL_TEST);
+    }
+    else
+    {
+        glDisable(GL_STENCIL_TEST);
+    }
+
+    /*
+     * Polygon
+     */
+    glPolygonMode(GL_FRONT_AND_BACK, pso->rasterizer_state_.polygon_mode);
+}

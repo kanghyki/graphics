@@ -15,7 +15,8 @@ void ResourceUI::RenderImpl()
             }
             if (texture2d_selected == tex)
             {
-                ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(tex->id())), ImVec2(130, 130));
+                ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(tex->id())), ImVec2(130, 130),
+                             ImVec2(0, 1), ImVec2(1, 0));
                 if (ImGui::IsItemClicked())
                 {
                     texture2d_selected = nullptr;
@@ -24,7 +25,8 @@ void ResourceUI::RenderImpl()
             }
             else
             {
-                ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(tex->id())), ImVec2(100, 100));
+                ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(tex->id())), ImVec2(100, 100),
+                             ImVec2(0, 1), ImVec2(1, 0));
                 if (ImGui::IsItemClicked())
                 {
                     texture2d_selected = tex;
@@ -53,13 +55,13 @@ void ResourceUI::RenderImpl()
                 }
                 else
                 {
-                    model_selected = models[i];
+                    model_selected = models[i].second;
                     selectable = i;
                 }
                 NotifyModel(model_selected);
             }
             ImGui::SameLine();
-            ImGui::Text("Model %d", i);
+            ImGui::Text("%s", models[i].first.c_str());
         }
     }
     ImGui::End();

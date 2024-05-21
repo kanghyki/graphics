@@ -1,20 +1,8 @@
 #ifndef INCLUDED_OPENGL_DEVICE_H
 #define INCLUDED_OPENGL_DEVICE_H
 
-#include "buffer.h"
-#include "framebuffer.h"
-#include "graphics_pso.h"
 #include "libopengl.h"
-#include "mesh.h"
-#include "program.h"
-#include "uniform_struct.h"
 #include <string>
-
-enum class GRAPHIC_PSO_TYPE
-{
-    LIGHTING,
-    SIMPLE
-};
 
 class OpenGLDevice
 {
@@ -26,31 +14,18 @@ class OpenGLDevice
     bool IsWindowClose();
     void SwapBuffer();
     void Terminate();
-    void ClearFramebuffer();
 
+    int width()
+    {
+        return width_;
+    }
+    int height()
+    {
+        return height_;
+    }
     GLFWwindow *glfw_window()
     {
         return glfw_window_;
-    }
-
-    GraphicsPSOPtr GetPSO(GRAPHIC_PSO_TYPE type);
-    void ApplyPSO(GraphicsPSOPtr pso) const;
-
-    BufferPtr matrices_ubo()
-    {
-        return matrices_ubo_;
-    }
-    BufferPtr material_ubo()
-    {
-        return material_ubo_;
-    }
-    BufferPtr lights_ubo()
-    {
-        return lights_ubo_;
-    }
-    BufferPtr global_ubo()
-    {
-        return global_ubo_;
     }
 
   private:
@@ -65,37 +40,6 @@ class OpenGLDevice
 
     /* GLFW */
     GLFWwindow *glfw_window_;
-
-    /* framebuffer */
-    FramebufferPtr main_framebuffer_;
-
-    /* PSO */
-    GraphicsPSOPtr lighting_pso_;
-    GraphicsPSOPtr simple_pso_;
-
-    /* shader */
-    ShaderPtr lighting_vs_;
-    ShaderPtr lighting_fs_;
-
-    ShaderPtr simple_vs_;
-    ShaderPtr simple_fs_;
-
-    /* program */
-    ProgramPtr lighting_program_;
-    ProgramPtr simple_program_;
-
-    /* uniform buffer */
-    BufferPtr matrices_ubo_;
-    BufferPtr material_ubo_;
-    BufferPtr lights_ubo_;
-    BufferPtr global_ubo_;
-
-    /* Post processing */
-    MeshPtr plane_mesh_;
-    ShaderPtr post_processing_vs_;
-    ShaderPtr post_processing_fs_;
-    ProgramPtr post_processing_program_;
-    GraphicsPSOPtr post_processing_pso_;
 };
 
 #endif

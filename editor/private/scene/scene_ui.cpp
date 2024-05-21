@@ -1,5 +1,6 @@
 #include "scene_ui.h"
 #include "actor.h"
+#include "camera.h"
 #include "camera_component.h"
 #include "layer.h"
 #include "level.h"
@@ -267,29 +268,37 @@ void SceneUI::ModelDetail()
         {
             for (uint32_t i = 0; i < model->meshes_count(); ++i)
             {
-                auto mesh = model->mesh(i);
-                if (!mesh->material())
+
+                if (ImGui::TreeNodeEx(std::to_string(i).c_str()))
                 {
-                    if (ImGui::Button("Create material"))
+                    auto mesh = model->mesh(i);
+                    if (!mesh->material())
                     {
-                        mesh->set_material(Material::Create());
+                        if (ImGui::Button("Create material"))
+                        {
+                            mesh->set_material(Material::Create());
+                        }
+                        ImGui::SameLine();
+                        ImGui::Text(" : (None)");
                     }
-                    ImGui::SameLine();
-                    ImGui::Text(" : (None)");
-                    return;
+                    else
+                    {
+                        ImGui::Text("Ambient");
+                        MeshTextureDetail(mesh, TextureType::AMBIENT);
+                        ImGui::Text("Diffuse");
+                        MeshTextureDetail(mesh, TextureType::DIFFUSE);
+                        ImGui::Text("Specular");
+                        MeshTextureDetail(mesh, TextureType::SPECULAR);
+                        ImGui::Text("Normal");
+                        MeshTextureDetail(mesh, TextureType::NORMAL);
+                        ImGui::Text("Height");
+                        MeshTextureDetail(mesh, TextureType::HEIGHT);
+                        ImGui::Text("Tangent");
+                        MeshTextureDetail(mesh, TextureType::TANGENT);
+                    }
+
+                    ImGui::TreePop();
                 }
-                ImGui::Text("Ambient");
-                MeshTextureDetail(mesh, TextureType::AMBIENT);
-                ImGui::Text("Diffuse");
-                MeshTextureDetail(mesh, TextureType::DIFFUSE);
-                ImGui::Text("Specular");
-                MeshTextureDetail(mesh, TextureType::SPECULAR);
-                ImGui::Text("Normal");
-                MeshTextureDetail(mesh, TextureType::NORMAL);
-                ImGui::Text("Height");
-                MeshTextureDetail(mesh, TextureType::HEIGHT);
-                ImGui::Text("Tangent");
-                MeshTextureDetail(mesh, TextureType::TANGENT);
             }
         }
         if (model_selected)

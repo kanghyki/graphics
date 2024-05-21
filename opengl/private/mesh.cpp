@@ -80,7 +80,7 @@ MeshPtr Mesh::CreateSphere(size_t slice, size_t stack)
             v.position =
                 glm::vec4(yPoint, 1.0f) * glm::rotate(glm::mat4(1.0f), (d_theta * j), glm::vec3(0.0f, -1.0f, 0.0f));
             v.normal = glm::normalize(v.position);
-            v.tex_coord = glm::vec2(static_cast<float>(j) / slice, 1.0f - static_cast<float>(i) / stack);
+            v.uv = glm::vec2(static_cast<float>(j) / slice, 1.0f - static_cast<float>(i) / stack);
             vertices.push_back(v);
         }
     }
@@ -144,14 +144,14 @@ void Mesh::ComputeTangents(std::vector<Vertex> &vertices, const std::vector<uint
         auto i1 = indices[i + 1];
         auto i2 = indices[i + 2];
 
-        tangents[i0] += compute(vertices[i0].position, vertices[i1].position, vertices[i2].position,
-                                vertices[i0].tex_coord, vertices[i1].tex_coord, vertices[i2].tex_coord);
+        tangents[i0] += compute(vertices[i0].position, vertices[i1].position, vertices[i2].position, vertices[i0].uv,
+                                vertices[i1].uv, vertices[i2].uv);
 
-        tangents[i1] = compute(vertices[i1].position, vertices[i2].position, vertices[i0].position,
-                               vertices[i1].tex_coord, vertices[i2].tex_coord, vertices[i0].tex_coord);
+        tangents[i1] = compute(vertices[i1].position, vertices[i2].position, vertices[i0].position, vertices[i1].uv,
+                               vertices[i2].uv, vertices[i0].uv);
 
-        tangents[i2] = compute(vertices[i2].position, vertices[i0].position, vertices[i1].position,
-                               vertices[i2].tex_coord, vertices[i0].tex_coord, vertices[i1].tex_coord);
+        tangents[i2] = compute(vertices[i2].position, vertices[i0].position, vertices[i1].position, vertices[i2].uv,
+                               vertices[i0].uv, vertices[i1].uv);
     }
 
     for (size_t i = 0; i < vertices.size(); i++)
@@ -172,16 +172,16 @@ void Mesh::Init(const std::vector<Vertex> &vertices, const std::vector<uint32_t>
         Buffer::Create(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices.data(), sizeof(uint32_t), indices.size());
     vertex_array_->SetAttrib(0, 3, GL_FLOAT, false, sizeof(Vertex), 0);
     vertex_array_->SetAttrib(1, 3, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, normal));
-    vertex_array_->SetAttrib(2, 2, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, tex_coord));
+    vertex_array_->SetAttrib(2, 2, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, uv));
     vertex_array_->SetAttrib(3, 3, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, tangent));
 }
 
 void Mesh::Draw(const Program *program) const
 {
-    vertex_array_->Bind();
-    if (material_)
+    if (program && material_)
     {
         material_->Setup(program);
     }
+    vertex_array_->Bind();
     glDrawElements(primitive_type_, index_buffer_->count(), GL_UNSIGNED_INT, 0);
 }

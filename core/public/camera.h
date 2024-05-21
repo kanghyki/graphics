@@ -21,12 +21,11 @@ class Camera
     float aspect_;
     float near_plane_;
     float far_plane_;
+    Transform transform_;
 
   private:
     Camera(const Camera &);
     Camera &operator=(const Camera &);
-
-    Transform transform_;
 };
 
 #endif

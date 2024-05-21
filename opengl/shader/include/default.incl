@@ -1,53 +1,22 @@
 /***********************************\
 |                                   |
-|             Matrices              |
+|             Camera                |
 |                                   |
 \***********************************/
-layout(binding = 0, std140) uniform Matrices {
-    mat4 t_view;
-    mat4 t_proj;
-    mat4 t_model;
+layout(binding = 0, std140) uniform Camera {
+    vec3 c_view_position;
 };
 
 /***********************************\
 |                                   |
-|             Material              |
+|             Matrices              |
 |                                   |
 \***********************************/
-layout(binding = 1, std140) uniform Material {
-    int         m_int_0;
-    int         m_int_1;
-    int         m_int_2;
-    int         m_int_3;
-
-    float       m_float_0;
-    float       m_float_1;
-    float       m_float_2;
-    float       m_float_3;
-
-    vec2        m_vec2_0;
-    vec2        m_vec2_1;
-    vec2        m_vec2_2;
-    vec2        m_vec2_3;
-
-    vec4        m_vec4_0;
-    vec4        m_vec4_1;
-    vec4        m_vec4_2;
-    vec4        m_vec4_3;
-
-    mat4        m_mat4_0;
-    mat4        m_mat4_1;
-    mat4        m_mat4_2;
-    mat4        m_mat4_3;
+layout(binding = 1, std140) uniform Matrices {
+    mat4 t_view;
+    mat4 t_proj;
+    mat4 t_model;
 };
-
-uniform sampler2D m_ambient;
-uniform sampler2D m_diffuse;
-uniform sampler2D m_specular;
-uniform sampler2D m_normal;
-uniform sampler2D m_height;
-uniform sampler2D m_tangent;
-
 
 /***********************************\
 |                                   |
@@ -56,31 +25,22 @@ uniform sampler2D m_tangent;
 \***********************************/
 struct Light {
     int     type;
-    // Point & Spot
     float   constant;
     float   linear;
     float   quadratic;
-
-    vec3    position;
-
-    // Directional & Spot
-    vec3    direction;
-
-    // Spot
     vec2    cutoff;
-
-    // All
+    vec3    position;
+    vec3    direction;
     vec3    ambient;
     vec3    diffuse;
     vec3    specular;
 };
 
-// layout(std140) uniform Lights {
-//     int     l_light_count;
-//     Light   l_lights[32];
-// };
+#define LIGHT_MAX 64
+
 layout(binding = 2, std140) uniform Lights {
-    Light   l_lights;
+    int     l_light_count;
+    Light   l_lights[LIGHT_MAX];
 };
 
 
@@ -95,12 +55,15 @@ layout(binding = 3, std140) uniform Global {
     float   g_delta_time;
 };
 
-uniform sampler2D g_texture_0;
-uniform sampler2D g_texture_1;
-uniform sampler2D g_texture_2;
-uniform sampler2D g_texture_3;
-
-uniform sampler3D g_texture3d_0;
-uniform sampler3D g_texture3d_1;
-uniform sampler3D g_texture3d_2;
-uniform sampler3D g_texture3d_3;
+/***********************************\
+|                                   |
+|             Material              |
+|                                   |
+\***********************************/
+uniform sampler2D m_ambient;
+uniform sampler2D m_diffuse;
+uniform sampler2D m_specular;
+uniform sampler2D m_normal;
+uniform sampler2D m_height;
+uniform sampler2D m_tangent;
+uniform float m_shineness;
