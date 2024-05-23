@@ -4,6 +4,7 @@
 #include "image.h"
 #include "libopengl.h"
 #include "ptr.h"
+#include <vector>
 
 namespace image_util
 {
@@ -20,7 +21,7 @@ class BaseTexture
     void Bind() const;
 
     void SetFilter(uint32_t min_filter, uint32_t mag_filter) const;
-    void SetWrap(uint32_t s_wrap, uint32_t t_wrap) const;
+    void SetWrap(uint32_t s_wrap, uint32_t t_wrap, uint32_t r_wrap = GL_NONE) const;
 
     const uint32_t id() const
     {
@@ -52,23 +53,23 @@ class Texture2d : public BaseTexture
     std::array<uint8_t, 4> GetTexPixel(int x, int y) const;
     bool SaveAsPng(const std::string &filename) const;
 
-    inline int width() const
+    int width() const
     {
         return width_;
     }
-    inline int height() const
+    int height() const
     {
         return height_;
     }
-    inline uint32_t inner_format() const
+    uint32_t inner_format() const
     {
         return inner_format_;
     }
-    inline uint32_t format() const
+    uint32_t format() const
     {
         return format_;
     }
-    inline uint32_t type() const
+    uint32_t type() const
     {
         return type_;
     }
@@ -78,11 +79,59 @@ class Texture2d : public BaseTexture
 
     void SetTextureFromImage(const Image *image);
 
-    int width_;
-    int height_;
-    uint32_t inner_format_;
-    uint32_t format_;
-    uint32_t type_;
+    int width_{0};
+    int height_{0};
+    uint32_t inner_format_{GL_RGBA};
+    uint32_t format_{GL_RGBA};
+    uint32_t type_{GL_UNSIGNED_BYTE};
+};
+
+CLASS_PTR(Texture3d);
+class Texture3d : public BaseTexture
+{
+  public:
+    static Texture3dPtr Create(const std::vector<Image *> &images);
+    static Texture3dPtr Create(int width, int height, int length, uint32_t inner_format, uint32_t format,
+                               uint32_t type);
+    ~Texture3d();
+
+    int width() const
+    {
+        return width_;
+    }
+    int height() const
+    {
+        return height_;
+    }
+    int length() const
+    {
+        return length_;
+    }
+    uint32_t inner_format() const
+    {
+        return inner_format_;
+    }
+    uint32_t type() const
+    {
+        return type_;
+    }
+    uint32_t format() const
+    {
+        return format_;
+    }
+
+  private:
+    Texture3d();
+
+    void SetCubeMapFromImages(const std::vector<Image *> &images);
+    void SetCubeMapFormat(int width, int height, int length, uint32_t inner_format, uint32_t format, uint32_t type);
+
+    int width_{0};
+    int height_{0};
+    int length_{0};
+    uint32_t inner_format_{GL_RGBA};
+    uint32_t format_{GL_RGBA};
+    uint32_t type_{GL_UNSIGNED_BYTE};
 };
 
 #endif

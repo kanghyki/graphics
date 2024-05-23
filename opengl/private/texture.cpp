@@ -75,10 +75,14 @@ void BaseTexture::SetFilter(uint32_t min_filter, uint32_t mag_filter) const
     glTexParameteri(texture_type_, GL_TEXTURE_MAG_FILTER, mag_filter);
 }
 
-void BaseTexture::SetWrap(uint32_t s_wrap, uint32_t t_wrap) const
+void BaseTexture::SetWrap(uint32_t s_wrap, uint32_t t_wrap, uint32_t r_wrap) const
 {
     glTexParameteri(texture_type_, GL_TEXTURE_WRAP_S, s_wrap);
     glTexParameteri(texture_type_, GL_TEXTURE_WRAP_T, t_wrap);
+    if (r_wrap != GL_NONE)
+    {
+        glTexParameteri(texture_type_, GL_TEXTURE_WRAP_T, r_wrap);
+    }
 }
 
 /*
@@ -204,4 +208,81 @@ bool Texture2d::SaveAsPng(const std::string &filename) const
     delete[] data;
 
     return result;
+}
+
+/*
+ * Texture3d
+ */
+
+Texture3d::Texture3d() : BaseTexture(GL_TEXTURE_CUBE_MAP)
+{
+}
+
+Texture3d::~Texture3d()
+{
+}
+
+Texture3dPtr Texture3d::Create(const std::vector<Image *> &images)
+{
+    auto texture = Texture3dPtr(new Texture3d());
+
+    if (images.size() != 6)
+    {
+        return nullptr;
+    }
+    texture->Bind();
+    texture->SetFilter(GL_LINEAR, GL_LINEAR);
+    texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    texture->SetCubeMapFromImages(images);
+
+    return std::move(texture);
+}
+
+Texture3dPtr Texture3d::Create(int width, int height, int length, uint32_t inner_format, uint32_t format, uint32_t type)
+{
+    auto texture = Texture3dPtr(new Texture3d());
+
+    texture->Bind();
+    texture->SetFilter(GL_LINEAR, GL_LINEAR);
+    texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    texture->SetCubeMapFormat(width, height, length, inner_format, format, type);
+
+    return std::move(texture);
+}
+
+void Texture3d::SetCubeMapFromImages(const std::vector<Image *> &images)
+{
+    // images { right, left, top, bottom, front, back }
+    width_ = images[4]->width();
+    height_ = images[4]->height();
+    length_ = images[0]->width();
+    type_ = GL_UNSIGNED_BYTE;
+    format_ = image_util::ChannelCountToRGBAFormat(images[0]->channel_count());
+
+    for (uint32_t i = 0; i < (uint32_t)images.size(); i++)
+    {
+        Image *image = images[i];
+        GLenum format = image_util::ChannelCountToRGBAFormat(image->channel_count());
+
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, image->width(), image->height(), 0, format, type_,
+                     image->data());
+    }
+}
+
+void Texture3d::SetCubeMapFormat(int width, int height, int length, uint32_t inner_format, uint32_t format,
+                                 uint32_t type)
+{
+    width_ = width;
+    height_ = height;
+    length_ = length;
+    inner_format_ = inner_format_;
+    type_ = type;
+    format_ = format;
+
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, inner_format_, height_, length_, 0, format_, type_, NULL);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, inner_format_, height_, length_, 0, format_, type_, NULL);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, inner_format_, width_, height_, 0, format_, type_, NULL);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, inner_format_, width_, height_, 0, format_, type_, NULL);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, inner_format_, length_, width_, 0, format_, type_, NULL);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, inner_format_, length_, width_, 0, format_, type_, NULL);
 }

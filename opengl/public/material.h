@@ -47,7 +47,7 @@ class Material
 
     float shineness_{30.0f};
     glm::vec3 albedo_color_{1.0f, 0.0f, 0.0f};
-    float specular_alpha_{1.0f};
+    float specular_alpha_{0.0f};
 
   private:
     Material();

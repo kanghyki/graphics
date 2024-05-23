@@ -179,7 +179,7 @@ void Mesh::Init(const std::vector<Vertex> &vertices, const std::vector<uint32_t>
 void Mesh::Draw(const Program *program) const
 {
     vertex_array_->Bind();
-    if (program && material_)
+    if (material_)
     {
         material_->Setup(program);
     }
