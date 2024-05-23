@@ -2,10 +2,12 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoord;
+layout (location = 3) in vec3 aTangent;
 
 out vec3 position;
 out vec3 normal;
 out vec2 texCoord;
+out vec3 tangent;
 
 #include "include/default.incl"
 
@@ -15,7 +17,10 @@ out vec2 texCoord;
 
 void main() {
   gl_Position = proj * view * model * vec4(aPos, 1.0);
-  normal = (transpose(inverse(model)) * vec4(aNormal, 0.0)).xyz;
+  // TODO: inv_model_uniform
+  mat4 invModel = transpose(inverse(model));
+  normal = (invModel * vec4(aNormal, 0.0)).xyz;
+  tangent = (invModel * vec4(aTangent, 0.0)).xyz;
   texCoord = aTexCoord;
   position = (model * vec4(aPos, 1.0)).xyz;
 }

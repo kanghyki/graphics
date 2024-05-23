@@ -4,7 +4,6 @@ layout (location = 2) in vec2 aTexCoord;
 
 uniform mat4 model;
 
-out vec4 vertexColor;
 out vec2 texCoord;
 
 void main() {

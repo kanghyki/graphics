@@ -29,7 +29,7 @@ void ResourceManager::Init()
     {
         if (entry.is_regular_file())
         {
-            auto texture2d = Texture2d::Load(entry.path().string());
+            auto texture2d = Texture2d::Create(Image::Load(entry.path().string(), false).get());
             if (!texture2d)
             {
                 SPDLOG_WARN("Loading failed 2d Texture : {}", entry.path().filename().string());
