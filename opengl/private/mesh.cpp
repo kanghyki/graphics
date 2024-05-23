@@ -178,10 +178,10 @@ void Mesh::Init(const std::vector<Vertex> &vertices, const std::vector<uint32_t>
 
 void Mesh::Draw(const Program *program) const
 {
+    vertex_array_->Bind();
     if (program && material_)
     {
         material_->Setup(program);
     }
-    vertex_array_->Bind();
     glDrawElements(primitive_type_, index_buffer_->count(), GL_UNSIGNED_INT, 0);
 }

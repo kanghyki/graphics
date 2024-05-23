@@ -12,6 +12,20 @@ in vec2 texCoord;
 void main() {
   gPosition = vec4(position, 1.0);
   gNormal = vec4(normalize(normal), 1.0);
-  gAlbedoSpec.rgb = texture(m_diffuse, texCoord).rgb;
-  gAlbedoSpec.a = texture(m_specular, texCoord).r;
+  if (material.use_albedo_map)
+  {
+    gAlbedoSpec.rgb = texture(m_albedo, texCoord).rgb;
+  }
+  else
+  {
+    gAlbedoSpec.rgb = material.albedo_color.rbg;
+  }
+  if (material.use_specular_map)
+  {
+    gAlbedoSpec.a = texture(m_specular, texCoord).r;
+  }
+  else
+  {
+    gAlbedoSpec.a = material.specular_alpha;
+  }
 }

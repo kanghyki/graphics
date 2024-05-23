@@ -13,7 +13,7 @@ class LightManager
 
     void Init();
     void Tick();
-    void AddLight(const LightUniform &light);
+    void AddLight(const LightData &light);
 
   private:
     LightManager();

@@ -25,19 +25,15 @@ layout(binding = 1, std140) uniform Matrices {
 \***********************************/
 struct Light {
     int     type;
-    float   constant;
-    float   linear;
-    float   quadratic;
-    vec2    cutoff;
+    float   falloff_start;
+    float   falloff_end;
+    float   spot_power;
+
     vec3    position;
+    vec3    strength;
     vec3    direction;
-    vec3    ambient;
-    vec3    diffuse;
-    vec3    specular;
 };
-
 #define LIGHT_MAX 64
-
 layout(binding = 2, std140) uniform Lights {
     int     l_light_count;
     Light   l_lights[LIGHT_MAX];
@@ -60,10 +56,27 @@ layout(binding = 3, std140) uniform Global {
 |             Material              |
 |                                   |
 \***********************************/
-uniform sampler2D m_ambient;
-uniform sampler2D m_diffuse;
+struct Material {
+    float shininess;
+    bool use_albedo_map;
+    bool use_specular_map;
+    bool use_ao_map;
+
+    bool use_normal_map;
+    bool use_roughness_map;
+    bool use_metallic_map;
+    bool use_emissive_map;
+
+    vec3 albedo_color;
+    float specular_alpha;
+};
+layout(binding = 4, std140) uniform Materialu {
+    Material material;
+};
+uniform sampler2D m_albedo;
 uniform sampler2D m_specular;
+uniform sampler2D m_ao;
 uniform sampler2D m_normal;
-uniform sampler2D m_height;
-uniform sampler2D m_tangent;
-uniform float m_shineness;
+uniform sampler2D m_roughness;
+uniform sampler2D m_metallic;
+uniform sampler2D m_emissive;

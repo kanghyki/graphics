@@ -75,11 +75,15 @@ bool Model::LoadByAssimp(const std::string &filename)
         MaterialPtr material = Material::Create();
 
         aiMaterial *scene_material = scene->mMaterials[i];
-        material->set_texture(TextureType::AMBIENT, LoadTexture(dirname, scene_material, aiTextureType_AMBIENT));
-        material->set_texture(TextureType::DIFFUSE, LoadTexture(dirname, scene_material, aiTextureType_DIFFUSE));
+        material->set_texture(TextureType::ALBEDO, LoadTexture(dirname, scene_material, aiTextureType_DIFFUSE));
         material->set_texture(TextureType::SPECULAR, LoadTexture(dirname, scene_material, aiTextureType_SPECULAR));
+        material->set_texture(TextureType::AO, LoadTexture(dirname, scene_material, aiTextureType_AMBIENT_OCCLUSION));
         material->set_texture(TextureType::NORMAL, LoadTexture(dirname, scene_material, aiTextureType_NORMALS));
-        material->set_texture(TextureType::HEIGHT, LoadTexture(dirname, scene_material, aiTextureType_HEIGHT));
+        material->set_texture(TextureType::ROUGHNESS,
+                              LoadTexture(dirname, scene_material, aiTextureType_DIFFUSE_ROUGHNESS));
+        // Metallic = metalness ?
+        material->set_texture(TextureType::METAILLIC, LoadTexture(dirname, scene_material, aiTextureType_METALNESS));
+        material->set_texture(TextureType::EMISSIVE, LoadTexture(dirname, scene_material, aiTextureType_EMISSIVE));
 
         materials_.push_back(material);
     }

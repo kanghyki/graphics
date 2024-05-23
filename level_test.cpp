@@ -126,7 +126,7 @@ void CreateTestLevel::Create()
     auto floor_mesh = Mesh::CreateBox();
     floor_mesh->set_material(Material::Create());
     auto floor_material = floor_mesh->material();
-    floor_material->set_texture(TextureType::DIFFUSE, Texture2d::Load(resource_path + "\\texture2d\\brickwall.jpg"));
+    floor_material->set_texture(TextureType::ALBEDO, Texture2d::Load(resource_path + "\\texture2d\\brickwall.jpg"));
     floor->GetModelComponent()->set_model(Model::Create({floor_mesh}));
     floor->GetTransformComponent()->transform().scale_ = glm::vec3(10.0f, 0.1f, 10.0f);
     floor->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -135,7 +135,7 @@ void CreateTestLevel::Create()
     auto box_mesh = Mesh::CreateBox();
     box_mesh->set_material(Material::Create());
     auto box_material = box_mesh->material();
-    box_material->set_texture(TextureType::DIFFUSE, Texture2d::Load(resource_path + "\\texture2d\\box.png"));
+    box_material->set_texture(TextureType::ALBEDO, Texture2d::Load(resource_path + "\\texture2d\\box.png"));
     box_material->set_texture(TextureType::SPECULAR, Texture2d::Load(resource_path + "\\texture2d\\box_spec.png"));
     box->SetComponent(std::shared_ptr<Component>(new RotationTransformComponent()));
     box->AddModelComponent();
@@ -155,14 +155,13 @@ void CreateTestLevel::Create()
     auto red = Mesh::CreateSphere(30, 30);
     red->set_material(Material::Create());
     red->material()->set_texture(
-        TextureType::DIFFUSE,
+        TextureType::ALBEDO,
         Texture2d::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.8f, 0.0f, 0.0f, 1.0f)).get()));
     light_0->GetModelComponent()->set_model(Model::Create({red}));
     light_0->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 2.0f, -2.5f);
     light_0->GetTransformComponent()->transform().scale_ *= 0.2;
     light_0->GetLightComponent()->light().type_ = LightType::POINT;
-    light_0->GetLightComponent()->light().diffuse_ = glm::vec3(0.8f, 0.0f, 0.0f);
-    light_0->GetLightComponent()->light().ambient_ = glm::vec3(0.2f, 0.2f, 0.2f);
+    light_0->GetLightComponent()->light().strength_ = glm::vec3(0.8f, 0.0f, 0.0f);
 
     Actor *light_1 = new Actor("Light_green");
     light_1->AddLightComponent();
@@ -170,14 +169,13 @@ void CreateTestLevel::Create()
     auto blue = Mesh::CreateSphere(30, 30);
     blue->set_material(Material::Create());
     blue->material()->set_texture(
-        TextureType::DIFFUSE,
+        TextureType::ALBEDO,
         Texture2d::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.8f, 0.0f, 1.0f)).get()));
     light_1->GetModelComponent()->set_model(Model::Create({blue}));
     light_1->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 2.0f, 3.0f);
     light_1->GetTransformComponent()->transform().scale_ *= 0.2;
     light_1->GetLightComponent()->light().type_ = LightType::POINT;
-    light_1->GetLightComponent()->light().diffuse_ = glm::vec3(0.0f, 0.8f, 0.0f);
-    light_1->GetLightComponent()->light().ambient_ = glm::vec3(0.2f, 0.2f, 0.2f);
+    light_1->GetLightComponent()->light().strength_ = glm::vec3(0.0f, 0.8f, 0.0f);
 
     Actor *light_2 = new Actor("Light_blue");
     light_2->AddLightComponent();
@@ -185,14 +183,13 @@ void CreateTestLevel::Create()
     auto green = Mesh::CreateSphere(30, 30);
     green->set_material(Material::Create());
     green->material()->set_texture(
-        TextureType::DIFFUSE,
+        TextureType::ALBEDO,
         Texture2d::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.0f, 0.8f, 1.0f)).get()));
     light_2->GetModelComponent()->set_model(Model::Create({green}));
     light_2->GetTransformComponent()->transform().position_ = glm::vec3(-3.0f, 2.5f, 0.0f);
     light_2->GetTransformComponent()->transform().scale_ *= 0.2;
     light_2->GetLightComponent()->light().type_ = LightType::POINT;
-    light_2->GetLightComponent()->light().diffuse_ = glm::vec3(0.0f, 0.0f, 0.8f);
-    light_2->GetLightComponent()->light().ambient_ = glm::vec3(0.2f, 0.2f, 0.2f);
+    light_2->GetLightComponent()->light().strength_ = glm::vec3(0.0f, 0.0f, 0.8f);
 
     Actor *light_3 = new Actor("Light_yellow");
     light_3->AddLightComponent();
@@ -200,14 +197,13 @@ void CreateTestLevel::Create()
     auto yellow = Mesh::CreateSphere(30, 30);
     yellow->set_material(Material::Create());
     yellow->material()->set_texture(
-        TextureType::DIFFUSE,
+        TextureType::ALBEDO,
         Texture2d::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.8f, 0.8f, 0.0f, 1.0f)).get()));
     light_3->GetModelComponent()->set_model(Model::Create({yellow}));
     light_3->GetTransformComponent()->transform().position_ = glm::vec3(3.0f, 2.0f, -3.0f);
     light_3->GetTransformComponent()->transform().scale_ *= 0.2;
     light_3->GetLightComponent()->light().type_ = LightType::POINT;
-    light_3->GetLightComponent()->light().diffuse_ = glm::vec3(0.5f, 0.5f, 0.0f);
-    light_3->GetLightComponent()->light().ambient_ = glm::vec3(0.2f, 0.2f, 0.2f);
+    light_3->GetLightComponent()->light().strength_ = glm::vec3(0.5f, 0.5f, 0.0f);
 
     Actor *cam = new Actor("Camera man");
     cam->SetComponent(std::shared_ptr<Component>(new CameraTransformComponent()));

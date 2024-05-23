@@ -21,24 +21,21 @@ struct MatricesUniform
     glm::mat4 t_model;
 };
 
-struct LightUniform
+struct LightData
 {
     int type;
-    float constant;
-    float linear;
-    float quadratic;
-    glm::vec2 cutoff;
-    unsigned char __p2[8];
+    float falloff_start;
+    float falloff_end;
+    float spot_power;
+
     glm::vec3 position;
     unsigned char __p0[4];
-    glm::vec3 direction;
+
+    glm::vec3 strength;
     unsigned char __p1[4];
-    glm::vec3 ambient;
-    unsigned char __p3[4];
-    glm::vec3 diffuse;
-    unsigned char __p4[4];
-    glm::vec3 specular;
-    unsigned char __p5[4];
+
+    glm::vec3 direction;
+    unsigned char __p2[4];
 };
 
 struct LightsUniform
@@ -49,7 +46,7 @@ struct LightsUniform
     };
     int count{0};
     unsigned char __p0[12];
-    LightUniform l_lights[LIGHT_MAX];
+    LightData l_lights[LIGHT_MAX];
 };
 
 struct GlobalUniform
@@ -57,6 +54,22 @@ struct GlobalUniform
     glm::vec2 g_resolution;
     float g_time;
     float g_delta_time;
+};
+
+struct MaterialUniform
+{
+    float m_shineness;
+    int use_albedo_map;
+    int use_specular_map;
+    int use_ao_map;
+
+    int use_normal_map;
+    int use_roughness_map;
+    int use_metallic_map;
+    int use_emissive_map;
+
+    glm::vec3 albedo_color;
+    float specular_alpha;
 };
 
 #endif

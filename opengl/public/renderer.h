@@ -24,7 +24,8 @@ enum class UBOType
     CAMERA,
     MATRICES,
     LIGHT,
-    GLOBAL
+    GLOBAL,
+    MATERIAL
 };
 
 class Renderer
@@ -72,6 +73,8 @@ class Renderer
             return lights_ubo_;
         case UBOType::GLOBAL:
             return global_ubo_;
+        case UBOType::MATERIAL:
+            return material_ubo_;
         }
         return nullptr;
     }
@@ -125,6 +128,7 @@ class Renderer
     BufferPtr matrices_ubo_;
     BufferPtr lights_ubo_;
     BufferPtr global_ubo_;
+    BufferPtr material_ubo_;
 
     /* For render */
     MeshPtr plane_mesh_;

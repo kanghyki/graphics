@@ -60,10 +60,12 @@ void Renderer::Init()
     matrices_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(MatricesUniform), 1);
     lights_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(LightsUniform), 1);
     global_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(GlobalUniform), 1);
+    material_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(MaterialUniform), 1);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, camera_ubo_->id());
     glBindBufferBase(GL_UNIFORM_BUFFER, 1, matrices_ubo_->id());
     glBindBufferBase(GL_UNIFORM_BUFFER, 2, lights_ubo_->id());
     glBindBufferBase(GL_UNIFORM_BUFFER, 3, global_ubo_->id());
+    glBindBufferBase(GL_UNIFORM_BUFFER, 4, material_ubo_->id());
 
     /* For render */
     plane_mesh_ = Mesh::CreatePlane();
@@ -81,6 +83,12 @@ void Renderer::ClearFramebuffer()
 
 void Renderer::Render()
 {
+    int width = g_buffer_->color_attachment(0)->width();
+    int height = g_buffer_->color_attachment(0)->width();
+
+    g_buffer_->Bind(GL_READ_FRAMEBUFFER);
+    main_framebuffer_->Bind(GL_DRAW_FRAMEBUFFER);
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     main_framebuffer_->Bind();
     ApplyPSO(deffered_shading_pso_);
     deffered_shading_program_->Use();

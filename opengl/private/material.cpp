@@ -1,4 +1,5 @@
 #include "material.h"
+#include "renderer.h"
 
 Material::Material()
 {
@@ -27,5 +28,7 @@ void Material::Setup(const Program *program) const
             ++textureCount;
         }
     }
-    // program->SetUniform("m_shineness", shineness_);
+    Renderer::GetInstance()->GetUBO(UBOType::MATERIAL)->Bind();
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(MaterialUniform), &ToUniform());
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }

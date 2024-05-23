@@ -230,19 +230,13 @@ void SceneUI::LightDetail()
         ImGui::RadioButton("Point", (int *)&light.type_, (int)LightType::POINT);
         ImGui::SameLine();
         ImGui::RadioButton("Spot", (int *)&light.type_, (int)LightType::SPOT);
-        if (light.type_ == LightType::DIRECTIONAL || light.type_ == LightType::SPOT)
-        {
-            ImGui::Text("%10s : x(%.3f), y(%.3f), z(%.3f)", "Direction", light.direction().x, light.direction().y,
-                        light.direction().z);
-        }
-        else if (light.type_ == LightType::SPOT)
-        {
-            ImGui::DragFloat2("cutoff", glm::value_ptr(light.cutoff_), 0.5f, 0.0f, 180.0f);
-        }
+        ImGui::Text("%10s : x(%.3f), y(%.3f), z(%.3f)", "Direction", light.direction().x, light.direction().y,
+                    light.direction().z);
+        ImGui::ColorEdit3("strengh", glm::value_ptr(light.strength_));
+        ImGui::DragFloat("falloff_start", &light.falloff_start_, 0.01f, 0.0f, 180.0f);
+        ImGui::DragFloat("falloff_end", &light.falloff_end_, 0.01f, 0.0f, 180.0f);
+        ImGui::DragFloat("spot_power", &light.spot_power_, 0.01f, 0.0f, 180.0f);
         ImGui::Separator();
-        ImGui::ColorEdit3("Ambient", glm::value_ptr(light.ambient_));
-        ImGui::ColorEdit3("Diffuse", glm::value_ptr(light.diffuse_));
-        ImGui::ColorEdit3("Specular", glm::value_ptr(light.specular_));
         if (ImGui::Button("Remove##2"))
         {
             actor_selected->RemoveComponent(ComponentType::LIGHT);
@@ -283,18 +277,23 @@ void SceneUI::ModelDetail()
                     }
                     else
                     {
-                        ImGui::Text("Ambient");
-                        MeshTextureDetail(mesh, TextureType::AMBIENT);
-                        ImGui::Text("Diffuse");
-                        MeshTextureDetail(mesh, TextureType::DIFFUSE);
+                        ImGui::DragFloat("Shininess", &mesh->material()->shineness_, 0.01f, 0.0f, 100.0f);
+                        ImGui::ColorEdit3("Albedo", glm::value_ptr(mesh->material()->albedo_color_));
+                        ImGui::DragFloat("Specular alpha", &mesh->material()->specular_alpha_, 0.01f, 0.0f, 1.0f);
+                        ImGui::Text("ALBEDO");
+                        MeshTextureDetail(mesh, TextureType::ALBEDO);
                         ImGui::Text("Specular");
                         MeshTextureDetail(mesh, TextureType::SPECULAR);
+                        ImGui::Text("AO");
+                        MeshTextureDetail(mesh, TextureType::AO);
                         ImGui::Text("Normal");
                         MeshTextureDetail(mesh, TextureType::NORMAL);
-                        ImGui::Text("Height");
-                        MeshTextureDetail(mesh, TextureType::HEIGHT);
-                        ImGui::Text("Tangent");
-                        MeshTextureDetail(mesh, TextureType::TANGENT);
+                        ImGui::Text("Roughness");
+                        MeshTextureDetail(mesh, TextureType::ROUGHNESS);
+                        ImGui::Text("Metaillic");
+                        MeshTextureDetail(mesh, TextureType::METAILLIC);
+                        ImGui::Text("Emissive");
+                        MeshTextureDetail(mesh, TextureType::EMISSIVE);
                     }
 
                     ImGui::TreePop();

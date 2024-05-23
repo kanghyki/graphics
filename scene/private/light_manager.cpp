@@ -30,14 +30,15 @@ void LightManager::Tick()
 {
     Renderer::GetInstance()->GetUBO(UBOType::LIGHT)->Bind();
     glBufferSubData(GL_UNIFORM_BUFFER, offsetof(LightsUniform, count), sizeof(int), &lights_.count);
-    glBufferSubData(GL_UNIFORM_BUFFER, offsetof(LightsUniform, l_lights), sizeof(LightUniform) * lights_.count,
+    glBufferSubData(GL_UNIFORM_BUFFER, offsetof(LightsUniform, l_lights), sizeof(LightData) * lights_.count,
                     &lights_.l_lights);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     lights_.count = 0;
 }
 
-void LightManager::AddLight(const LightUniform &light)
+void LightManager::AddLight(const LightData &light)
 {
+    // TODO : opt
     if (lights_.count >= LightsUniform::LIGHT_MAX)
     {
         SPDLOG_WARN("MAXIMUM LIGHT");

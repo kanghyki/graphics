@@ -23,48 +23,37 @@ class Light
     {
     }
 
-    LightUniform ToUniform() const
+    LightData ToData() const
     {
-        LightUniform uniform;
+        LightData data;
 
-        uniform.type = static_cast<int>(type_);
-        uniform.position = position();
-        uniform.constant = constant_;
-        uniform.linear = linear_;
-        uniform.quadratic = quadratic_;
+        // memset(&data, 0, sizeof(LightData));
+        data.type = static_cast<int>(type_);
+        data.falloff_start = falloff_start_;
+        data.falloff_end = falloff_end_;
+        data.spot_power = spot_power_;
 
-        uniform.direction = direction();
+        data.position = position();
+        data.strength = strength_;
+        data.direction = direction();
 
-        uniform.cutoff = cutoff_;
-        uniform.ambient = ambient_;
-        uniform.diffuse = diffuse_;
-        uniform.specular = specular_;
-
-        return uniform;
+        return data;
     }
 
-    // Point & Spot
     glm::vec3 position() const
     {
         return transform_.position_;
     }
-    const float constant_{1.0f};
-    const float linear_{0.09f};
-    const float quadratic_{0.032f};
-    // Directional & Spot
     glm::vec3 direction() const
     {
         return transform_.direction();
     }
 
-    // Spot
-    glm::vec2 cutoff_{glm::vec2(55.0f, 5.0f)};
-
-    // All
     Transform transform_;
-    glm::vec3 ambient_{glm::vec3(1.0f, 1.0f, 1.0f)};
-    glm::vec3 diffuse_{glm::vec3(1.0f, 1.0f, 1.0f)};
-    glm::vec3 specular_{glm::vec3(1.0f, 1.0f, 1.0f)};
+    glm::vec3 strength_{1.0f, 1.0f, 1.0f};
+    float spot_power_{1.0f};
+    float falloff_start_{0.0f};
+    float falloff_end_{10.0f};
 
     LightType type_{LightType::DIRECTIONAL};
 };
