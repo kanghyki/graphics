@@ -2,9 +2,10 @@
 #include "editor.h"
 #include "input_manager.h"
 #include "opengl_device.h"
+#include "renderer.h"
 #include <iostream>
 
-void FramebufferCallback(GLFWwindow *window, int width, int height);
+void FramebufferSizeCallback(GLFWwindow *window, int width, int height);
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 void CharCallback(GLFWwindow *window, unsigned int ch);
 void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset);
@@ -15,7 +16,7 @@ void event::glfw_callback_init()
 {
     GLFWwindow *window = OpenGLDevice::GetInstance()->glfw_window();
 
-    glfwSetFramebufferSizeCallback(window, FramebufferCallback);
+    glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
     glfwSetKeyCallback(window, KeyCallback);
     glfwSetCharCallback(window, CharCallback);
     glfwSetCursorPosCallback(window, CursorCallback);
@@ -23,8 +24,9 @@ void event::glfw_callback_init()
     glfwSetScrollCallback(window, ScrollCallback);
 }
 
-void FramebufferCallback(GLFWwindow *window, int width, int height)
+void FramebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
+    Renderer::GetInstance()->Resize(width, height);
 }
 
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)

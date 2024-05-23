@@ -15,6 +15,7 @@ CameraComponent::~CameraComponent()
 
 void CameraComponent::Tick()
 {
+    camera_.aspect_ = Renderer::GetInstance()->aspect();
     CameraManager::GetInstance()->RegisterCamera(this);
     actors_ = LevelManager::GetInstance()->GetCurrentLevel()->GetActors();
 }

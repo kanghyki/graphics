@@ -13,8 +13,9 @@ Renderer *Renderer::GetInstance()
     return instance_;
 }
 
-Renderer::Renderer()
+Renderer::Renderer() : width_(WINDOW_INIT_WIDTH), height_(WINDOW_INIT_HEIGHT)
 {
+    aspect_ = static_cast<float>(width_) / static_cast<float>(height_);
 }
 
 Renderer::~Renderer()
@@ -23,13 +24,12 @@ Renderer::~Renderer()
 
 void Renderer::Init()
 {
-    int width = OpenGLDevice::GetInstance()->width();
-    int height = OpenGLDevice::GetInstance()->height();
+    glViewport(0, 0, width_, height_);
     /* framebuffer */
-    main_framebuffer_ = Framebuffer::Create({Texture2d::Create(width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE)});
-    g_buffer_ = Framebuffer::Create({Texture2d::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT),
-                                     Texture2d::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT),
-                                     Texture2d::Create(width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE)});
+    main_framebuffer_ = Framebuffer::Create({Texture2d::Create(width_, height_, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE)});
+    g_buffer_ = Framebuffer::Create({Texture2d::Create(width_, height_, GL_RGBA16F, GL_RGBA, GL_FLOAT),
+                                     Texture2d::Create(width_, height_, GL_RGBA16F, GL_RGBA, GL_FLOAT),
+                                     Texture2d::Create(width_, height_, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE)});
 
     /* shader */
     std::string shader_dir(SHADER_PATH);
@@ -83,12 +83,9 @@ void Renderer::ClearFramebuffer()
 
 void Renderer::Render()
 {
-    int width = g_buffer_->color_attachment(0)->width();
-    int height = g_buffer_->color_attachment(0)->width();
-
     g_buffer_->Bind(GL_READ_FRAMEBUFFER);
     main_framebuffer_->Bind(GL_DRAW_FRAMEBUFFER);
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     main_framebuffer_->Bind();
     ApplyPSO(deffered_shading_pso_);
     deffered_shading_program_->Use();
@@ -175,4 +172,17 @@ void Renderer::ApplyPSO(const GraphicsPSOPtr &pso) const
      * Polygon
      */
     glPolygonMode(GL_FRONT_AND_BACK, pso->rasterizer_state_.polygon_mode);
+}
+
+void Renderer::Resize(int width, int height)
+{
+    SPDLOG_INFO("Resize window {} {}", width, height);
+    width_ = width;
+    height_ = height;
+    aspect_ = static_cast<float>(width_) / static_cast<float>(height_);
+    glViewport(0, 0, width_, height_);
+    main_framebuffer_ = Framebuffer::Create({Texture2d::Create(width_, height_, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE)});
+    g_buffer_ = Framebuffer::Create({Texture2d::Create(width_, height_, GL_RGBA16F, GL_RGBA, GL_FLOAT),
+                                     Texture2d::Create(width_, height_, GL_RGBA16F, GL_RGBA, GL_FLOAT),
+                                     Texture2d::Create(width_, height_, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE)});
 }

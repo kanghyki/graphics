@@ -41,6 +41,19 @@ class Renderer
 
     void ApplyPSO(const GraphicsPSOPtr &pso) const;
 
+    void Resize(int width, int height);
+    int width()
+    {
+        return width_;
+    }
+    int height()
+    {
+        return height_;
+    }
+    float aspect()
+    {
+        return aspect_;
+    }
     GraphicsPSOPtr GetPSO(PsoType type)
     {
         switch (type)
@@ -100,6 +113,10 @@ class Renderer
     Renderer &operator=(const Renderer &rhs);
 
     static Renderer *instance_;
+
+    int width_;
+    int height_;
+    float aspect_;
 
     /* framebuffer */
     FramebufferPtr main_framebuffer_;

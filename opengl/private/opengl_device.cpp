@@ -12,8 +12,7 @@ OpenGLDevice *OpenGLDevice::GetInstance()
     return instance_;
 }
 
-OpenGLDevice ::OpenGLDevice()
-    : width_(WINDOW_INIT_WIDTH), height_(WINDOW_INIT_HEIGHT), window_name_(WINDOW_NAME), glfw_window_(nullptr)
+OpenGLDevice ::OpenGLDevice() : glfw_window_(nullptr)
 {
 }
 
@@ -38,7 +37,7 @@ bool OpenGLDevice::Init()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    glfw_window_ = glfwCreateWindow(width_, height_, window_name_.c_str(), nullptr, nullptr);
+    glfw_window_ = glfwCreateWindow(WINDOW_INIT_WIDTH, WINDOW_INIT_HEIGHT, WINDOW_NAME, nullptr, nullptr);
     if (!glfw_window_)
     {
         SPDLOG_ERROR("failed to create glfw window");
@@ -53,7 +52,6 @@ bool OpenGLDevice::Init()
         glfwTerminate();
         return false;
     }
-    glViewport(0, 0, width_, height_);
 
     return true;
 }

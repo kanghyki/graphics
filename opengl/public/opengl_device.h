@@ -15,14 +15,6 @@ class OpenGLDevice
     void SwapBuffer();
     void Terminate();
 
-    int width()
-    {
-        return width_;
-    }
-    int height()
-    {
-        return height_;
-    }
     GLFWwindow *glfw_window()
     {
         return glfw_window_;
@@ -34,9 +26,6 @@ class OpenGLDevice
     OpenGLDevice &operator=(const OpenGLDevice &c);
 
     static OpenGLDevice *instance_;
-    int width_;
-    int height_;
-    std::string window_name_;
 
     /* GLFW */
     GLFWwindow *glfw_window_;
