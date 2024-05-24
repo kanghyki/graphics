@@ -29,14 +29,7 @@ void ResourceManager::Init()
     {
         if (entry.is_regular_file())
         {
-            auto texture2d = Texture2d::Create(Image::Load(entry.path().string(), false).get());
-            if (!texture2d)
-            {
-                SPDLOG_WARN("Loading failed 2d Texture : {}", entry.path().filename().string());
-                continue;
-            }
-            SPDLOG_INFO("Loaded 2d texture : {}", entry.path().filename().string());
-            texture2ds_.push_back(texture2d);
+            LoadTexture(entry.path().string());
         }
     }
 
@@ -52,14 +45,60 @@ void ResourceManager::Init()
             {
                 continue;
             }
-            auto model = Model::Load(entry.path().string());
-            if (!model)
-            {
-                SPDLOG_WARN("Loading failed Model : {}", entry.path().filename().string());
-                continue;
-            }
-            SPDLOG_INFO("Loaded Model : {}", entry.path().filename().string());
-            models_.push_back({entry.path().filename().string(), model});
+            LoadModel(entry.path().string());
         }
     }
+}
+
+bool ResourceManager::LoadResource(const std::string &path)
+{
+    bool ret = false;
+
+    size_t pos = path.find_last_of(".");
+    if (pos == std::string::npos)
+    {
+        SPDLOG_WARN("Extension not found.");
+        return false;
+    }
+    std::string extension = path.substr(pos);
+    if (extension == ".png" || extension == ".jpg")
+    {
+        ret = LoadTexture(path);
+    }
+    else if (extension == ".obj")
+    {
+        ret = LoadModel(path);
+    }
+
+    return ret;
+}
+
+bool ResourceManager::LoadTexture(const std::string &path)
+{
+    SPDLOG_INFO("Load.. Texture {}", path);
+    auto texture2d = Texture2d::Create(Image::Load(path, false).get());
+    if (!texture2d)
+    {
+        SPDLOG_WARN("Failed");
+        return false;
+    }
+    texture2ds_.push_back(texture2d);
+    SPDLOG_INFO("Success");
+
+    return true;
+}
+
+bool ResourceManager::LoadModel(const std::string &path)
+{
+    SPDLOG_INFO("Load.. Model {}", path);
+    auto model = Model::Load(path);
+    if (!model)
+    {
+        SPDLOG_WARN("Failed");
+        return false;
+    }
+    models_.push_back({path, model});
+    SPDLOG_INFO("Success");
+
+    return true;
 }

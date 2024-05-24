@@ -3,7 +3,8 @@
 #include "input_manager.h"
 #include "opengl_device.h"
 #include "renderer.h"
-#include <iostream>
+#include "resource_manager.h"
+#include <spdlog/spdlog.h>
 
 void FramebufferSizeCallback(GLFWwindow *window, int width, int height);
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -11,6 +12,9 @@ void CharCallback(GLFWwindow *window, unsigned int ch);
 void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset);
 void CursorCallback(GLFWwindow *window, double x, double y);
 void MouseCallback(GLFWwindow *window, int button, int action, int modifier);
+#ifdef EDITOR
+void DropCallback(GLFWwindow *window, int count, const char **paths);
+#endif
 
 void event::glfw_callback_init()
 {
@@ -22,6 +26,9 @@ void event::glfw_callback_init()
     glfwSetCursorPosCallback(window, CursorCallback);
     glfwSetMouseButtonCallback(window, MouseCallback);
     glfwSetScrollCallback(window, ScrollCallback);
+#ifdef EDITOR
+    glfwSetDropCallback(window, DropCallback);
+#endif
 }
 
 void FramebufferSizeCallback(GLFWwindow *window, int width, int height)
@@ -63,3 +70,14 @@ void MouseCallback(GLFWwindow *window, int button, int action, int modifier)
 #endif
     InputManager::GetInstance()->UpdateMouse(button, action);
 }
+
+#ifdef EDITOR
+void DropCallback(GLFWwindow *window, int count, const char **paths)
+{
+    for (int i = 0; i < count; ++i)
+    {
+        SPDLOG_INFO("drag & drop: {}", paths[i]);
+        bool ret = ResourceManager::GetInstance()->LoadResource(paths[i]);
+    }
+}
+#endif

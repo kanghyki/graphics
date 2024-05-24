@@ -14,6 +14,7 @@ class ResourceManager
     ~ResourceManager();
 
     void Init();
+    bool LoadResource(const std::string &path);
 
     std::vector<std::pair<std::string, ModelPtr>> models()
     {
@@ -29,8 +30,10 @@ class ResourceManager
     ResourceManager(const ResourceManager &);
     ResourceManager &operator=(const ResourceManager &);
 
-    static ResourceManager *instance_;
+    bool LoadTexture(const std::string &path);
+    bool LoadModel(const std::string &path);
 
+    static ResourceManager *instance_;
     std::vector<std::pair<std::string, ModelPtr>> models_;
     std::vector<Texture2dPtr> texture2ds_;
 };

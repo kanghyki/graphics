@@ -21,7 +21,11 @@ target_link_libraries(${PROJECT_NAME}
 PRIVATE
     opengl
     editor
-PUBLIC
+    resource
 )
 
-add_dependencies(${PROJECT_NAME} opengl editor)
+add_dependencies(${PROJECT_NAME}
+    opengl
+    editor
+    resource
+)
