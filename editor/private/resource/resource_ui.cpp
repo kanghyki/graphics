@@ -6,7 +6,7 @@ void ResourceUI::RenderImpl()
 {
     if (ImGui::Begin("Resource"))
     {
-        auto TexturePreview = [this](const Texture2dPtr tex) {
+        auto TexturePreview = [this](const TexturePtr tex) {
             ImGui::SameLine();
             if (!tex)
             {
@@ -20,7 +20,7 @@ void ResourceUI::RenderImpl()
                 if (ImGui::IsItemClicked())
                 {
                     texture2d_selected = nullptr;
-                    NotifyTexture2d(texture2d_selected);
+                    NotifyTexture(texture2d_selected);
                 }
             }
             else
@@ -30,7 +30,7 @@ void ResourceUI::RenderImpl()
                 if (ImGui::IsItemClicked())
                 {
                     texture2d_selected = tex;
-                    NotifyTexture2d(texture2d_selected);
+                    NotifyTexture(texture2d_selected);
                 }
             }
         };

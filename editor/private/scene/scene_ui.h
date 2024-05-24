@@ -34,11 +34,11 @@ class SceneUI : public EditorUI, public ResourceUIObserver
     Level *level_current{nullptr};
     Layer *layer_selected{nullptr};
     Actor *actor_selected{nullptr};
-    Texture2dPtr texture2d_selected{nullptr};
+    TexturePtr texture2d_selected{nullptr};
     ModelPtr model_selected{nullptr};
 
   private:
-    void UpdateTexture2d(Texture2dPtr tex) override
+    void UpdateTexture(TexturePtr tex) override
     {
         texture2d_selected = tex;
     }

@@ -42,7 +42,7 @@ void Model::Draw(const Program *program) const
     }
 }
 
-Texture2dPtr LoadTexture(const std::string &dirname, aiMaterial *ai_material, aiTextureType ai_texture_type)
+TexturePtr LoadTexture(const std::string &dirname, aiMaterial *ai_material, aiTextureType ai_texture_type)
 {
     if (ai_material->GetTextureCount(ai_texture_type) <= 0)
     {
@@ -55,7 +55,7 @@ Texture2dPtr LoadTexture(const std::string &dirname, aiMaterial *ai_material, ai
     {
         return nullptr;
     }
-    return Texture2d::Create(image.get());
+    return Texture::Create(image.get());
 }
 
 bool Model::LoadByAssimp(const std::string &filename)

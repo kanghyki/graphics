@@ -37,15 +37,15 @@ class BaseTexture
     uint32_t texture_type_{GL_TEXTURE_2D};
 };
 
-CLASS_PTR(Texture2d);
-class Texture2d : public BaseTexture
+CLASS_PTR(Texture);
+class Texture : public BaseTexture
 {
   public:
-    static Texture2dPtr Load(const std::string &filename);
-    static Texture2dPtr Create(const Image *image);
-    static Texture2dPtr Create(int width, int height, uint32_t inner_format = GL_RGBA, uint32_t format = GL_RGBA,
-                               uint32_t type = GL_UNSIGNED_BYTE);
-    ~Texture2d();
+    static TexturePtr Load(const std::string &filename);
+    static TexturePtr Create(const Image *image);
+    static TexturePtr Create(int width, int height, uint32_t inner_format = GL_RGBA, uint32_t format = GL_RGBA,
+                             uint32_t type = GL_UNSIGNED_BYTE);
+    ~Texture();
 
     void SetTextureFormat(int width, int height, uint32_t inner_format, uint32_t format, uint32_t type);
     void SetBorderColor(const glm::vec4 &color) const;
@@ -75,7 +75,7 @@ class Texture2d : public BaseTexture
     }
 
   private:
-    Texture2d();
+    Texture();
 
     void SetTextureFromImage(const Image *image);
 
@@ -86,14 +86,14 @@ class Texture2d : public BaseTexture
     uint32_t type_{GL_UNSIGNED_BYTE};
 };
 
-CLASS_PTR(Texture3d);
-class Texture3d : public BaseTexture
+CLASS_PTR(CubeTexture);
+class CubeTexture : public BaseTexture
 {
   public:
-    static Texture3dPtr Create(const std::vector<Image *> &images);
-    static Texture3dPtr Create(int width, int height, int length, uint32_t inner_format, uint32_t format,
-                               uint32_t type);
-    ~Texture3d();
+    static CubeTexturePtr Create(const std::vector<Image *> &images);
+    static CubeTexturePtr Create(int width, int height, int length, uint32_t inner_format, uint32_t format,
+                                 uint32_t type);
+    ~CubeTexture();
 
     int width() const
     {
@@ -121,7 +121,7 @@ class Texture3d : public BaseTexture
     }
 
   private:
-    Texture3d();
+    CubeTexture();
 
     void SetCubeMapFromImages(const std::vector<Image *> &images);
     void SetCubeMapFormat(int width, int height, int length, uint32_t inner_format, uint32_t format, uint32_t type);

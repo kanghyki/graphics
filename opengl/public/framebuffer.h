@@ -36,10 +36,10 @@ CLASS_PTR(Framebuffer);
 class Framebuffer : public BaseFramebuffer
 {
   public:
-    static FramebufferPtr Create(const std::vector<Texture2dPtr> color_attachments);
+    static FramebufferPtr Create(const std::vector<TexturePtr> color_attachments);
     ~Framebuffer();
 
-    const Texture2dPtr color_attachment(int i) const
+    const TexturePtr color_attachment(int i) const
     {
         if (i >= 0 && i < color_attachments_.size())
         {
@@ -54,13 +54,13 @@ class Framebuffer : public BaseFramebuffer
 
     virtual void AttachTexture() override;
 
-    void set_color_attachments(const std::vector<Texture2dPtr> &color_attachments)
+    void set_color_attachments(const std::vector<TexturePtr> &color_attachments)
     {
         color_attachments_ = color_attachments;
     }
 
     uint32_t depth_stencil_buffer_;
-    std::vector<Texture2dPtr> color_attachments_;
+    std::vector<TexturePtr> color_attachments_;
 };
 
 #endif

@@ -14,7 +14,7 @@ class ResourceUIObserver
     {
     }
 
-    virtual void UpdateTexture2d(Texture2dPtr tex) = 0;
+    virtual void UpdateTexture(TexturePtr tex) = 0;
     virtual void UpdateModel(ModelPtr model) = 0;
 
   private:
@@ -35,11 +35,11 @@ class ResourceUIObservable
         observers_.push_back(observer);
     }
 
-    void NotifyTexture2d(Texture2dPtr tex)
+    void NotifyTexture(TexturePtr tex)
     {
         for (const auto &observer : observers_)
         {
-            observer->UpdateTexture2d(tex);
+            observer->UpdateTexture(tex);
         }
     }
 

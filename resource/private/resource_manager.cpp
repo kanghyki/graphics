@@ -24,7 +24,7 @@ ResourceManager::~ResourceManager()
 void ResourceManager::Init()
 {
     std::string path(RESOURCE_DIR_PATH);
-    /* Texture2d */
+    /* Texture */
     for (const auto &entry : std::filesystem::directory_iterator(path + "/texture2d"))
     {
         if (entry.is_regular_file())
@@ -76,7 +76,7 @@ bool ResourceManager::LoadResource(const std::string &path)
 bool ResourceManager::LoadTexture(const std::string &path)
 {
     SPDLOG_INFO("Load.. Texture {}", path);
-    auto texture2d = Texture2d::Create(Image::Load(path, false).get());
+    auto texture2d = Texture::Create(Image::Load(path, false).get());
     if (!texture2d)
     {
         SPDLOG_WARN("Failed");

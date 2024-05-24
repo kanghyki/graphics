@@ -20,7 +20,7 @@ class ResourceManager
     {
         return models_;
     }
-    std::vector<Texture2dPtr> texture2ds()
+    std::vector<TexturePtr> texture2ds()
     {
         return texture2ds_;
     }
@@ -35,7 +35,7 @@ class ResourceManager
 
     static ResourceManager *instance_;
     std::vector<std::pair<std::string, ModelPtr>> models_;
-    std::vector<Texture2dPtr> texture2ds_;
+    std::vector<TexturePtr> texture2ds_;
 };
 
 #endif

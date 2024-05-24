@@ -86,20 +86,20 @@ void BaseTexture::SetWrap(uint32_t s_wrap, uint32_t t_wrap, uint32_t r_wrap) con
 }
 
 /*
- * Texture2d
+ * Texture
  */
 
-Texture2d::Texture2d()
+Texture::Texture()
     : BaseTexture(GL_TEXTURE_2D), width_(0), height_(0), inner_format_(GL_RGBA), format_(GL_RGBA),
       type_(GL_UNSIGNED_BYTE)
 {
 }
 
-Texture2d::~Texture2d()
+Texture::~Texture()
 {
 }
 
-Texture2dPtr Texture2d::Load(const std::string &filename)
+TexturePtr Texture::Load(const std::string &filename)
 {
     auto image = Image::Load(filename);
     if (!image)
@@ -107,7 +107,7 @@ Texture2dPtr Texture2d::Load(const std::string &filename)
         return nullptr;
     }
     SPDLOG_INFO("image: {}x{}, {} channels", image->width(), image->height(), image->channel_count());
-    auto texture = Texture2dPtr(new Texture2d());
+    auto texture = TexturePtr(new Texture());
     texture->Bind();
     texture->SetFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
     texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
@@ -116,9 +116,9 @@ Texture2dPtr Texture2d::Load(const std::string &filename)
     return texture;
 }
 
-Texture2dPtr Texture2d::Create(const Image *image)
+TexturePtr Texture::Create(const Image *image)
 {
-    auto texture = Texture2dPtr(new Texture2d());
+    auto texture = TexturePtr(new Texture());
     texture->Bind();
     texture->SetFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
     texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
@@ -127,9 +127,9 @@ Texture2dPtr Texture2d::Create(const Image *image)
     return texture;
 }
 
-Texture2dPtr Texture2d::Create(int width, int height, uint32_t inner_format, uint32_t format, uint32_t type)
+TexturePtr Texture::Create(int width, int height, uint32_t inner_format, uint32_t format, uint32_t type)
 {
-    auto texture = Texture2dPtr(new Texture2d());
+    auto texture = TexturePtr(new Texture());
     texture->Bind();
     texture->SetFilter(GL_LINEAR, GL_LINEAR);
     texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
@@ -138,7 +138,7 @@ Texture2dPtr Texture2d::Create(int width, int height, uint32_t inner_format, uin
     return texture;
 }
 
-void Texture2d::SetTextureFromImage(const Image *image)
+void Texture::SetTextureFromImage(const Image *image)
 {
     width_ = image->width();
     height_ = image->height();
@@ -148,7 +148,7 @@ void Texture2d::SetTextureFromImage(const Image *image)
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-void Texture2d::SetTextureFormat(int width, int height, uint32_t inner_format, uint32_t format, uint32_t type)
+void Texture::SetTextureFormat(int width, int height, uint32_t inner_format, uint32_t format, uint32_t type)
 {
     width_ = width;
     height_ = height;
@@ -159,12 +159,12 @@ void Texture2d::SetTextureFormat(int width, int height, uint32_t inner_format, u
     glTexImage2D(GL_TEXTURE_2D, 0, inner_format_, width_, height_, 0, format_, type_, nullptr);
 }
 
-void Texture2d::SetBorderColor(const glm::vec4 &color) const
+void Texture::SetBorderColor(const glm::vec4 &color) const
 {
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
 }
 
-unsigned char *Texture2d::GetTexImage() const
+unsigned char *Texture::GetTexImage() const
 {
     int channel_count = image_util::RGBAFormatToChannelCount(format_);
     unsigned char *data = new unsigned char[width_ * height_ * channel_count];
@@ -178,7 +178,7 @@ unsigned char *Texture2d::GetTexImage() const
     return data;
 }
 
-std::array<uint8_t, 4> Texture2d::GetTexPixel(int x, int y) const
+std::array<uint8_t, 4> Texture::GetTexPixel(int x, int y) const
 {
     uint8_t pixel[4];
 
@@ -188,7 +188,7 @@ std::array<uint8_t, 4> Texture2d::GetTexPixel(int x, int y) const
     return {pixel[0], pixel[1], pixel[2], pixel[3]};
 }
 
-bool Texture2d::SaveAsPng(const std::string &filename) const
+bool Texture::SaveAsPng(const std::string &filename) const
 {
     int channel_count = image_util::RGBAFormatToChannelCount(format_);
     unsigned char *data = GetTexImage();
@@ -211,20 +211,20 @@ bool Texture2d::SaveAsPng(const std::string &filename) const
 }
 
 /*
- * Texture3d
+ * CubeTexture
  */
 
-Texture3d::Texture3d() : BaseTexture(GL_TEXTURE_CUBE_MAP)
+CubeTexture::CubeTexture() : BaseTexture(GL_TEXTURE_CUBE_MAP)
 {
 }
 
-Texture3d::~Texture3d()
+CubeTexture::~CubeTexture()
 {
 }
 
-Texture3dPtr Texture3d::Create(const std::vector<Image *> &images)
+CubeTexturePtr CubeTexture::Create(const std::vector<Image *> &images)
 {
-    auto texture = Texture3dPtr(new Texture3d());
+    auto texture = CubeTexturePtr(new CubeTexture());
 
     if (images.size() != 6)
     {
@@ -238,9 +238,10 @@ Texture3dPtr Texture3d::Create(const std::vector<Image *> &images)
     return std::move(texture);
 }
 
-Texture3dPtr Texture3d::Create(int width, int height, int length, uint32_t inner_format, uint32_t format, uint32_t type)
+CubeTexturePtr CubeTexture::Create(int width, int height, int length, uint32_t inner_format, uint32_t format,
+                                   uint32_t type)
 {
-    auto texture = Texture3dPtr(new Texture3d());
+    auto texture = CubeTexturePtr(new CubeTexture());
 
     texture->Bind();
     texture->SetFilter(GL_LINEAR, GL_LINEAR);
@@ -250,7 +251,7 @@ Texture3dPtr Texture3d::Create(int width, int height, int length, uint32_t inner
     return std::move(texture);
 }
 
-void Texture3d::SetCubeMapFromImages(const std::vector<Image *> &images)
+void CubeTexture::SetCubeMapFromImages(const std::vector<Image *> &images)
 {
     // images { right, left, top, bottom, front, back }
     width_ = images[4]->width();
@@ -269,8 +270,8 @@ void Texture3d::SetCubeMapFromImages(const std::vector<Image *> &images)
     }
 }
 
-void Texture3d::SetCubeMapFormat(int width, int height, int length, uint32_t inner_format, uint32_t format,
-                                 uint32_t type)
+void CubeTexture::SetCubeMapFormat(int width, int height, int length, uint32_t inner_format, uint32_t format,
+                                   uint32_t type)
 {
     width_ = width;
     height_ = height;

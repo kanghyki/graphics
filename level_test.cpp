@@ -126,7 +126,7 @@ void CreateTestLevel::Create()
     auto floor_mesh = Mesh::CreateBox();
     floor_mesh->set_material(Material::Create());
     auto floor_material = floor_mesh->material();
-    floor_material->set_texture(TextureType::ALBEDO, Texture2d::Load(resource_path + "\\texture2d\\brickwall.jpg"));
+    floor_material->set_texture(TextureType::ALBEDO, Texture::Load(resource_path + "\\texture2d\\brickwall.jpg"));
     floor->GetModelComponent()->set_model(Model::Create({floor_mesh}));
     floor->GetTransformComponent()->transform().scale_ = glm::vec3(10.0f, 0.1f, 10.0f);
     floor->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -135,8 +135,8 @@ void CreateTestLevel::Create()
     auto box_mesh = Mesh::CreateBox();
     box_mesh->set_material(Material::Create());
     auto box_material = box_mesh->material();
-    box_material->set_texture(TextureType::ALBEDO, Texture2d::Load(resource_path + "\\texture2d\\box.png"));
-    box_material->set_texture(TextureType::SPECULAR, Texture2d::Load(resource_path + "\\texture2d\\box_spec.png"));
+    box_material->set_texture(TextureType::ALBEDO, Texture::Load(resource_path + "\\texture2d\\box.png"));
+    box_material->set_texture(TextureType::SPECULAR, Texture::Load(resource_path + "\\texture2d\\box_spec.png"));
     box->SetComponent(std::shared_ptr<Component>(new RotationTransformComponent()));
     box->AddModelComponent();
     box->GetModelComponent()->set_model(Model::Create({box_mesh}));
@@ -156,7 +156,7 @@ void CreateTestLevel::Create()
     red->set_material(Material::Create());
     red->material()->set_texture(
         TextureType::ALBEDO,
-        Texture2d::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.8f, 0.0f, 0.0f, 1.0f)).get()));
+        Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.8f, 0.0f, 0.0f, 1.0f)).get()));
     light_0->GetModelComponent()->set_model(Model::Create({red}));
     light_0->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 2.0f, -2.5f);
     light_0->GetTransformComponent()->transform().scale_ *= 0.2;
@@ -170,7 +170,7 @@ void CreateTestLevel::Create()
     blue->set_material(Material::Create());
     blue->material()->set_texture(
         TextureType::ALBEDO,
-        Texture2d::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.8f, 0.0f, 1.0f)).get()));
+        Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.8f, 0.0f, 1.0f)).get()));
     light_1->GetModelComponent()->set_model(Model::Create({blue}));
     light_1->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 2.0f, 3.0f);
     light_1->GetTransformComponent()->transform().scale_ *= 0.2;
@@ -184,7 +184,7 @@ void CreateTestLevel::Create()
     green->set_material(Material::Create());
     green->material()->set_texture(
         TextureType::ALBEDO,
-        Texture2d::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.0f, 0.8f, 1.0f)).get()));
+        Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.0f, 0.8f, 1.0f)).get()));
     light_2->GetModelComponent()->set_model(Model::Create({green}));
     light_2->GetTransformComponent()->transform().position_ = glm::vec3(-3.0f, 2.5f, 0.0f);
     light_2->GetTransformComponent()->transform().scale_ *= 0.2;
@@ -198,7 +198,7 @@ void CreateTestLevel::Create()
     yellow->set_material(Material::Create());
     yellow->material()->set_texture(
         TextureType::ALBEDO,
-        Texture2d::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.8f, 0.8f, 0.0f, 1.0f)).get()));
+        Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.8f, 0.8f, 0.0f, 1.0f)).get()));
     light_3->GetModelComponent()->set_model(Model::Create({yellow}));
     light_3->GetTransformComponent()->transform().position_ = glm::vec3(3.0f, 2.0f, -3.0f);
     light_3->GetTransformComponent()->transform().scale_ *= 0.2;

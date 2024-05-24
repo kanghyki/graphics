@@ -58,7 +58,7 @@ Framebuffer::~Framebuffer()
     }
 }
 
-FramebufferPtr Framebuffer::Create(const std::vector<Texture2dPtr> color_attachments)
+FramebufferPtr Framebuffer::Create(const std::vector<TexturePtr> color_attachments)
 {
     auto framebuffer = FramebufferPtr(new Framebuffer());
 

@@ -36,11 +36,11 @@ class Material
         shineness_ = shineness;
     }
 
-    Texture2dPtr texture(TextureType type)
+    TexturePtr texture(TextureType type)
     {
         return textures_[static_cast<int>(type)];
     }
-    void set_texture(TextureType type, Texture2dPtr texture)
+    void set_texture(TextureType type, TexturePtr texture)
     {
         textures_[static_cast<int>(type)] = texture;
     }
@@ -73,7 +73,7 @@ class Material
             "m_emissive"
         // clang-format on
     };
-    std::array<Texture2dPtr, TextureSize> textures_;
+    std::array<TexturePtr, TextureSize> textures_;
     MaterialUniform ToUniform() const
     {
         MaterialUniform uniform;

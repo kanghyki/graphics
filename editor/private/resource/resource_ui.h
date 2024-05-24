@@ -11,7 +11,7 @@ class ResourceUI : public EditorUI, public ResourceUIObservable
   private:
     void RenderImpl() override;
 
-    Texture2dPtr texture2d_selected{nullptr};
+    TexturePtr texture2d_selected{nullptr};
     ModelPtr model_selected{nullptr};
 };
 
