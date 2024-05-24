@@ -2,6 +2,7 @@
 #include "camera_component.h"
 #include "light_component.h"
 #include "model_component.h"
+#include "skybox_component.h"
 #include "transform_component.h"
 
 ComponentFactory::ComponentFactory()
@@ -23,6 +24,8 @@ std::shared_ptr<Component> ComponentFactory::Generate(ComponentType type) const
         return std::shared_ptr<Component>(new TransformComponent());
     case ComponentType::MODEL:
         return std::shared_ptr<Component>(new ModelComponent());
+    case ComponentType::SKYBOX:
+        return std::shared_ptr<Component>(new SkyboxComponent());
     default:
         return nullptr;
     }

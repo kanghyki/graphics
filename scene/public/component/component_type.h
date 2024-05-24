@@ -8,6 +8,7 @@ enum class ComponentType
     LIGHT,
     /* Render component */
     MODEL,
+    SKYBOX,
     EOL
 };
 

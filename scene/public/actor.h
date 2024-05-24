@@ -11,6 +11,7 @@ class TransformComponent;
 class CameraComponent;
 class LightComponent;
 class ModelComponent;
+class SkyboxComponent;
 #define COMPONENT_GETTER(ENUM_TYPE_NAME, className)                                                                    \
     std::shared_ptr<className> Get##className()                                                                        \
     {                                                                                                                  \
@@ -47,13 +48,15 @@ class Actor
     void RemoveComponent(ComponentType type);
     void AddCameraComponent();
     void AddTransformComponent();
-    void AddModelComponent();
     void AddLightComponent();
+    void AddModelComponent();
+    void AddSkyboxComponent();
 
     COMPONENT_GETTER(TRANSFORM, TransformComponent)
     COMPONENT_GETTER(CAMERA, CameraComponent)
     COMPONENT_GETTER(LIGHT, LightComponent)
     COMPONENT_GETTER(MODEL, ModelComponent)
+    COMPONENT_GETTER(SKYBOX, SkyboxComponent)
 
   private:
     Actor(const Actor &c);
