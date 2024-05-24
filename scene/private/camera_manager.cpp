@@ -12,7 +12,7 @@ CameraManager *CameraManager::GetInstance()
     return instance_;
 }
 
-CameraManager::CameraManager() : cameras_(0)
+CameraManager::CameraManager()
 {
 }
 
@@ -22,18 +22,15 @@ CameraManager::~CameraManager()
 
 void CameraManager::ClearCamera()
 {
-    cameras_.clear();
+    main_camera_ = nullptr;
 }
 
 void CameraManager::Render()
 {
-    for (const auto &camera : cameras_)
-    {
-        camera->Render();
-    }
+    main_camera_->Render();
 }
 
-void CameraManager::RegisterCamera(CameraComponent *camera)
+void CameraManager::SetMainCamera(CameraComponent *camera)
 {
-    cameras_.push_back(camera);
+    main_camera_ = camera;
 }

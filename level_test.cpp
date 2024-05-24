@@ -222,6 +222,10 @@ void CreateTestLevel::Create()
     layer02->AddActor(light_1);
     layer02->AddActor(light_2);
     layer02->AddActor(light_3);
+    auto layer03 = level->AddLayer("skybox");
+    Actor *skybox = new Actor("Skybox");
+    skybox->AddSkyboxComponent();
+    layer03->AddActor(skybox);
 
     LevelManager::GetInstance()->SetCurrentLevel(level->name());
 

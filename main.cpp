@@ -47,7 +47,6 @@ int main(void)
 
         renderer->ClearFramebuffer();
         camera_manager->Render();
-        renderer->Render();
         renderer->PostProcessing();
 #ifdef EDITOR
         editor->NewFrame();

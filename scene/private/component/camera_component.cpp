@@ -15,9 +15,23 @@ CameraComponent::~CameraComponent()
 
 void CameraComponent::Tick()
 {
+    models_.clear();
+    skymaps_.clear();
+
     camera_.aspect_ = Renderer::GetInstance()->aspect();
-    CameraManager::GetInstance()->RegisterCamera(this);
-    actors_ = LevelManager::GetInstance()->GetCurrentLevel()->GetActors();
+    CameraManager::GetInstance()->SetMainCamera(this);
+    std::vector<Actor *> actors = LevelManager::GetInstance()->GetCurrentLevel()->GetActors();
+    for (const auto &actor : actors)
+    {
+        if (actor->GetSkyboxComponent())
+        {
+            skymaps_.push_back(actor);
+        }
+        else if (actor->GetModelComponent())
+        {
+            models_.push_back(actor);
+        }
+    }
 }
 
 void CameraComponent::FinalTick()
@@ -42,9 +56,21 @@ void CameraComponent::Render()
     GraphicsPSOPtr g_buffer_pso = Renderer::GetInstance()->GetPSO(PsoType::G_BUFFER);
     Renderer::GetInstance()->ApplyPSO(g_buffer_pso);
     g_buffer_pso->program_->Use();
-    for (Actor *actor : actors_)
+    for (Actor *actor : models_)
     {
         actor->Render(g_buffer_pso->program_);
+    }
+    glUseProgram(0);
+
+    Renderer::GetInstance()->RenderDeffered();
+
+    Renderer::GetInstance()->GetFramebuffer(FramebufferType::MAIN)->Bind();
+    GraphicsPSOPtr skybox_pso = Renderer::GetInstance()->GetPSO(PsoType::SKYBOX);
+    Renderer::GetInstance()->ApplyPSO(skybox_pso);
+    skybox_pso->program_->Use();
+    for (Actor *actor : skymaps_)
+    {
+        actor->Render(skybox_pso->program_);
     }
     glUseProgram(0);
 }

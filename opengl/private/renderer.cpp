@@ -37,21 +37,28 @@ void Renderer::Init()
     g_buffer_fs_ = Shader::CreateFromFile(shader_dir + "g_buffer.fs", GL_FRAGMENT_SHADER);
     deffered_shading_vs_ = Shader::CreateFromFile(shader_dir + "deffered_shading.vs", GL_VERTEX_SHADER);
     deffered_shading_fs_ = Shader::CreateFromFile(shader_dir + "deffered_shading.fs", GL_FRAGMENT_SHADER);
+    skybox_vs_ = Shader::CreateFromFile(shader_dir + "skybox.vs", GL_VERTEX_SHADER);
+    skybox_fs_ = Shader::CreateFromFile(shader_dir + "skybox.fs", GL_FRAGMENT_SHADER);
     post_processing_vs_ = Shader::CreateFromFile(shader_dir + "post_processing.vs", GL_VERTEX_SHADER);
     post_processing_fs_ = Shader::CreateFromFile(shader_dir + "post_processing.fs", GL_FRAGMENT_SHADER);
 
     /* program */
     g_buffer_program_ = Program::Create({g_buffer_vs_, g_buffer_fs_});
     deffered_shading_program_ = Program::Create({deffered_shading_vs_, deffered_shading_fs_});
+    skybox_program_ = Program::Create({skybox_vs_, skybox_fs_});
     post_processing_program_ = Program::Create({post_processing_vs_, post_processing_fs_});
 
     /* PSO */
     g_buffer_pso_ = GraphicsPSO::Create();
     deffered_shading_pso_ = GraphicsPSO::Create();
+    skybox_pso_ = GraphicsPSO::Create();
     post_processing_pso_ = GraphicsPSO::Create();
 
     g_buffer_pso_->program_ = g_buffer_program_;
     deffered_shading_pso_->program_ = deffered_shading_program_;
+    skybox_pso_->program_ = skybox_program_;
+    skybox_pso_->rasterizer_state_.cull_face_ = GL_FRONT;
+
     post_processing_pso_->program_ = post_processing_program_;
     post_processing_pso_->rasterizer_state_.is_depth_test_ = false;
 
@@ -81,11 +88,8 @@ void Renderer::ClearFramebuffer()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-void Renderer::Render()
+void Renderer::RenderDeffered()
 {
-    g_buffer_->Bind(GL_READ_FRAMEBUFFER);
-    main_framebuffer_->Bind(GL_DRAW_FRAMEBUFFER);
-    glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     main_framebuffer_->Bind();
     ApplyPSO(deffered_shading_pso_);
     deffered_shading_program_->Use();
@@ -99,8 +103,11 @@ void Renderer::Render()
     glActiveTexture(GL_TEXTURE2);
     g_buffer_->color_attachment(2)->Bind();
     deffered_shading_program_->SetUniform("gAlbedoSpec", 2);
-
     plane_mesh_->Draw(nullptr);
+
+    g_buffer_->Bind(GL_READ_FRAMEBUFFER);
+    main_framebuffer_->Bind(GL_DRAW_FRAMEBUFFER);
+    glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 }
 
 void Renderer::PostProcessing()

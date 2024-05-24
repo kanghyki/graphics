@@ -10,13 +10,15 @@
 
 enum class PsoType
 {
+    MAIN,
     G_BUFFER,
+    SKYBOX
 };
 
 enum class FramebufferType
 {
+    MAIN,
     G_BUFFER,
-    MAIN
 };
 
 enum class UBOType
@@ -36,7 +38,7 @@ class Renderer
 
     void Init();
     void ClearFramebuffer();
-    void Render();
+    void RenderDeffered();
     void PostProcessing();
 
     void ApplyPSO(const GraphicsPSOPtr &pso) const;
@@ -60,6 +62,8 @@ class Renderer
         {
         case PsoType::G_BUFFER:
             return g_buffer_pso_;
+        case PsoType::SKYBOX:
+            return skybox_pso_;
         }
         return nullptr;
     }
@@ -67,10 +71,10 @@ class Renderer
     {
         switch (type)
         {
-        case FramebufferType::G_BUFFER:
-            return g_buffer_;
         case FramebufferType::MAIN:
             return main_framebuffer_;
+        case FramebufferType::G_BUFFER:
+            return g_buffer_;
         }
         return nullptr;
     }
@@ -119,25 +123,29 @@ class Renderer
     float aspect_;
 
     /* framebuffer */
-    FramebufferPtr main_framebuffer_;
     FramebufferPtr g_buffer_;
+    FramebufferPtr main_framebuffer_;
 
     /* shader */
     ShaderPtr g_buffer_vs_;
     ShaderPtr g_buffer_fs_;
     ShaderPtr deffered_shading_vs_;
     ShaderPtr deffered_shading_fs_;
+    ShaderPtr skybox_vs_;
+    ShaderPtr skybox_fs_;
     ShaderPtr post_processing_vs_;
     ShaderPtr post_processing_fs_;
 
     /* program */
     ProgramPtr g_buffer_program_;
     ProgramPtr deffered_shading_program_;
+    ProgramPtr skybox_program_;
     ProgramPtr post_processing_program_;
 
     /* PSO */
     GraphicsPSOPtr g_buffer_pso_;
     GraphicsPSOPtr deffered_shading_pso_;
+    GraphicsPSOPtr skybox_pso_;
     GraphicsPSOPtr post_processing_pso_;
 
     /* uniform buffer */

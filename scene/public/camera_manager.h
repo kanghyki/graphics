@@ -12,7 +12,7 @@ class CameraManager
 
     void ClearCamera();
     void Render();
-    void RegisterCamera(CameraComponent *camera);
+    void SetMainCamera(CameraComponent *camera);
 
   private:
     CameraManager();
@@ -21,7 +21,7 @@ class CameraManager
 
     static CameraManager *instance_;
 
-    std::vector<CameraComponent *> cameras_;
+    CameraComponent *main_camera_;
 };
 
 #endif
