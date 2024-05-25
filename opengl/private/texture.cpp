@@ -85,12 +85,16 @@ void BaseTexture::SetWrap(uint32_t s_wrap, uint32_t t_wrap, uint32_t r_wrap) con
     }
 }
 
+void BaseTexture::SetBorderColor(const glm::vec4 &color) const
+{
+    glTexParameterfv(texture_type_, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
+}
+
 uint32_t BaseTexture::format() const
 {
     switch (internal_format_)
     {
     case GL_DEPTH_COMPONENT:
-    case GL_DEPTH_COMPONENT32F:
         return GL_DEPTH_COMPONENT;
     case GL_RG:
     case GL_RG16F:
@@ -112,15 +116,14 @@ uint32_t BaseTexture::data_type() const
 {
     switch (internal_format_)
     {
-    case GL_DEPTH_COMPONENT32F:
     case GL_RG16F:
     case GL_RG32F:
     case GL_RGB16F:
     case GL_RGB32F:
     case GL_RGBA16F:
     case GL_RGBA32F:
-        return GL_FLOAT;
     case GL_DEPTH_COMPONENT:
+        return GL_FLOAT;
     case GL_RG:
     case GL_RGB:
     case GL_RGBA:
@@ -197,11 +200,6 @@ void Texture::SetTextureFormat(int width, int height, uint32_t internal_format)
     internal_format_ = internal_format;
 
     glTexImage2D(GL_TEXTURE_2D, 0, internal_format_, width_, height_, 0, format(), data_type(), nullptr);
-}
-
-void Texture::SetBorderColor(const glm::vec4 &color) const
-{
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
 }
 
 std::array<uint8_t, 4> Texture::GetTexPixel(int x, int y) const

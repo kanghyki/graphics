@@ -23,6 +23,7 @@ class BaseTexture
 
     void SetFilter(uint32_t min_filter, uint32_t mag_filter) const;
     void SetWrap(uint32_t s_wrap, uint32_t t_wrap, uint32_t r_wrap = GL_NONE) const;
+    void SetBorderColor(const glm::vec4 &color) const;
 
     const uint32_t id() const
     {
@@ -67,7 +68,6 @@ class Texture : public BaseTexture
     ~Texture();
 
     void SetTextureFormat(int width, int height, uint32_t internal_format);
-    void SetBorderColor(const glm::vec4 &color) const;
 
     std::array<uint8_t, 4> GetTexPixel(int x, int y) const;
     bool SaveAsPng(const std::string &filename, bool flip_vertical = true) const;

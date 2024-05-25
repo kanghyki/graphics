@@ -22,12 +22,9 @@ BaseFramebuffer::~BaseFramebuffer()
 bool BaseFramebuffer::Init()
 {
     bool ret = true;
-
     glGenFramebuffers(1, &id_);
     Bind();
-
     AttachTexture();
-
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
         SPDLOG_ERROR("failed to create framebuffer");
@@ -95,4 +92,49 @@ void Framebuffer::AttachTexture()
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depth_stencil_buffer_);
     }
+}
+
+/*
+ * Depthmap
+ */
+
+DepthMapPtr DepthMap::Create(int width, int height, int length)
+{
+    auto depth_map = DepthMapPtr(new DepthMap());
+
+    if (!depth_map->SetTexture(width, height, length) || !depth_map->Init())
+    {
+        return nullptr;
+    }
+
+    return depth_map;
+}
+
+DepthMap::DepthMap()
+{
+}
+
+DepthMap::~DepthMap()
+{
+}
+
+bool DepthMap::SetTexture(int width, int height, int length)
+{
+    length == -1 ? depth_texture_ = Texture::Create(width, height, GL_DEPTH_COMPONENT)
+                 : depth_texture_ = CubeTexture::Create(width, height, length, GL_DEPTH_COMPONENT);
+    if (!depth_texture_)
+    {
+        return false;
+    }
+    depth_texture_->SetFilter(GL_NEAREST, GL_NEAREST);
+    depth_texture_->SetWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
+    depth_texture_->SetBorderColor(glm::vec4(1.0f));
+    return true;
+}
+
+void DepthMap::AttachTexture()
+{
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth_texture_->id(), 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
 }

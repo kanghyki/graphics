@@ -52,15 +52,35 @@ class Framebuffer : public BaseFramebuffer
   private:
     Framebuffer();
 
-    virtual void AttachTexture() override;
-
     void set_color_attachments(const std::vector<BaseTexturePtr> &color_attachments)
     {
         color_attachments_ = color_attachments;
     }
+    void AttachTexture() override;
 
     uint32_t depth_stencil_buffer_;
     std::vector<BaseTexturePtr> color_attachments_;
+};
+
+CLASS_PTR(DepthMap);
+class DepthMap : public BaseFramebuffer
+{
+  public:
+    static DepthMapPtr Create(int width, int height, int length = -1);
+    ~DepthMap();
+
+    BaseTexture *depth_map()
+    {
+        return depth_texture_.get();
+    }
+
+  private:
+    DepthMap();
+
+    bool SetTexture(int width, int height, int length);
+    void AttachTexture() override;
+
+    BaseTexturePtr depth_texture_;
 };
 
 #endif
