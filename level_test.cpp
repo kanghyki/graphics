@@ -10,6 +10,7 @@
 #include "material.h"
 #include "model_component.h"
 #include "renderer.h"
+#include "skybox_component.h"
 #include "time_manager.h"
 #include "transform_component.h"
 #include <spdlog/spdlog.h>
@@ -222,9 +223,26 @@ void CreateTestLevel::Create()
     layer02->AddActor(light_1);
     layer02->AddActor(light_2);
     layer02->AddActor(light_3);
+
     auto layer03 = level->AddLayer("skybox");
     Actor *skybox = new Actor("Skybox");
+    auto cubeRight = Image::Load("../../asset/cube_texture/0/right.jpg", false);
+    auto cubeLeft = Image::Load("../../asset/cube_texture/0/left.jpg", false);
+    auto cubeTop = Image::Load("../../asset/cube_texture/0/top.jpg", false);
+    auto cubeBottom = Image::Load("../../asset/cube_texture/0/bottom.jpg", false);
+    auto cubeFront = Image::Load("../../asset/cube_texture/0/front.jpg", false);
+    auto cubeBack = Image::Load("../../asset/cube_texture/0/back.jpg", false);
+    auto cube_texture = CubeTexture::Create({
+        cubeRight.get(),
+        cubeLeft.get(),
+        cubeTop.get(),
+        cubeBottom.get(),
+        cubeFront.get(),
+        cubeBack.get(),
+    });
     skybox->AddSkyboxComponent();
+    skybox->GetSkyboxComponent()->set_cube_texture(cube_texture);
+    skybox->GetTransformComponent()->transform().scale_ = glm::vec3(200.0f);
     layer03->AddActor(skybox);
 
     LevelManager::GetInstance()->SetCurrentLevel(level->name());

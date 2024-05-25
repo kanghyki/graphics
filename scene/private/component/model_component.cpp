@@ -20,5 +20,5 @@ void ModelComponent::Render(ProgramPtr program)
     glBufferSubData(GL_UNIFORM_BUFFER, offsetof(MatricesUniform, t_model), sizeof(glm::mat4),
                     glm::value_ptr(GetTransformComponent()->transform().CalcModelMatrix()));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    model()->Draw(program.get());
+    model_->Draw(program.get());
 }
