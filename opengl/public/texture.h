@@ -31,10 +31,29 @@ class BaseTexture
     {
         return texture_type_;
     }
+    uint32_t internal_format() const
+    {
+        return internal_format_;
+    }
+    uint32_t format() const;
+    uint32_t data_type() const;
 
-  private:
-    uint32_t id_;
-    uint32_t texture_type_{GL_TEXTURE_2D};
+    int width() const
+    {
+        return width_;
+    }
+    int height() const
+    {
+        return height_;
+    }
+
+  protected:
+    uint32_t id_{0};
+    uint32_t internal_format_{0};
+    uint32_t texture_type_{0};
+
+    int width_{0};
+    int height_{0};
 };
 
 CLASS_PTR(Texture);
@@ -43,47 +62,19 @@ class Texture : public BaseTexture
   public:
     static TexturePtr Load(const std::string &filename);
     static TexturePtr Create(const Image *image);
-    static TexturePtr Create(int width, int height, uint32_t inner_format = GL_RGBA, uint32_t format = GL_RGBA,
-                             uint32_t type = GL_UNSIGNED_BYTE);
+    static TexturePtr Create(int width, int height, uint32_t internal_format);
     ~Texture();
 
-    void SetTextureFormat(int width, int height, uint32_t inner_format, uint32_t format, uint32_t type);
+    void SetTextureFormat(int width, int height, uint32_t internal_format);
     void SetBorderColor(const glm::vec4 &color) const;
-    unsigned char *GetTexImage() const;
-    std::array<uint8_t, 4> GetTexPixel(int x, int y) const;
-    bool SaveAsPng(const std::string &filename) const;
 
-    int width() const
-    {
-        return width_;
-    }
-    int height() const
-    {
-        return height_;
-    }
-    uint32_t inner_format() const
-    {
-        return inner_format_;
-    }
-    uint32_t format() const
-    {
-        return format_;
-    }
-    uint32_t type() const
-    {
-        return type_;
-    }
+    std::array<uint8_t, 4> GetTexPixel(int x, int y) const;
+    bool SaveAsPng(const std::string &filename, bool flip_vertical = true) const;
 
   private:
     Texture();
 
     void SetTextureFromImage(const Image *image);
-
-    int width_{0};
-    int height_{0};
-    uint32_t inner_format_{GL_RGBA};
-    uint32_t format_{GL_RGBA};
-    uint32_t type_{GL_UNSIGNED_BYTE};
 };
 
 CLASS_PTR(CubeTexture);
@@ -91,47 +82,21 @@ class CubeTexture : public BaseTexture
 {
   public:
     static CubeTexturePtr Create(const std::vector<Image *> &images);
-    static CubeTexturePtr Create(int width, int height, int length, uint32_t inner_format, uint32_t format,
-                                 uint32_t type);
+    static CubeTexturePtr Create(int width, int height, int length, uint32_t internal_format);
     ~CubeTexture();
 
-    int width() const
-    {
-        return width_;
-    }
-    int height() const
-    {
-        return height_;
-    }
     int length() const
     {
         return length_;
-    }
-    uint32_t inner_format() const
-    {
-        return inner_format_;
-    }
-    uint32_t type() const
-    {
-        return type_;
-    }
-    uint32_t format() const
-    {
-        return format_;
     }
 
   private:
     CubeTexture();
 
-    void SetCubeMapFromImages(const std::vector<Image *> &images);
-    void SetCubeMapFormat(int width, int height, int length, uint32_t inner_format, uint32_t format, uint32_t type);
+    void SetCubemapFromImages(const std::vector<Image *> &images);
+    void SetCubemapFormat(int width, int height, int length, uint32_t internal_format);
 
-    int width_{0};
-    int height_{0};
     int length_{0};
-    uint32_t inner_format_{GL_RGBA};
-    uint32_t format_{GL_RGBA};
-    uint32_t type_{GL_UNSIGNED_BYTE};
 };
 
 #endif

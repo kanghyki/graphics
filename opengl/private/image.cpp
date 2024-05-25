@@ -26,10 +26,10 @@ ImagePtr Image::Load(const std::string &filepath, bool flip_vertical)
     return image;
 }
 
-ImagePtr Image::Create(int width, int height, int channel_count)
+ImagePtr Image::Create(int width, int height, int channel_count, int byte_per_channel)
 {
     auto image = ImagePtr(new Image());
-    if (!image->Allocate(width, height, channel_count))
+    if (!image->Allocate(width, height, channel_count, byte_per_channel))
     {
         return nullptr;
     }
@@ -37,12 +37,13 @@ ImagePtr Image::Create(int width, int height, int channel_count)
     return image;
 }
 
-bool Image::Allocate(int width, int height, int channelCount)
+bool Image::Allocate(int width, int height, int channelCount, int byte_per_channel)
 {
     width_ = width;
     height_ = height;
     channel_count_ = channelCount;
-    if (!(data_ = (uint8_t *)malloc(width_ * height_ * channel_count_)))
+    byte_per_channel_ = byte_per_channel;
+    if (!(data_ = (uint8_t *)malloc(width_ * height_ * channel_count_ * byte_per_channel_)))
     {
         return false;
     }
@@ -70,8 +71,19 @@ ImagePtr Image::CreateSingleColorImage(int width, int height, const glm::vec4 &c
 
 bool Image::LoadFile(const std::string &filepath, bool flip_vertical)
 {
+    std::string extension = filepath.substr(filepath.find_last_of('.'));
     stbi_set_flip_vertically_on_load(flip_vertical);
-    data_ = stbi_load(filepath.c_str(), &width_, &height_, &channel_count_, 0);
+
+    if (extension == ".hdr" || extension == ".HDR")
+    {
+        data_ = reinterpret_cast<uint8_t *>(stbi_loadf(filepath.c_str(), &width_, &height_, &channel_count_, 0));
+        byte_per_channel_ = 4;
+    }
+    else
+    {
+        data_ = stbi_load(filepath.c_str(), &width_, &height_, &channel_count_, 0);
+        byte_per_channel_ = 1;
+    }
     if (!data_)
     {
         SPDLOG_ERROR("failed to load image: {}", filepath);

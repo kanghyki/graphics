@@ -26,10 +26,10 @@ void Renderer::Init()
 {
     glViewport(0, 0, width_, height_);
     /* framebuffer */
-    main_framebuffer_ = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE)});
-    g_buffer_ = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F, GL_RGBA, GL_FLOAT),
-                                     Texture::Create(width_, height_, GL_RGBA16F, GL_RGBA, GL_FLOAT),
-                                     Texture::Create(width_, height_, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE)});
+    main_framebuffer_ = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA)});
+    g_buffer_ =
+        Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F), Texture::Create(width_, height_, GL_RGBA16F),
+                             Texture::Create(width_, height_, GL_RGBA)});
 
     /* shader */
     std::string shader_dir(SHADER_PATH);
@@ -188,8 +188,8 @@ void Renderer::Resize(int width, int height)
     height_ = height;
     aspect_ = static_cast<float>(width_) / static_cast<float>(height_);
     glViewport(0, 0, width_, height_);
-    main_framebuffer_ = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE)});
-    g_buffer_ = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F, GL_RGBA, GL_FLOAT),
-                                     Texture::Create(width_, height_, GL_RGBA16F, GL_RGBA, GL_FLOAT),
-                                     Texture::Create(width_, height_, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE)});
+    main_framebuffer_ = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA)});
+    g_buffer_ =
+        Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F), Texture::Create(width_, height_, GL_RGBA16F),
+                             Texture::Create(width_, height_, GL_RGBA)});
 }
