@@ -12,6 +12,7 @@ GLenum ChannelCountToRGBAFormat(uint32_t channel_count);
 uint32_t RGBAFormatToChannelCount(GLenum format);
 }; // namespace image_util
 
+CLASS_PTR(BaseTexture);
 class BaseTexture
 {
   public:
