@@ -24,45 +24,43 @@ Renderer::~Renderer()
 
 void Renderer::Init()
 {
+    std::string shader_dir(SHADER_PATH);
     glViewport(0, 0, width_, height_);
-    /* framebuffer */
+
+    plane_mesh_ = Mesh::CreatePlane();
+    box_mesh_ = Mesh::CreateBox();
+
     main_framebuffer_ = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA)});
+
+    deffered_shading_vs_ = Shader::CreateFromFile(shader_dir + "deffered_shading.vs", GL_VERTEX_SHADER);
+    deffered_shading_fs_ = Shader::CreateFromFile(shader_dir + "deffered_shading.fs", GL_FRAGMENT_SHADER);
+    deffered_shading_program_ = Program::Create({deffered_shading_vs_, deffered_shading_fs_});
+    deffered_shading_pso_ = GraphicsPSO::Create();
+    deffered_shading_pso_->program_ = deffered_shading_program_;
+
     g_buffer_ =
         Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F), Texture::Create(width_, height_, GL_RGBA16F),
                              Texture::Create(width_, height_, GL_RGBA)});
-
-    /* shader */
-    std::string shader_dir(SHADER_PATH);
     g_buffer_vs_ = Shader::CreateFromFile(shader_dir + "g_buffer.vs", GL_VERTEX_SHADER);
     g_buffer_fs_ = Shader::CreateFromFile(shader_dir + "g_buffer.fs", GL_FRAGMENT_SHADER);
-    deffered_shading_vs_ = Shader::CreateFromFile(shader_dir + "deffered_shading.vs", GL_VERTEX_SHADER);
-    deffered_shading_fs_ = Shader::CreateFromFile(shader_dir + "deffered_shading.fs", GL_FRAGMENT_SHADER);
+    g_buffer_program_ = Program::Create({g_buffer_vs_, g_buffer_fs_});
+    g_buffer_pso_ = GraphicsPSO::Create();
+    g_buffer_pso_->program_ = g_buffer_program_;
+
     skybox_vs_ = Shader::CreateFromFile(shader_dir + "skybox.vs", GL_VERTEX_SHADER);
     skybox_fs_ = Shader::CreateFromFile(shader_dir + "skybox.fs", GL_FRAGMENT_SHADER);
-    post_processing_vs_ = Shader::CreateFromFile(shader_dir + "post_processing.vs", GL_VERTEX_SHADER);
-    post_processing_fs_ = Shader::CreateFromFile(shader_dir + "post_processing.fs", GL_FRAGMENT_SHADER);
-
-    /* program */
-    g_buffer_program_ = Program::Create({g_buffer_vs_, g_buffer_fs_});
-    deffered_shading_program_ = Program::Create({deffered_shading_vs_, deffered_shading_fs_});
     skybox_program_ = Program::Create({skybox_vs_, skybox_fs_});
-    post_processing_program_ = Program::Create({post_processing_vs_, post_processing_fs_});
-
-    /* PSO */
-    g_buffer_pso_ = GraphicsPSO::Create();
-    deffered_shading_pso_ = GraphicsPSO::Create();
     skybox_pso_ = GraphicsPSO::Create();
-    post_processing_pso_ = GraphicsPSO::Create();
-
-    g_buffer_pso_->program_ = g_buffer_program_;
-    deffered_shading_pso_->program_ = deffered_shading_program_;
     skybox_pso_->program_ = skybox_program_;
     skybox_pso_->rasterizer_state_.cull_face_ = GL_FRONT;
 
+    post_processing_vs_ = Shader::CreateFromFile(shader_dir + "post_processing.vs", GL_VERTEX_SHADER);
+    post_processing_fs_ = Shader::CreateFromFile(shader_dir + "post_processing.fs", GL_FRAGMENT_SHADER);
+    post_processing_program_ = Program::Create({post_processing_vs_, post_processing_fs_});
+    post_processing_pso_ = GraphicsPSO::Create();
     post_processing_pso_->program_ = post_processing_program_;
     post_processing_pso_->rasterizer_state_.is_depth_test_ = false;
 
-    /* uniform buffer object */
     camera_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(CameraUniform), 1);
     matrices_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(MatricesUniform), 1);
     lights_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(LightsUniform), 1);
@@ -73,9 +71,6 @@ void Renderer::Init()
     glBindBufferBase(GL_UNIFORM_BUFFER, 2, lights_ubo_->id());
     glBindBufferBase(GL_UNIFORM_BUFFER, 3, global_ubo_->id());
     glBindBufferBase(GL_UNIFORM_BUFFER, 4, material_ubo_->id());
-
-    /* For render */
-    plane_mesh_ = Mesh::CreatePlane();
 }
 
 void Renderer::ClearFramebuffer()

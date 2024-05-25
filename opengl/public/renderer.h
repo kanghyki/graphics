@@ -56,6 +56,15 @@ class Renderer
     {
         return aspect_;
     }
+    MeshPtr plane_mesh()
+    {
+        return plane_mesh_;
+    }
+    MeshPtr box_mesh()
+    {
+        return box_mesh_;
+    }
+
     GraphicsPSOPtr GetPSO(PsoType type)
     {
         switch (type)
@@ -122,41 +131,37 @@ class Renderer
     int height_;
     float aspect_;
 
-    /* framebuffer */
-    FramebufferPtr g_buffer_;
+    MeshPtr plane_mesh_;
+    MeshPtr box_mesh_;
+
     FramebufferPtr main_framebuffer_;
 
-    /* shader */
     ShaderPtr g_buffer_vs_;
     ShaderPtr g_buffer_fs_;
+    ProgramPtr g_buffer_program_;
+    GraphicsPSOPtr g_buffer_pso_;
+
+    FramebufferPtr g_buffer_;
     ShaderPtr deffered_shading_vs_;
     ShaderPtr deffered_shading_fs_;
+    ProgramPtr deffered_shading_program_;
+    GraphicsPSOPtr deffered_shading_pso_;
+
     ShaderPtr skybox_vs_;
     ShaderPtr skybox_fs_;
+    ProgramPtr skybox_program_;
+    GraphicsPSOPtr skybox_pso_;
+
     ShaderPtr post_processing_vs_;
     ShaderPtr post_processing_fs_;
-
-    /* program */
-    ProgramPtr g_buffer_program_;
-    ProgramPtr deffered_shading_program_;
-    ProgramPtr skybox_program_;
     ProgramPtr post_processing_program_;
-
-    /* PSO */
-    GraphicsPSOPtr g_buffer_pso_;
-    GraphicsPSOPtr deffered_shading_pso_;
-    GraphicsPSOPtr skybox_pso_;
     GraphicsPSOPtr post_processing_pso_;
 
-    /* uniform buffer */
     BufferPtr camera_ubo_;
     BufferPtr matrices_ubo_;
     BufferPtr lights_ubo_;
     BufferPtr global_ubo_;
     BufferPtr material_ubo_;
-
-    /* For render */
-    MeshPtr plane_mesh_;
 };
 
 #endif
