@@ -12,11 +12,12 @@ class CameraComponent;
 class LightComponent;
 class ModelComponent;
 class SkyboxComponent;
-#define COMPONENT_GETTER(ENUM_TYPE_NAME, className)                                                                    \
-    std::shared_ptr<className> Get##className()                                                                        \
+#define COMPONENT_GETTER_DECL(ENUM_TYPE_NAME, className) std::shared_ptr<className> Get##className();
+#define COMPONENT_GETTER_IMPL(ENUM_TYPE_NAME, className)                                                               \
+    std::shared_ptr<className> Actor::Get##className()                                                                 \
     {                                                                                                                  \
         return std::reinterpret_pointer_cast<className>(GetComponent(ComponentType::ENUM_TYPE_NAME));                  \
-    }
+    };
 
 class RenderComponent;
 class Component;
@@ -52,11 +53,11 @@ class Actor
     void AddModelComponent();
     void AddSkyboxComponent();
 
-    COMPONENT_GETTER(TRANSFORM, TransformComponent)
-    COMPONENT_GETTER(CAMERA, CameraComponent)
-    COMPONENT_GETTER(LIGHT, LightComponent)
-    COMPONENT_GETTER(MODEL, ModelComponent)
-    COMPONENT_GETTER(SKYBOX, SkyboxComponent)
+    COMPONENT_GETTER_DECL(TRANSFORM, TransformComponent)
+    COMPONENT_GETTER_DECL(CAMERA, CameraComponent)
+    COMPONENT_GETTER_DECL(LIGHT, LightComponent)
+    COMPONENT_GETTER_DECL(MODEL, ModelComponent)
+    COMPONENT_GETTER_DECL(SKYBOX, SkyboxComponent)
 
   private:
     Actor(const Actor &c);

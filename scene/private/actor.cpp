@@ -50,7 +50,7 @@ void Actor::SetComponent(std::shared_ptr<Component> component)
     {
     case ComponentType::MODEL:
     case ComponentType::SKYBOX:
-        render_component_ = std::reinterpret_pointer_cast<RenderComponent>(component);
+        render_component_ = std::static_pointer_cast<RenderComponent>(component);
         break;
     default:
         break;
@@ -119,3 +119,9 @@ void Actor::AddSkyboxComponent()
     }
     SetComponent(ComponentFactory().Generate(ComponentType::SKYBOX));
 }
+
+COMPONENT_GETTER_IMPL(TRANSFORM, TransformComponent)
+COMPONENT_GETTER_IMPL(CAMERA, CameraComponent)
+COMPONENT_GETTER_IMPL(LIGHT, LightComponent)
+COMPONENT_GETTER_IMPL(MODEL, ModelComponent)
+COMPONENT_GETTER_IMPL(SKYBOX, SkyboxComponent)

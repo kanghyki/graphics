@@ -24,7 +24,7 @@ class Mesh
     static MeshPtr Create(const std::vector<Vertex> &vertices, const std::vector<uint32_t> &indices,
                           uint32_t primitive_type);
     static MeshPtr CreateBox();
-    static MeshPtr CreateSphere(size_t slice, size_t stack);
+    static MeshPtr CreateSphere(uint32_t slice, uint32_t stack);
     static MeshPtr CreatePlane();
     static void ComputeTangents(std::vector<Vertex> &vertices, const std::vector<uint32_t> &indices);
     ~Mesh();

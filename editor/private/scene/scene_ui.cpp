@@ -239,8 +239,7 @@ void SceneUI::LightDetail()
         ImGui::Separator();
         if (comp->depth_map())
         {
-            ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(comp->depth_map()->texture()->id())),
-                         ImVec2(100, 100));
+            ImGui::Image(reinterpret_cast<ImTextureID>(comp->depth_map()->texture()->id()), ImVec2(100, 100));
         }
 
         if (ImGui::Button("Remove##2"))
@@ -339,7 +338,7 @@ void SceneUI::MeshTextureDetail(MeshPtr mesh, TextureType type)
         }
         return;
     }
-    ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(tex->id())), ImVec2(100, 100));
+    ImGui::Image(reinterpret_cast<ImTextureID>(tex->id()), ImVec2(100, 100));
     std::string label("Remove texture##" + std::to_string((int)type));
     if (ImGui::Button(label.c_str()))
     {

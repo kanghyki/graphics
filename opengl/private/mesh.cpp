@@ -62,7 +62,7 @@ MeshPtr Mesh::CreateBox()
     return Create(vertices, indices, GL_TRIANGLES);
 }
 
-MeshPtr Mesh::CreateSphere(size_t slice, size_t stack)
+MeshPtr Mesh::CreateSphere(uint32_t slice, uint32_t stack)
 {
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
@@ -70,11 +70,11 @@ MeshPtr Mesh::CreateSphere(size_t slice, size_t stack)
     const float d_theta = -(glm::pi<float>() * 2) / static_cast<float>(slice);
     const float d_phi = -glm::pi<float>() / static_cast<float>(stack);
 
-    for (size_t i = 0; i < stack + 1; ++i)
+    for (uint32_t i = 0; i < stack + 1; ++i)
     {
         glm::vec3 yPoint = glm::vec4(0.0f, -radius, 0.0f, 1.0f) *
                            glm::rotate(glm::mat4(1.0f), (d_phi * i), glm::vec3(0.0f, 0.0f, -1.0f));
-        for (size_t j = 0; j < slice + 1; ++j)
+        for (uint32_t j = 0; j < slice + 1; ++j)
         {
             Vertex v;
             v.position =
@@ -85,17 +85,17 @@ MeshPtr Mesh::CreateSphere(size_t slice, size_t stack)
         }
     }
 
-    for (size_t i = 0; i < stack; ++i)
+    for (uint32_t i = 0; i < stack; ++i)
     {
-        const size_t offset = (slice + 1) * i;
-        for (size_t j = 0; j < slice; ++j)
+        const uint32_t offset = (slice + 1) * i;
+        for (uint32_t j = 0; j < slice; ++j)
         {
-            indices.push_back(static_cast<uint32_t>(offset + j));
-            indices.push_back(static_cast<uint32_t>(offset + j + slice + 1));
-            indices.push_back(static_cast<uint32_t>(offset + j + slice + 2));
-            indices.push_back(static_cast<uint32_t>(offset + j));
-            indices.push_back(static_cast<uint32_t>(offset + j + slice + 2));
-            indices.push_back(static_cast<uint32_t>(offset + j + 1));
+            indices.push_back(offset + j);
+            indices.push_back(offset + j + slice + 1);
+            indices.push_back(offset + j + slice + 2);
+            indices.push_back(offset + j);
+            indices.push_back(offset + j + slice + 2);
+            indices.push_back(offset + j + 1);
         }
     }
 

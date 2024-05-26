@@ -15,8 +15,7 @@ void ResourceUI::RenderImpl()
             }
             if (texture2d_selected == tex)
             {
-                ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(tex->id())), ImVec2(130, 130),
-                             ImVec2(0, 1), ImVec2(1, 0));
+                ImGui::Image(reinterpret_cast<ImTextureID>(tex->id()), ImVec2(130, 130), ImVec2(0, 1), ImVec2(1, 0));
                 if (ImGui::IsItemClicked())
                 {
                     texture2d_selected = nullptr;
@@ -25,8 +24,7 @@ void ResourceUI::RenderImpl()
             }
             else
             {
-                ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(tex->id())), ImVec2(100, 100),
-                             ImVec2(0, 1), ImVec2(1, 0));
+                ImGui::Image(reinterpret_cast<ImTextureID>(tex->id()), ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
                 if (ImGui::IsItemClicked())
                 {
                     texture2d_selected = tex;

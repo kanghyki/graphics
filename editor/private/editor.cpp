@@ -25,10 +25,10 @@ Editor::Editor()
     auto scene_ui = std::shared_ptr<SceneUI>(new SceneUI());
     resource_ui->Register(scene_ui.get());
     auto render_ui = std::shared_ptr<RenderUI>(new RenderUI());
-    ui_->AddUI(std::reinterpret_pointer_cast<EditorUI>(main_menu));
-    ui_->AddUI(std::reinterpret_pointer_cast<EditorUI>(scene_ui));
-    ui_->AddUI(std::reinterpret_pointer_cast<EditorUI>(resource_ui));
-    ui_->AddUI(std::reinterpret_pointer_cast<EditorUI>(render_ui));
+    ui_->AddUI(std::static_pointer_cast<EditorUI>(main_menu));
+    ui_->AddUI(std::static_pointer_cast<EditorUI>(scene_ui));
+    ui_->AddUI(std::static_pointer_cast<EditorUI>(resource_ui));
+    ui_->AddUI(std::static_pointer_cast<EditorUI>(render_ui));
 }
 
 Editor::~Editor()
@@ -44,7 +44,7 @@ void Editor::Init(void *window)
 {
     imgui_context_ = ImGui::CreateContext();
     ImGui::SetCurrentContext(imgui_context_);
-    ImGui_ImplGlfw_InitForOpenGL(reinterpret_cast<GLFWwindow *>(window), false);
+    ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow *>(window), false);
     ImGui_ImplOpenGL3_Init();
     ImGui_ImplOpenGL3_CreateFontsTexture();
     ImGui_ImplOpenGL3_CreateDeviceObjects();

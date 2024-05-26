@@ -48,7 +48,7 @@ void DrawFramebuffers()
 
     if (ImGui::CollapsingHeader("MAIN", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::Image(reinterpret_cast<ImTextureID>((ImTextureID)main->color_attachment(0)->id()),
+        ImGui::Image(reinterpret_cast<ImTextureID>(main->color_attachment(0)->id()),
                      ImVec2(window_size.x, window_size.x), ImVec2(0, 1), ImVec2(1, 0));
     }
 
@@ -57,7 +57,7 @@ void DrawFramebuffers()
         const char *buffer_name[3] = {"Position", "Normal", "Albedo(rgb)/Specular(a)"};
         static int buffer_selected = 0;
         ImGui::Combo("color_attachment", &buffer_selected, buffer_name, 3);
-        ImGui::Image(reinterpret_cast<ImTextureID>((ImTextureID)g_buffer->color_attachment(buffer_selected)->id()),
+        ImGui::Image(reinterpret_cast<ImTextureID>(g_buffer->color_attachment(buffer_selected)->id()),
                      ImVec2(window_size.x, window_size.x), ImVec2(0, 1), ImVec2(1, 0));
     }
 }
