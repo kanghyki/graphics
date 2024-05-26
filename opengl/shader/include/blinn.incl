@@ -4,13 +4,13 @@ struct MaterialForShading {
     float shininess;
 };
 
-vec3 BlinnPhong(vec3 light_strength, vec3 light_vec, vec3 normal, vec3 to_eye, MaterialForShading mat)
+vec3 BlinnPhong(vec3 light_color, vec3 light_vec, vec3 normal, vec3 to_eye, MaterialForShading mat)
 {
     vec3 halfway = normalize(to_eye + light_vec);
     float hdotn = dot(halfway, normal);
     vec3 specular = mat.albedo * pow(max(hdotn, 0.0f), mat.shininess);
 
-    return (mat.albedo + (specular * mat.specular_alpha)) * light_strength;
+    return (mat.albedo + (specular * mat.specular_alpha)) * light_color;
 }
 
 vec3 ComputeDirectionalLight(Light L, MaterialForShading mat, vec3 normal, vec3 to_eye)
@@ -18,7 +18,7 @@ vec3 ComputeDirectionalLight(Light L, MaterialForShading mat, vec3 normal, vec3 
     vec3 light_vec = -L.direction;
 
     float ndotl = max(dot(light_vec, normal), 0.0f);
-    vec3 lightStrength = L.strength * ndotl;
+    vec3 lightStrength = L.color * L.strength * ndotl;
 
     return BlinnPhong(lightStrength, light_vec, normal, to_eye, mat);
 }
@@ -41,7 +41,7 @@ vec3 ComputePointLight(Light L, MaterialForShading mat, vec3 pos, vec3 normal, v
         light_vec /= d;
 
         float ndotl = max(dot(light_vec, normal), 0.0f);
-        vec3 lightStrength = L.strength * ndotl;
+        vec3 lightStrength = L.color * L.strength * ndotl;
 
         float att = CalcAttenuation(d, L.falloff_start, L.falloff_end);
         lightStrength *= att;
@@ -63,14 +63,14 @@ vec3 ComputeSpotLight(Light L, MaterialForShading mat, vec3 pos, vec3 normal, ve
         light_vec /= d;
 
         float ndotl = max(dot(light_vec, normal), 0.0f);
-        vec3 light_strength = L.strength * ndotl;
+        vec3 light_color = L.color * L.strength * ndotl;
 
         float att = CalcAttenuation(d, L.falloff_start, L.falloff_end);
-        light_strength *= att;
+        light_color *= att;
 
         float spot_factor = pow(max(-dot(light_vec, L.direction), 0.0f), L.spot_power);
-        light_strength *= spot_factor;
+        light_color *= spot_factor;
 
-        return BlinnPhong(light_strength, light_vec, normal, to_eye, mat);
+        return BlinnPhong(light_color, light_vec, normal, to_eye, mat);
     }
 }

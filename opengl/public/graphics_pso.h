@@ -14,6 +14,7 @@ struct RasterizerState
 
     bool is_cull_face_{true};
     bool is_depth_test_{true};
+    uint32_t depth_func_{GL_LESS};
     bool is_stencil_test_{false};
     bool is_blend_{false};
     uint32_t cull_face_{GL_BACK};

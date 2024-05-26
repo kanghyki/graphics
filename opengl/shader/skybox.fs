@@ -1,9 +1,12 @@
 #version 430 core
-out vec4 fragColor;
-in vec3 texCoord;
+layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 brightColor;
+
+in vec3 localPos;
 
 uniform samplerCube cubemap;
 
 void main() {
-    fragColor = texture(cubemap, texCoord);
+    fragColor = texture(cubemap, localPos);
+    brightColor = vec4(0.0, 0.0, 0.0, 0.0);
 }

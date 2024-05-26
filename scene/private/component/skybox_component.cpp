@@ -15,6 +15,5 @@ void SkyboxComponent::Render(ProgramPtr program)
     glActiveTexture(GL_TEXTURE0);
     cube_texture_->Bind();
     program->SetUniform("cubemap", 0);
-    program->SetUniform("model", GetTransformComponent()->transform().CalcModelMatrix());
     Renderer::GetInstance()->box_mesh()->Draw(program.get());
 }

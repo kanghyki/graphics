@@ -232,7 +232,8 @@ void SceneUI::LightDetail()
         ImGui::RadioButton("Spot", (int *)&light.type_, (int)LightType::SPOT);
         ImGui::Text("%10s : x(%.3f), y(%.3f), z(%.3f)", "Direction", light.direction().x, light.direction().y,
                     light.direction().z);
-        ImGui::ColorEdit3("strengh", glm::value_ptr(light.strength_));
+        ImGui::ColorEdit3("color", glm::value_ptr(light.color_));
+        ImGui::DragFloat("strength", &light.strength_, 0.01f, 0.0f, 100.0f);
         ImGui::DragFloat("falloff_start", &light.falloff_start_, 0.01f, 0.0f, 180.0f);
         ImGui::DragFloat("falloff_end", &light.falloff_end_, 0.01f, 0.0f, 180.0f);
         ImGui::DragFloat("spot_power", &light.spot_power_, 0.01f, 0.0f, 180.0f);

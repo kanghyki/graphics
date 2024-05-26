@@ -30,7 +30,8 @@ void Renderer::Init()
     plane_mesh_ = Mesh::CreatePlane();
     box_mesh_ = Mesh::CreateBox();
 
-    main_framebuffer_ = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA)});
+    main_framebuffer_ = Framebuffer::Create(
+        {Texture::Create(width_, height_, GL_RGBA16F), Texture::Create(width_, height_, GL_RGBA16F)});
 
     deffered_shading_vs_ = Shader::CreateFromFile(shader_dir + "deffered_shading.vs", GL_VERTEX_SHADER);
     deffered_shading_fs_ = Shader::CreateFromFile(shader_dir + "deffered_shading.fs", GL_FRAGMENT_SHADER);
@@ -53,6 +54,7 @@ void Renderer::Init()
     skybox_pso_ = GraphicsPSO::Create();
     skybox_pso_->program_ = skybox_program_;
     skybox_pso_->rasterizer_state_.cull_face_ = GL_FRONT;
+    skybox_pso_->rasterizer_state_.depth_func_ = GL_LEQUAL;
 
     depth_map_vs_ = Shader::CreateFromFile(shader_dir + "depth_map.vs", GL_VERTEX_SHADER);
     depth_map_fs_ = Shader::CreateFromFile(shader_dir + "depth_map.fs", GL_FRAGMENT_SHADER);
@@ -67,6 +69,15 @@ void Renderer::Init()
     omni_depth_map_pso_ = GraphicsPSO::Create();
     omni_depth_map_pso_->program_ = omni_depth_map_program_;
     omni_depth_map_pso_->rasterizer_state_.cull_face_ = GL_FRONT;
+
+    gaussian_blur_framebuffer_[0] = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F)});
+    gaussian_blur_framebuffer_[1] = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F)});
+    gaussian_blur_vs_ = Shader::CreateFromFile(shader_dir + "gaussian_blur.vs", GL_VERTEX_SHADER);
+    gaussian_blur_fs_ = Shader::CreateFromFile(shader_dir + "gaussian_blur.fs", GL_FRAGMENT_SHADER);
+    gaussian_blur_program_ = Program::Create({gaussian_blur_vs_, gaussian_blur_fs_});
+    gaussian_blur_pso_ = GraphicsPSO::Create();
+    gaussian_blur_pso_->program_ = gaussian_blur_program_;
+    gaussian_blur_pso_->rasterizer_state_.is_depth_test_ = false;
 
     post_processing_vs_ = Shader::CreateFromFile(shader_dir + "post_processing.vs", GL_VERTEX_SHADER);
     post_processing_fs_ = Shader::CreateFromFile(shader_dir + "post_processing.fs", GL_FRAGMENT_SHADER);
@@ -121,15 +132,39 @@ void Renderer::RenderDeffered()
 
 void Renderer::PostProcessing()
 {
+    ApplyPSO(gaussian_blur_pso_);
+    bool horizontal = true;
+    auto model = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f));
+    gaussian_blur_program_->Use();
+    gaussian_blur_program_->SetUniform("transform", model);
+
+    for (unsigned int i = 0; i < blur_time_ * 2; i++)
+    {
+        gaussian_blur_framebuffer_[horizontal]->Bind();
+        gaussian_blur_program_->SetUniform("horizontal", horizontal);
+        glActiveTexture(GL_TEXTURE0);
+        i == 0 ? main_framebuffer_->color_attachment(1)->Bind()
+               : gaussian_blur_framebuffer_[!horizontal]->color_attachment(0)->Bind();
+        gaussian_blur_program_->SetUniform("image", 0);
+        plane_mesh_->Draw(gaussian_blur_program_.get());
+        horizontal = !horizontal;
+    }
+
     Framebuffer::BindToDefault();
     ApplyPSO(post_processing_pso_);
     post_processing_program_->Use();
     post_processing_program_->SetUniform("model", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
     post_processing_program_->SetUniform("gamma", gamma_);
-    post_processing_program_->SetUniform("is_gray_scale", gray_scale_);
+    post_processing_program_->SetUniform("use_gray_scale", use_gray_scale_);
+    post_processing_program_->SetUniform("use_bloom", use_bloom_);
+    post_processing_program_->SetUniform("bloom_strength", bloom_strength_);
+    post_processing_program_->SetUniform("exposure", exposure_);
     glActiveTexture(GL_TEXTURE0);
     main_framebuffer_->color_attachment(0)->Bind();
     post_processing_program_->SetUniform("main_texture", 0);
+    glActiveTexture(GL_TEXTURE1);
+    gaussian_blur_framebuffer_[0]->color_attachment(0)->Bind();
+    post_processing_program_->SetUniform("blured_texture", 1);
     plane_mesh_->Draw(nullptr);
 }
 
@@ -166,6 +201,7 @@ void Renderer::ApplyPSO(const GraphicsPSOPtr &pso) const
     if (pso->rasterizer_state_.is_depth_test_)
     {
         glEnable(GL_DEPTH_TEST);
+        glDepthFunc(pso->rasterizer_state_.depth_func_);
     }
     else
     {
@@ -197,7 +233,8 @@ void Renderer::Resize(int width, int height)
     height_ = height;
     aspect_ = static_cast<float>(width_) / static_cast<float>(height_);
     glViewport(0, 0, width_, height_);
-    main_framebuffer_ = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA)});
+    main_framebuffer_ = Framebuffer::Create(
+        {Texture::Create(width_, height_, GL_RGBA16F), Texture::Create(width_, height_, GL_RGBA16F)});
     g_buffer_ =
         Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F), Texture::Create(width_, height_, GL_RGBA16F),
                              Texture::Create(width_, height_, GL_RGBA)});

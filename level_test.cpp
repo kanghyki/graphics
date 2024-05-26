@@ -162,7 +162,7 @@ void CreateTestLevel::Create()
     light_0->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 2.0f, -2.5f);
     light_0->GetTransformComponent()->transform().scale_ *= 0.2;
     light_0->GetLightComponent()->light().type_ = LightType::POINT;
-    light_0->GetLightComponent()->light().strength_ = glm::vec3(0.8f, 0.0f, 0.0f);
+    light_0->GetLightComponent()->light().color_ = glm::vec3(0.8f, 0.0f, 0.0f);
 
     Actor *light_1 = new Actor("Light_green");
     light_1->AddLightComponent();
@@ -176,7 +176,7 @@ void CreateTestLevel::Create()
     light_1->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 2.0f, 3.0f);
     light_1->GetTransformComponent()->transform().scale_ *= 0.2;
     light_1->GetLightComponent()->light().type_ = LightType::POINT;
-    light_1->GetLightComponent()->light().strength_ = glm::vec3(0.0f, 0.8f, 0.0f);
+    light_1->GetLightComponent()->light().color_ = glm::vec3(0.0f, 0.8f, 0.0f);
 
     Actor *light_2 = new Actor("Light_blue");
     light_2->AddLightComponent();
@@ -190,7 +190,7 @@ void CreateTestLevel::Create()
     light_2->GetTransformComponent()->transform().position_ = glm::vec3(-3.0f, 2.5f, 0.0f);
     light_2->GetTransformComponent()->transform().scale_ *= 0.2;
     light_2->GetLightComponent()->light().type_ = LightType::POINT;
-    light_2->GetLightComponent()->light().strength_ = glm::vec3(0.0f, 0.0f, 0.8f);
+    light_2->GetLightComponent()->light().color_ = glm::vec3(0.0f, 0.0f, 0.8f);
     light_2->GetLightComponent()->set_use_shadow(true);
 
     Actor *light_3 = new Actor("Light_yellow");
@@ -205,7 +205,7 @@ void CreateTestLevel::Create()
     light_3->GetTransformComponent()->transform().position_ = glm::vec3(3.0f, 2.0f, -3.0f);
     light_3->GetTransformComponent()->transform().scale_ *= 0.2;
     light_3->GetLightComponent()->light().type_ = LightType::POINT;
-    light_3->GetLightComponent()->light().strength_ = glm::vec3(0.5f, 0.5f, 0.0f);
+    light_3->GetLightComponent()->light().color_ = glm::vec3(0.5f, 0.5f, 0.0f);
 
     Actor *cam = new Actor("Camera man");
     cam->SetComponent(std::shared_ptr<Component>(new CameraTransformComponent()));

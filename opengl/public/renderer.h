@@ -21,6 +21,7 @@ enum class FramebufferType
 {
     MAIN,
     G_BUFFER,
+    GAUSSIAN_BLUR
 };
 
 enum class UBOType
@@ -90,6 +91,8 @@ class Renderer
             return main_framebuffer_;
         case FramebufferType::G_BUFFER:
             return g_buffer_;
+        case FramebufferType::GAUSSIAN_BLUR:
+            return gaussian_blur_framebuffer_[0];
         }
         return nullptr;
     }
@@ -112,7 +115,6 @@ class Renderer
     }
 
     /* Render option */
-    float gamma_{1.0f};
     void set_wireframe(bool b)
     {
         if (b)
@@ -124,7 +126,12 @@ class Renderer
             g_buffer_pso_->rasterizer_state_.polygon_mode = GL_FILL;
         }
     }
-    bool gray_scale_{false};
+    float gamma_{1.0f};
+    bool use_gray_scale_{false};
+    bool use_bloom_{false};
+    float bloom_strength_{1.0f};
+    float exposure_{1.0f};
+    int blur_time_{5};
 
   private:
     Renderer();
@@ -167,6 +174,12 @@ class Renderer
     ShaderPtr omni_depth_map_fs_;
     ProgramPtr omni_depth_map_program_;
     GraphicsPSOPtr omni_depth_map_pso_;
+
+    FramebufferPtr gaussian_blur_framebuffer_[2];
+    ShaderPtr gaussian_blur_vs_;
+    ShaderPtr gaussian_blur_fs_;
+    ProgramPtr gaussian_blur_program_;
+    GraphicsPSOPtr gaussian_blur_pso_;
 
     ShaderPtr post_processing_vs_;
     ShaderPtr post_processing_fs_;

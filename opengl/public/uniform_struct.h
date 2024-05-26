@@ -31,8 +31,8 @@ struct LightData
     glm::vec3 position;
     unsigned char __p0[4];
 
-    glm::vec3 strength;
-    unsigned char __p1[4];
+    glm::vec3 color;
+    float strength;
 
     glm::vec3 direction;
     unsigned char __p2[4];

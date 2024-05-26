@@ -38,7 +38,6 @@ void LightManager::Tick()
 
 void LightManager::AddLight(const LightData &light)
 {
-    // TODO : opt
     if (lights_.count >= LightsUniform::LIGHT_MAX)
     {
         SPDLOG_WARN("MAXIMUM LIGHT");

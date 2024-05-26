@@ -30,7 +30,8 @@ struct Light {
     float   spot_power;
 
     vec3    position;
-    vec3    strength;
+    vec3    color;
+    float   strength;
     vec3    direction;
 };
 #define LIGHT_MAX 64

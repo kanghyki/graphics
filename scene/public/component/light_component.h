@@ -36,6 +36,7 @@ class Light
         data.spot_power = spot_power_;
 
         data.position = position();
+        data.color = color_;
         data.strength = strength_;
         data.direction = direction();
 
@@ -52,7 +53,8 @@ class Light
     }
 
     Transform transform_;
-    glm::vec3 strength_{1.0f, 1.0f, 1.0f};
+    glm::vec3 color_{1.0f, 1.0f, 1.0f};
+    float strength_{1.0f};
     float spot_power_{1.0f};
     float falloff_start_{0.0f};
     float falloff_end_{10.0f};

@@ -1,15 +1,16 @@
 #version 430 core
 layout (location = 0) in vec3 aPos;
 
-out vec3 texCoord;
+out vec3 localPos;
 
 #include "include/default.incl"
 
-#define proj t_proj
+#define proj t_proj 
 #define view t_view
-uniform mat4 model;
 
 void main() {
-    texCoord = aPos;
-    gl_Position = t_proj * t_view * model * vec4(aPos, 1.0);
+  localPos = aPos;
+  mat4 rotView = mat4(mat3(view));
+  vec4 clipPos = proj * rotView * vec4(localPos, 1.0);
+  gl_Position = clipPos.xyww;
 }
