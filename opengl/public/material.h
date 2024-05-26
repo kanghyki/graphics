@@ -46,8 +46,12 @@ class Material
     }
 
     float shineness_{30.0f};
-    glm::vec3 albedo_color_{1.0f, 0.0f, 0.0f};
+    glm::vec3 albedo_color_{1.0f, 1.0f, 1.0f};
     float specular_alpha_{0.0f};
+    // float ao_{1.0f};
+    // float metallic_{1.0f};
+    // float roughness_{1.0f};
+    // float emissive_{1.0f};
 
   private:
     Material();

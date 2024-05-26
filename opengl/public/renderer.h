@@ -12,7 +12,9 @@ enum class PsoType
 {
     MAIN,
     G_BUFFER,
-    SKYBOX
+    SKYBOX,
+    DEPTH_MAP,
+    OMNI_DEPTH_MAP
 };
 
 enum class FramebufferType
@@ -73,6 +75,10 @@ class Renderer
             return g_buffer_pso_;
         case PsoType::SKYBOX:
             return skybox_pso_;
+        case PsoType::DEPTH_MAP:
+            return depth_map_pso_;
+        case PsoType::OMNI_DEPTH_MAP:
+            return omni_depth_map_pso_;
         }
         return nullptr;
     }
@@ -151,6 +157,16 @@ class Renderer
     ShaderPtr skybox_fs_;
     ProgramPtr skybox_program_;
     GraphicsPSOPtr skybox_pso_;
+
+    ShaderPtr depth_map_vs_;
+    ShaderPtr depth_map_fs_;
+    ProgramPtr depth_map_program_;
+    GraphicsPSOPtr depth_map_pso_;
+
+    ShaderPtr omni_depth_map_vs_;
+    ShaderPtr omni_depth_map_fs_;
+    ProgramPtr omni_depth_map_program_;
+    GraphicsPSOPtr omni_depth_map_pso_;
 
     ShaderPtr post_processing_vs_;
     ShaderPtr post_processing_fs_;

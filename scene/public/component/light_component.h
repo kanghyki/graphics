@@ -1,7 +1,9 @@
 #ifndef INCLUDED_LIGHT_COMPONENT_H
 #define INCLUDED_LIGHT_COMPONENT_H
 
+#include "camera.h"
 #include "component.h"
+#include "framebuffer.h"
 #include "libmath.h"
 #include "transform.h"
 #include "uniform_struct.h"
@@ -72,6 +74,24 @@ class LightComponent : public Component
     {
         return light_;
     }
+    bool use_shadow() const
+    {
+        return use_shadow_;
+    }
+    void set_use_shadow(bool b)
+    {
+        use_shadow_ = true;
+        depthmap_ = DepthMap::Create(1024, 1024);
+        depthmap3d_ = DepthMap::Create(1024, 1024, 1024);
+    }
+    DepthMapPtr depth_map()
+    {
+        if (light_.type_ == LightType::POINT)
+        {
+            return depthmap3d_;
+        }
+        return depthmap_;
+    }
 
   private:
     LightComponent(const LightComponent &);
@@ -80,6 +100,12 @@ class LightComponent : public Component
     void Tick() override;
 
     Light light_;
+
+    /* For shadow */
+    bool use_shadow_{false};
+
+    DepthMapPtr depthmap_{nullptr};
+    DepthMapPtr depthmap3d_{nullptr};
 };
 
 #endif

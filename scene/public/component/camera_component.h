@@ -53,7 +53,12 @@ class CameraComponent : public Component, private NoInherit
 
     Camera camera_;
 
+    void RenderShadowMap();
+    void RenderSkybox();
+    void RenderShading();
+
     // uint32_t layer_mask_;
+    std::vector<Actor *> shadow_lights_;
     std::vector<Actor *> skymaps_;
     std::vector<Actor *> models_;
     std::pair<GraphicsPSOPtr, FramebufferPtr> render_;

@@ -69,9 +69,9 @@ class DepthMap : public BaseFramebuffer
     static DepthMapPtr Create(int width, int height, int length = -1);
     ~DepthMap();
 
-    BaseTexture *depth_map()
+    BaseTexture *texture()
     {
-        return depth_texture_.get();
+        return texture_.get();
     }
 
   private:
@@ -80,7 +80,7 @@ class DepthMap : public BaseFramebuffer
     bool SetTexture(int width, int height, int length);
     void AttachTexture() override;
 
-    BaseTexturePtr depth_texture_;
+    BaseTexturePtr texture_;
 };
 
 #endif

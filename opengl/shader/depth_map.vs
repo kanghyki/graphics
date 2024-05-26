@@ -3,8 +3,8 @@ layout (location = 0) in vec3 aPos;
 
 #include "include/default.incl"
 
-#define proj t_proj
-#define view t_view
+uniform mat4 proj;
+uniform mat4 view;
 #define model t_model
 
 void main() {

@@ -54,6 +54,20 @@ void Renderer::Init()
     skybox_pso_->program_ = skybox_program_;
     skybox_pso_->rasterizer_state_.cull_face_ = GL_FRONT;
 
+    depth_map_vs_ = Shader::CreateFromFile(shader_dir + "depth_map.vs", GL_VERTEX_SHADER);
+    depth_map_fs_ = Shader::CreateFromFile(shader_dir + "depth_map.fs", GL_FRAGMENT_SHADER);
+    depth_map_program_ = Program::Create({depth_map_vs_, depth_map_fs_});
+    depth_map_pso_ = GraphicsPSO::Create();
+    depth_map_pso_->program_ = depth_map_program_;
+    depth_map_pso_->rasterizer_state_.cull_face_ = GL_FRONT;
+
+    omni_depth_map_vs_ = Shader::CreateFromFile(shader_dir + "omni_depth_map.vs", GL_VERTEX_SHADER);
+    omni_depth_map_fs_ = Shader::CreateFromFile(shader_dir + "omni_depth_map.fs", GL_FRAGMENT_SHADER);
+    omni_depth_map_program_ = Program::Create({omni_depth_map_vs_, omni_depth_map_fs_});
+    omni_depth_map_pso_ = GraphicsPSO::Create();
+    omni_depth_map_pso_->program_ = omni_depth_map_program_;
+    omni_depth_map_pso_->rasterizer_state_.cull_face_ = GL_FRONT;
+
     post_processing_vs_ = Shader::CreateFromFile(shader_dir + "post_processing.vs", GL_VERTEX_SHADER);
     post_processing_fs_ = Shader::CreateFromFile(shader_dir + "post_processing.fs", GL_FRAGMENT_SHADER);
     post_processing_program_ = Program::Create({post_processing_vs_, post_processing_fs_});

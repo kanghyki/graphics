@@ -237,6 +237,12 @@ void SceneUI::LightDetail()
         ImGui::DragFloat("falloff_end", &light.falloff_end_, 0.01f, 0.0f, 180.0f);
         ImGui::DragFloat("spot_power", &light.spot_power_, 0.01f, 0.0f, 180.0f);
         ImGui::Separator();
+        if (comp->depth_map())
+        {
+            ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(comp->depth_map()->texture()->id())),
+                         ImVec2(100, 100));
+        }
+
         if (ImGui::Button("Remove##2"))
         {
             actor_selected->RemoveComponent(ComponentType::LIGHT);

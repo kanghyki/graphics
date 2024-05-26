@@ -127,7 +127,7 @@ void CreateTestLevel::Create()
     auto floor_mesh = Mesh::CreateBox();
     floor_mesh->set_material(Material::Create());
     auto floor_material = floor_mesh->material();
-    floor_material->set_texture(TextureType::ALBEDO, Texture::Load(resource_path + "\\texture2d\\brickwall.jpg"));
+    floor_material->specular_alpha_ = 1.0f;
     floor->GetModelComponent()->set_model(Model::Create({floor_mesh}));
     floor->GetTransformComponent()->transform().scale_ = glm::vec3(10.0f, 0.1f, 10.0f);
     floor->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -191,6 +191,7 @@ void CreateTestLevel::Create()
     light_2->GetTransformComponent()->transform().scale_ *= 0.2;
     light_2->GetLightComponent()->light().type_ = LightType::POINT;
     light_2->GetLightComponent()->light().strength_ = glm::vec3(0.0f, 0.0f, 0.8f);
+    light_2->GetLightComponent()->set_use_shadow(true);
 
     Actor *light_3 = new Actor("Light_yellow");
     light_3->AddLightComponent();

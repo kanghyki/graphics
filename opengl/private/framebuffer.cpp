@@ -120,21 +120,21 @@ DepthMap::~DepthMap()
 
 bool DepthMap::SetTexture(int width, int height, int length)
 {
-    length == -1 ? depth_texture_ = Texture::Create(width, height, GL_DEPTH_COMPONENT)
-                 : depth_texture_ = CubeTexture::Create(width, height, length, GL_DEPTH_COMPONENT);
-    if (!depth_texture_)
+    length == -1 ? texture_ = Texture::Create(width, height, GL_DEPTH_COMPONENT)
+                 : texture_ = CubeTexture::Create(width, height, length, GL_DEPTH_COMPONENT);
+    if (!texture_)
     {
         return false;
     }
-    depth_texture_->SetFilter(GL_NEAREST, GL_NEAREST);
-    depth_texture_->SetWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
-    depth_texture_->SetBorderColor(glm::vec4(1.0f));
+    texture_->SetFilter(GL_NEAREST, GL_NEAREST);
+    texture_->SetWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
+    texture_->SetBorderColor(glm::vec4(1.0f));
     return true;
 }
 
 void DepthMap::AttachTexture()
 {
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth_texture_->id(), 0);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture_->id(), 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 }
