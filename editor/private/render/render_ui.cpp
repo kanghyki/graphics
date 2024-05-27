@@ -32,6 +32,7 @@ void DrawFramebuffers()
     const auto &main = Renderer::GetInstance()->GetFramebuffer(FramebufferType::MAIN);
     const auto &g_buffer = Renderer::GetInstance()->GetFramebuffer(FramebufferType::G_BUFFER);
     const auto &gaussian_blur = Renderer::GetInstance()->GetFramebuffer(FramebufferType::GAUSSIAN_BLUR);
+    const auto &ssao = Renderer::GetInstance()->GetFramebuffer(FramebufferType::SSAO);
 
     if (ImGui::CollapsingHeader("OPTION", ImGuiTreeNodeFlags_DefaultOpen))
     {
@@ -45,13 +46,13 @@ void DrawFramebuffers()
     {
         ImGui::DragFloat("Gamma", &Renderer::GetInstance()->gamma_, 0.01f, 0.0f, 3.0f);
         ImGui::Checkbox("Gray scale", &Renderer::GetInstance()->use_gray_scale_);
-        ImGui::DragInt("Blur time", &Renderer::GetInstance()->blur_time_, 0.1f, 1, 64);
         ImGui::Checkbox("Bloom", &Renderer::GetInstance()->use_bloom_);
+        ImGui::DragInt("Bloom blur time", &Renderer::GetInstance()->blur_time_, 0.1f, 1, 64);
         ImGui::DragFloat("Bloom strength", &Renderer::GetInstance()->bloom_strength_, 0.01f, 0.0f, 10.0f);
         ImGui::DragFloat("Exposure", &Renderer::GetInstance()->exposure_, 0.01f, 0.0f, 10.0f);
     }
 
-    if (ImGui::CollapsingHeader("MAIN", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("MAIN"))
     {
         const char *buffer_name[2] = {"Color", "Bright"};
         static int buffer_selected = 0;
@@ -59,12 +60,26 @@ void DrawFramebuffers()
         ImGui::Image(reinterpret_cast<ImTextureID>(main->color_attachment(buffer_selected)->id()),
                      ImVec2(window_size.x, window_size.x), ImVec2(0, 1), ImVec2(1, 0));
     }
-    if (ImGui::CollapsingHeader("GAUSSIAN_BLUR", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("SSAO"))
+    {
+        ImGui::Checkbox("Use SSAO", &Renderer::GetInstance()->use_ssao_);
+        const char *buffer_name[2] = {"Origin", "Blurred"};
+        static int buffer_selected = 0;
+        ImGui::Combo("##SSAO", &buffer_selected, buffer_name, 2);
+        auto texture = buffer_selected == 0 ? ssao->color_attachment(0)
+                                            : Renderer::GetInstance()->ssao_blur_framebuffer_->color_attachment(0);
+        ImGui::Image(reinterpret_cast<ImTextureID>(texture->id()), ImVec2(window_size.x, window_size.x), ImVec2(0, 1),
+                     ImVec2(1, 0));
+        ImGui::DragInt("Sample size", &Renderer::GetInstance()->ssao_sample_size_, 0.1f, 1, 64);
+        ImGui::DragFloat("Radius", &Renderer::GetInstance()->ssao_radius_, 0.01f, 0.0f, 5.0f);
+        ImGui::DragFloat("Power", &Renderer::GetInstance()->ssao_power_, 0.01f, 0.0f, 5.0f);
+    }
+    if (ImGui::CollapsingHeader("GAUSSIAN_BLUR"))
     {
         ImGui::Image(reinterpret_cast<ImTextureID>(gaussian_blur->color_attachment(0)->id()),
                      ImVec2(window_size.x, window_size.x), ImVec2(0, 1), ImVec2(1, 0));
     }
-    if (ImGui::CollapsingHeader("G_BUFFER", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("G_BUFFER"))
     {
         const char *buffer_name[3] = {"Position", "Normal", "Albedo(rgb)/Specular(a)"};
         static int buffer_selected = 0;

@@ -14,14 +14,16 @@ enum class PsoType
     G_BUFFER,
     SKYBOX,
     DEPTH_MAP,
-    OMNI_DEPTH_MAP
+    OMNI_DEPTH_MAP,
+    SSAO
 };
 
 enum class FramebufferType
 {
     MAIN,
     G_BUFFER,
-    GAUSSIAN_BLUR
+    GAUSSIAN_BLUR,
+    SSAO
 };
 
 enum class UBOType
@@ -41,12 +43,13 @@ class Renderer
 
     void Init();
     void ClearFramebuffer();
+    void RenderSSAO();
     void RenderDeffered();
     void PostProcessing();
 
     void ApplyPSO(const GraphicsPSOPtr &pso) const;
-
     void Resize(int width, int height);
+
     int width()
     {
         return width_;
@@ -80,6 +83,8 @@ class Renderer
             return depth_map_pso_;
         case PsoType::OMNI_DEPTH_MAP:
             return omni_depth_map_pso_;
+        case PsoType::SSAO:
+            return ssao_pso_;
         }
         return nullptr;
     }
@@ -93,6 +98,8 @@ class Renderer
             return g_buffer_;
         case FramebufferType::GAUSSIAN_BLUR:
             return gaussian_blur_framebuffer_[0];
+        case FramebufferType::SSAO:
+            return ssao_framebuffer_;
         }
         return nullptr;
     }
@@ -149,43 +156,73 @@ class Renderer
 
     FramebufferPtr main_framebuffer_;
 
+    /* G-Buffer */
+    FramebufferPtr g_buffer_;
     ShaderPtr g_buffer_vs_;
     ShaderPtr g_buffer_fs_;
     ProgramPtr g_buffer_program_;
     GraphicsPSOPtr g_buffer_pso_;
 
-    FramebufferPtr g_buffer_;
+    /* Deffered shading */
     ShaderPtr deffered_shading_vs_;
     ShaderPtr deffered_shading_fs_;
     ProgramPtr deffered_shading_program_;
     GraphicsPSOPtr deffered_shading_pso_;
 
+    /* Skybox */
     ShaderPtr skybox_vs_;
     ShaderPtr skybox_fs_;
     ProgramPtr skybox_program_;
     GraphicsPSOPtr skybox_pso_;
 
+    /* Depth map */
     ShaderPtr depth_map_vs_;
     ShaderPtr depth_map_fs_;
     ProgramPtr depth_map_program_;
     GraphicsPSOPtr depth_map_pso_;
 
+    /* Omni-Depth map */
     ShaderPtr omni_depth_map_vs_;
     ShaderPtr omni_depth_map_fs_;
     ProgramPtr omni_depth_map_program_;
     GraphicsPSOPtr omni_depth_map_pso_;
 
+    /* Gaussian blur */
     FramebufferPtr gaussian_blur_framebuffer_[2];
     ShaderPtr gaussian_blur_vs_;
     ShaderPtr gaussian_blur_fs_;
     ProgramPtr gaussian_blur_program_;
     GraphicsPSOPtr gaussian_blur_pso_;
 
+    /* Post processing */
     ShaderPtr post_processing_vs_;
     ShaderPtr post_processing_fs_;
     ProgramPtr post_processing_program_;
     GraphicsPSOPtr post_processing_pso_;
 
+    /* SSAO */
+    FramebufferPtr ssao_framebuffer_;
+    ShaderPtr ssao_vs_;
+    ShaderPtr ssao_fs_;
+    ProgramPtr ssao_program_;
+    GraphicsPSOPtr ssao_pso_;
+    TexturePtr ssao_noise_texture_;
+    std::vector<glm::vec3> ssao_sample_;
+
+  public:
+    bool use_ssao_{true};
+    const int SSAO_SAMPLE_MAX = 64;
+    int ssao_sample_size_{64};
+    float ssao_radius_{1.0f};
+    float ssao_power_{1.0f};
+
+    FramebufferPtr ssao_blur_framebuffer_;
+    ShaderPtr linear_blur_vs_;
+    ShaderPtr linear_blur_fs_;
+    ProgramPtr linear_blur_program_;
+
+  private:
+    /* Uniform buffer object */
     BufferPtr camera_ubo_;
     BufferPtr matrices_ubo_;
     BufferPtr lights_ubo_;

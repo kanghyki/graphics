@@ -14,6 +14,9 @@ uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
 
+uniform bool use_ssao;
+uniform sampler2D SSAO;
+
 void main()
 {
     vec3    frag_pos    = texture(gPosition, texCoord).rgb;
@@ -22,11 +25,12 @@ void main()
     float   specular    = texture(gAlbedoSpec, texCoord).a;
     vec3    to_eye      = normalize(c_view_position - frag_pos);
 
-    vec3 lighting;
     MaterialForShading mat;
     mat.albedo = albedo;
     mat.specular_alpha = specular;
     mat.shininess = material.shininess;
+
+    vec3 lighting = use_ssao ? mat.albedo *  0.1 * texture(SSAO, texCoord).r : mat.albedo *  0.1;
     for (int i = 0; i < l_light_count; ++i)
     {
         if (l_lights[i].type == DIRECTIONAL)

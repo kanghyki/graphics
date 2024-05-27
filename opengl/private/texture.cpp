@@ -81,7 +81,7 @@ void BaseTexture::SetWrap(uint32_t s_wrap, uint32_t t_wrap, uint32_t r_wrap) con
     glTexParameteri(texture_type_, GL_TEXTURE_WRAP_T, t_wrap);
     if (r_wrap != GL_NONE)
     {
-        glTexParameteri(texture_type_, GL_TEXTURE_WRAP_T, r_wrap);
+        glTexParameteri(texture_type_, GL_TEXTURE_WRAP_R, r_wrap);
     }
 }
 
@@ -96,6 +96,11 @@ uint32_t BaseTexture::format() const
     {
     case GL_DEPTH_COMPONENT:
         return GL_DEPTH_COMPONENT;
+    case GL_RED:
+    case GL_R:
+    case GL_R16F:
+    case GL_R32F:
+        return GL_RED;
     case GL_RG:
     case GL_RG16F:
     case GL_RG32F:
@@ -116,6 +121,8 @@ uint32_t BaseTexture::data_type() const
 {
     switch (internal_format_)
     {
+    case GL_R16F:
+    case GL_R32F:
     case GL_RG16F:
     case GL_RG32F:
     case GL_RGB16F:
@@ -124,6 +131,8 @@ uint32_t BaseTexture::data_type() const
     case GL_RGBA32F:
     case GL_DEPTH_COMPONENT:
         return GL_FLOAT;
+    case GL_RED:
+    case GL_R:
     case GL_RG:
     case GL_RGB:
     case GL_RGBA:

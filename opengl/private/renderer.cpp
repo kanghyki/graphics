@@ -1,5 +1,6 @@
 #include "renderer.h"
 #include "opengl_device.h"
+#include "random_number_generator.h"
 #include <spdlog/spdlog.h>
 
 Renderer *Renderer::instance_ = nullptr;
@@ -33,12 +34,7 @@ void Renderer::Init()
     main_framebuffer_ = Framebuffer::Create(
         {Texture::Create(width_, height_, GL_RGBA16F), Texture::Create(width_, height_, GL_RGBA16F)});
 
-    deffered_shading_vs_ = Shader::CreateFromFile(shader_dir + "deffered_shading.vs", GL_VERTEX_SHADER);
-    deffered_shading_fs_ = Shader::CreateFromFile(shader_dir + "deffered_shading.fs", GL_FRAGMENT_SHADER);
-    deffered_shading_program_ = Program::Create({deffered_shading_vs_, deffered_shading_fs_});
-    deffered_shading_pso_ = GraphicsPSO::Create();
-    deffered_shading_pso_->program_ = deffered_shading_program_;
-
+    /* G-Buffer */
     g_buffer_ =
         Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F), Texture::Create(width_, height_, GL_RGBA16F),
                              Texture::Create(width_, height_, GL_RGBA)});
@@ -48,6 +44,14 @@ void Renderer::Init()
     g_buffer_pso_ = GraphicsPSO::Create();
     g_buffer_pso_->program_ = g_buffer_program_;
 
+    /* Deffered shading */
+    deffered_shading_vs_ = Shader::CreateFromFile(shader_dir + "deffered_shading.vs", GL_VERTEX_SHADER);
+    deffered_shading_fs_ = Shader::CreateFromFile(shader_dir + "deffered_shading.fs", GL_FRAGMENT_SHADER);
+    deffered_shading_program_ = Program::Create({deffered_shading_vs_, deffered_shading_fs_});
+    deffered_shading_pso_ = GraphicsPSO::Create();
+    deffered_shading_pso_->program_ = deffered_shading_program_;
+
+    /* Skybox */
     skybox_vs_ = Shader::CreateFromFile(shader_dir + "skybox.vs", GL_VERTEX_SHADER);
     skybox_fs_ = Shader::CreateFromFile(shader_dir + "skybox.fs", GL_FRAGMENT_SHADER);
     skybox_program_ = Program::Create({skybox_vs_, skybox_fs_});
@@ -56,6 +60,7 @@ void Renderer::Init()
     skybox_pso_->rasterizer_state_.cull_face_ = GL_FRONT;
     skybox_pso_->rasterizer_state_.depth_func_ = GL_LEQUAL;
 
+    /* Depth map */
     depth_map_vs_ = Shader::CreateFromFile(shader_dir + "depth_map.vs", GL_VERTEX_SHADER);
     depth_map_fs_ = Shader::CreateFromFile(shader_dir + "depth_map.fs", GL_FRAGMENT_SHADER);
     depth_map_program_ = Program::Create({depth_map_vs_, depth_map_fs_});
@@ -63,6 +68,7 @@ void Renderer::Init()
     depth_map_pso_->program_ = depth_map_program_;
     depth_map_pso_->rasterizer_state_.cull_face_ = GL_FRONT;
 
+    /* Omni-Depth map */
     omni_depth_map_vs_ = Shader::CreateFromFile(shader_dir + "omni_depth_map.vs", GL_VERTEX_SHADER);
     omni_depth_map_fs_ = Shader::CreateFromFile(shader_dir + "omni_depth_map.fs", GL_FRAGMENT_SHADER);
     omni_depth_map_program_ = Program::Create({omni_depth_map_vs_, omni_depth_map_fs_});
@@ -70,6 +76,7 @@ void Renderer::Init()
     omni_depth_map_pso_->program_ = omni_depth_map_program_;
     omni_depth_map_pso_->rasterizer_state_.cull_face_ = GL_FRONT;
 
+    /* Gaussian blur */
     gaussian_blur_framebuffer_[0] = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F)});
     gaussian_blur_framebuffer_[1] = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F)});
     gaussian_blur_vs_ = Shader::CreateFromFile(shader_dir + "gaussian_blur.vs", GL_VERTEX_SHADER);
@@ -79,6 +86,7 @@ void Renderer::Init()
     gaussian_blur_pso_->program_ = gaussian_blur_program_;
     gaussian_blur_pso_->rasterizer_state_.is_depth_test_ = false;
 
+    /* Post processing */
     post_processing_vs_ = Shader::CreateFromFile(shader_dir + "post_processing.vs", GL_VERTEX_SHADER);
     post_processing_fs_ = Shader::CreateFromFile(shader_dir + "post_processing.fs", GL_FRAGMENT_SHADER);
     post_processing_program_ = Program::Create({post_processing_vs_, post_processing_fs_});
@@ -86,6 +94,47 @@ void Renderer::Init()
     post_processing_pso_->program_ = post_processing_program_;
     post_processing_pso_->rasterizer_state_.is_depth_test_ = false;
 
+    /* SSAO */
+    ssao_framebuffer_ = Framebuffer::Create({Texture::Create(width_, height_, GL_RED)});
+    ssao_vs_ = Shader::CreateFromFile(shader_dir + "ssao.vs", GL_VERTEX_SHADER);
+    ssao_fs_ = Shader::CreateFromFile(shader_dir + "ssao.fs", GL_FRAGMENT_SHADER);
+    ssao_program_ = Program::Create({ssao_vs_, ssao_fs_});
+    ssao_pso_ = GraphicsPSO::Create();
+    ssao_pso_->program_ = ssao_program_;
+
+    ssao_blur_framebuffer_ = Framebuffer::Create({Texture::Create(width_, height_, GL_RED)});
+    linear_blur_vs_ = Shader::CreateFromFile(shader_dir + "linear_blur.vs", GL_VERTEX_SHADER);
+    linear_blur_fs_ = Shader::CreateFromFile(shader_dir + "linear_blur.fs", GL_FRAGMENT_SHADER);
+    linear_blur_program_ = Program::Create({linear_blur_vs_, linear_blur_fs_});
+
+    std::vector<glm::vec3> ssao_noise(16);
+    for (size_t i = 0; i < ssao_noise.size(); ++i)
+    {
+        float rx = RandomNumberGenerator().Uniform(-1.0f, 1.0f);
+        float ry = RandomNumberGenerator().Uniform(-1.0f, 1.0f);
+        ssao_noise[i] = glm::vec3(rx, ry, 0.0f);
+    }
+    ssao_noise_texture_ = Texture::Create(4, 4, GL_RGB16F);
+    ssao_noise_texture_->Bind();
+    ssao_noise_texture_->SetFilter(GL_NEAREST, GL_NEAREST);
+    ssao_noise_texture_->SetWrap(GL_REPEAT, GL_REPEAT);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 4, 4, GL_RGB, GL_FLOAT, ssao_noise.data());
+
+    ssao_sample_.resize(SSAO_SAMPLE_MAX);
+    for (size_t i = 0; i < ssao_sample_.size(); ++i)
+    {
+        float rx = RandomNumberGenerator().Uniform(-1.0f, 1.0f);
+        float ry = RandomNumberGenerator().Uniform(-1.0f, 1.0f);
+        float rz = RandomNumberGenerator().Uniform(0.0f, 1.0f);
+        float rr = RandomNumberGenerator().Uniform(0.0f, 1.0f);
+        glm::vec3 sample = glm::normalize(glm::vec3(rx, ry, rz)) * rr;
+        float t = static_cast<float>(i) / static_cast<float>(ssao_sample_.size());
+        float t2 = t * t;
+        float scale = (1.0f - t2) * 0.1f + t2 * 1.0f;
+        ssao_sample_[i] = sample * scale;
+    }
+
+    /* Uniform buffer object */
     camera_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(CameraUniform), 1);
     matrices_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(MatricesUniform), 1);
     lights_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(LightsUniform), 1);
@@ -104,8 +153,55 @@ void Renderer::ClearFramebuffer()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     g_buffer_->Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    if (use_ssao_)
+    {
+        ssao_framebuffer_->Bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        ssao_blur_framebuffer_->Bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    }
     Framebuffer::BindToDefault();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+}
+
+void Renderer::RenderSSAO()
+{
+    if (!use_ssao_)
+    {
+        return;
+    }
+    ssao_framebuffer_->Bind();
+    ApplyPSO(ssao_pso_);
+    ssao_program_->Use();
+    ssao_program_->SetUniform("model", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    glActiveTexture(GL_TEXTURE0);
+    g_buffer_->color_attachment(0)->Bind();
+    ssao_program_->SetUniform("gPosition", 0);
+    glActiveTexture(GL_TEXTURE1);
+    g_buffer_->color_attachment(1)->Bind();
+    ssao_program_->SetUniform("gNormal", 1);
+    glActiveTexture(GL_TEXTURE2);
+    ssao_noise_texture_->Bind();
+    ssao_program_->SetUniform("texNoise", 2);
+    ssao_program_->SetUniform("noiseScale", glm::vec2((float)width_ / (float)ssao_noise_texture_->width(),
+                                                      (float)height_ / (float)ssao_noise_texture_->height()));
+    ssao_program_->SetUniform("radius", ssao_radius_);
+    ssao_program_->SetUniform("power", ssao_power_);
+    ssao_program_->SetUniform("sampleSize", ssao_sample_size_);
+    for (size_t i = 0; i < ssao_sample_size_; ++i)
+    {
+        auto name = fmt::format("samples[{}]", i);
+        ssao_program_->SetUniform(name, ssao_sample_[i]);
+    }
+    plane_mesh_->Draw(nullptr);
+
+    ssao_blur_framebuffer_->Bind();
+    linear_blur_program_->Use();
+    glActiveTexture(GL_TEXTURE0);
+    ssao_framebuffer_->color_attachment(0)->Bind();
+    linear_blur_program_->SetUniform("tex", 0);
+    linear_blur_program_->SetUniform("model", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    plane_mesh_->Draw(nullptr);
 }
 
 void Renderer::RenderDeffered()
@@ -123,6 +219,14 @@ void Renderer::RenderDeffered()
     glActiveTexture(GL_TEXTURE2);
     g_buffer_->color_attachment(2)->Bind();
     deffered_shading_program_->SetUniform("gAlbedoSpec", 2);
+
+    deffered_shading_program_->SetUniform("use_ssao", use_ssao_);
+    if (use_ssao_)
+    {
+        glActiveTexture(GL_TEXTURE3);
+        ssao_blur_framebuffer_->color_attachment(0)->Bind();
+        deffered_shading_program_->SetUniform("SSAO", 3);
+    }
     plane_mesh_->Draw(nullptr);
 
     g_buffer_->Bind(GL_READ_FRAMEBUFFER);
@@ -132,22 +236,25 @@ void Renderer::RenderDeffered()
 
 void Renderer::PostProcessing()
 {
-    ApplyPSO(gaussian_blur_pso_);
-    bool horizontal = true;
-    auto model = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f));
-    gaussian_blur_program_->Use();
-    gaussian_blur_program_->SetUniform("transform", model);
-
-    for (unsigned int i = 0; i < blur_time_ * 2; i++)
+    if (use_bloom_)
     {
-        gaussian_blur_framebuffer_[horizontal]->Bind();
-        gaussian_blur_program_->SetUniform("horizontal", horizontal);
-        glActiveTexture(GL_TEXTURE0);
-        i == 0 ? main_framebuffer_->color_attachment(1)->Bind()
-               : gaussian_blur_framebuffer_[!horizontal]->color_attachment(0)->Bind();
-        gaussian_blur_program_->SetUniform("image", 0);
-        plane_mesh_->Draw(gaussian_blur_program_.get());
-        horizontal = !horizontal;
+        ApplyPSO(gaussian_blur_pso_);
+        bool horizontal = true;
+        auto model = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f));
+        gaussian_blur_program_->Use();
+        gaussian_blur_program_->SetUniform("transform", model);
+
+        for (unsigned int i = 0; i < blur_time_ * 2; i++)
+        {
+            gaussian_blur_framebuffer_[horizontal]->Bind();
+            gaussian_blur_program_->SetUniform("horizontal", horizontal);
+            glActiveTexture(GL_TEXTURE0);
+            i == 0 ? main_framebuffer_->color_attachment(1)->Bind()
+                   : gaussian_blur_framebuffer_[!horizontal]->color_attachment(0)->Bind();
+            gaussian_blur_program_->SetUniform("image", 0);
+            plane_mesh_->Draw(gaussian_blur_program_.get());
+            horizontal = !horizontal;
+        }
     }
 
     Framebuffer::BindToDefault();
@@ -238,4 +345,8 @@ void Renderer::Resize(int width, int height)
     g_buffer_ =
         Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F), Texture::Create(width_, height_, GL_RGBA16F),
                              Texture::Create(width_, height_, GL_RGBA)});
+    gaussian_blur_framebuffer_[0] = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F)});
+    gaussian_blur_framebuffer_[1] = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F)});
+    ssao_framebuffer_ = Framebuffer::Create({Texture::Create(width_, height_, GL_RED)});
+    ssao_blur_framebuffer_ = Framebuffer::Create({Texture::Create(width_, height_, GL_RED)});
 }

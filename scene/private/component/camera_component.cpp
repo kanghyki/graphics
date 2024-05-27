@@ -58,7 +58,7 @@ void CameraComponent::Render()
                     glm::value_ptr(camera_.CalcPerspectiveProjectionMatrix()));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    RenderShadowMap();
+    // RenderShadowMap();
     RenderShading();
     RenderSkybox();
 }
@@ -115,6 +115,7 @@ void CameraComponent::RenderShading()
     }
     glUseProgram(0);
 
+    Renderer::GetInstance()->RenderSSAO();
     Renderer::GetInstance()->RenderDeffered();
 }
 
