@@ -37,7 +37,7 @@ void Renderer::Init()
     /* G-Buffer */
     g_buffer_ =
         Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F), Texture::Create(width_, height_, GL_RGBA16F),
-                             Texture::Create(width_, height_, GL_RGBA)});
+                             Texture::Create(width_, height_, GL_RGBA), Texture::Create(width_, height_, GL_RGBA16F)});
     g_buffer_vs_ = Shader::CreateFromFile(shader_dir + "g_buffer.vs", GL_VERTEX_SHADER);
     g_buffer_fs_ = Shader::CreateFromFile(shader_dir + "g_buffer.fs", GL_FRAGMENT_SHADER);
     g_buffer_program_ = Program::Create({g_buffer_vs_, g_buffer_fs_});
@@ -219,13 +219,16 @@ void Renderer::RenderDeffered()
     glActiveTexture(GL_TEXTURE2);
     g_buffer_->color_attachment(2)->Bind();
     deffered_shading_program_->SetUniform("gAlbedoSpec", 2);
+    glActiveTexture(GL_TEXTURE3);
+    g_buffer_->color_attachment(3)->Bind();
+    deffered_shading_program_->SetUniform("gEmissive", 3);
 
     deffered_shading_program_->SetUniform("use_ssao", use_ssao_);
     if (use_ssao_)
     {
-        glActiveTexture(GL_TEXTURE3);
+        glActiveTexture(GL_TEXTURE4);
         ssao_blur_framebuffer_->color_attachment(0)->Bind();
-        deffered_shading_program_->SetUniform("SSAO", 3);
+        deffered_shading_program_->SetUniform("SSAO", 4);
     }
     plane_mesh_->Draw(nullptr);
 
@@ -344,7 +347,7 @@ void Renderer::Resize(int width, int height)
         {Texture::Create(width_, height_, GL_RGBA16F), Texture::Create(width_, height_, GL_RGBA16F)});
     g_buffer_ =
         Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F), Texture::Create(width_, height_, GL_RGBA16F),
-                             Texture::Create(width_, height_, GL_RGBA)});
+                             Texture::Create(width_, height_, GL_RGBA), Texture::Create(width_, height_, GL_RGBA16F)});
     gaussian_blur_framebuffer_[0] = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F)});
     gaussian_blur_framebuffer_[1] = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F)});
     ssao_framebuffer_ = Framebuffer::Create({Texture::Create(width_, height_, GL_RED)});

@@ -13,6 +13,7 @@ in vec2 texCoord;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
+uniform sampler2D gEmissive;
 
 uniform bool use_ssao;
 uniform sampler2D SSAO;
@@ -24,13 +25,15 @@ void main()
     vec3    albedo      = texture(gAlbedoSpec, texCoord).rgb;
     float   specular    = texture(gAlbedoSpec, texCoord).a;
     vec3    to_eye      = normalize(c_view_position - frag_pos);
+    vec3    emissive    = texture(gEmissive, texCoord).rgb;
 
     MaterialForShading mat;
     mat.albedo = albedo;
     mat.specular_alpha = specular;
     mat.shininess = material.shininess;
 
-    vec3 lighting = use_ssao ? mat.albedo *  0.1 * texture(SSAO, texCoord).r : mat.albedo *  0.1;
+    vec3 lighting = emissive;
+     lighting += use_ssao ? mat.albedo *  0.1 * texture(SSAO, texCoord).r : mat.albedo *  0.1;
     for (int i = 0; i < l_light_count; ++i)
     {
         if (l_lights[i].type == DIRECTIONAL)

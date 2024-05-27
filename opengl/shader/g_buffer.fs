@@ -2,6 +2,7 @@
 layout (location = 0) out vec4 gPosition;
 layout (location = 1) out vec4 gNormal;
 layout (location = 2) out vec4 gAlbedoSpec;
+layout (location = 3) out vec4 gEmissive;
 
 in vec3 position;
 in vec3 normal;
@@ -40,5 +41,9 @@ void main() {
   else
   {
     gAlbedoSpec.a = material.specular_alpha;
+  }
+  if (material.use_emissive_map)
+  {
+    gEmissive = vec4(texture(m_emissive, texCoord).xyz, 1.0);
   }
 }

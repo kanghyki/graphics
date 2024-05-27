@@ -156,7 +156,7 @@ void CreateTestLevel::Create()
     auto red = Mesh::CreateSphere(30, 30);
     red->set_material(Material::Create());
     red->material()->set_texture(
-        TextureType::ALBEDO,
+        TextureType::EMISSIVE,
         Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.8f, 0.0f, 0.0f, 1.0f)).get()));
     light_0->GetModelComponent()->set_model(Model::Create({red}));
     light_0->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 2.0f, -2.5f);
@@ -170,7 +170,7 @@ void CreateTestLevel::Create()
     auto blue = Mesh::CreateSphere(30, 30);
     blue->set_material(Material::Create());
     blue->material()->set_texture(
-        TextureType::ALBEDO,
+        TextureType::EMISSIVE,
         Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.8f, 0.0f, 1.0f)).get()));
     light_1->GetModelComponent()->set_model(Model::Create({blue}));
     light_1->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 2.0f, 3.0f);
@@ -184,7 +184,7 @@ void CreateTestLevel::Create()
     auto green = Mesh::CreateSphere(30, 30);
     green->set_material(Material::Create());
     green->material()->set_texture(
-        TextureType::ALBEDO,
+        TextureType::EMISSIVE,
         Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.0f, 0.8f, 1.0f)).get()));
     light_2->GetModelComponent()->set_model(Model::Create({green}));
     light_2->GetTransformComponent()->transform().position_ = glm::vec3(-3.0f, 2.5f, 0.0f);
@@ -199,7 +199,7 @@ void CreateTestLevel::Create()
     auto yellow = Mesh::CreateSphere(30, 30);
     yellow->set_material(Material::Create());
     yellow->material()->set_texture(
-        TextureType::ALBEDO,
+        TextureType::EMISSIVE,
         Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.8f, 0.8f, 0.0f, 1.0f)).get()));
     light_3->GetModelComponent()->set_model(Model::Create({yellow}));
     light_3->GetTransformComponent()->transform().position_ = glm::vec3(3.0f, 2.0f, -3.0f);

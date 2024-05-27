@@ -81,9 +81,9 @@ void DrawFramebuffers()
     }
     if (ImGui::CollapsingHeader("G_BUFFER"))
     {
-        const char *buffer_name[3] = {"Position", "Normal", "Albedo(rgb)/Specular(a)"};
+        const char *buffer_name[4] = {"Position", "Normal", "Albedo(rgb)/Specular(a)", "Emissive"};
         static int buffer_selected = 0;
-        ImGui::Combo("##G_BUFFER", &buffer_selected, buffer_name, 3);
+        ImGui::Combo("##G_BUFFER", &buffer_selected, buffer_name, 4);
         ImGui::Image(reinterpret_cast<ImTextureID>(g_buffer->color_attachment(buffer_selected)->id()),
                      ImVec2(window_size.x, window_size.x), ImVec2(0, 1), ImVec2(1, 0));
     }
