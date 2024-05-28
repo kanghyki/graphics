@@ -45,11 +45,18 @@ void DrawFramebuffers()
     if (ImGui::CollapsingHeader("POST", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::DragFloat("Gamma", &Renderer::GetInstance()->gamma_, 0.01f, 0.0f, 3.0f);
-        ImGui::Checkbox("Gray scale", &Renderer::GetInstance()->use_gray_scale_);
-        ImGui::Checkbox("Bloom", &Renderer::GetInstance()->use_bloom_);
-        ImGui::DragInt("Bloom blur time", &Renderer::GetInstance()->blur_time_, 0.1f, 1, 64);
-        ImGui::DragFloat("Bloom strength", &Renderer::GetInstance()->bloom_strength_, 0.01f, 0.0f, 10.0f);
-        ImGui::DragFloat("Exposure", &Renderer::GetInstance()->exposure_, 0.01f, 0.0f, 10.0f);
+        ImGui::Checkbox("Use gray scale", &Renderer::GetInstance()->use_gray_scale_);
+        ImGui::Checkbox("Use bloom", &Renderer::GetInstance()->use_bloom_);
+        if (Renderer::GetInstance()->use_bloom_)
+        {
+            ImGui::DragInt("Bloom blur time", &Renderer::GetInstance()->blur_time_, 0.1f, 1, 64);
+            ImGui::DragFloat("Bloom strength", &Renderer::GetInstance()->bloom_strength_, 0.01f, 0.0f, 10.0f);
+        }
+        ImGui::Checkbox("Use exposure", &Renderer::GetInstance()->use_exposure_);
+        if (Renderer::GetInstance()->use_exposure_)
+        {
+            ImGui::DragFloat("Exposure", &Renderer::GetInstance()->exposure_, 0.01f, 0.0f, 10.0f);
+        }
     }
 
     if (ImGui::CollapsingHeader("MAIN"))
@@ -59,6 +66,11 @@ void DrawFramebuffers()
         ImGui::Combo("##MAIN", &buffer_selected, buffer_name, 2);
         ImGui::Image(reinterpret_cast<ImTextureID>(main->color_attachment(buffer_selected)->id()),
                      ImVec2(window_size.x, window_size.x), ImVec2(0, 1), ImVec2(1, 0));
+        if (Renderer::GetInstance()->use_bloom_)
+        {
+            ImGui::Image(reinterpret_cast<ImTextureID>(gaussian_blur->color_attachment(0)->id()),
+                         ImVec2(window_size.x, window_size.x), ImVec2(0, 1), ImVec2(1, 0));
+        }
     }
     if (ImGui::CollapsingHeader("SSAO"))
     {
@@ -73,11 +85,6 @@ void DrawFramebuffers()
         ImGui::DragInt("Sample size", &Renderer::GetInstance()->ssao_sample_size_, 0.1f, 1, 64);
         ImGui::DragFloat("Radius", &Renderer::GetInstance()->ssao_radius_, 0.01f, 0.0f, 5.0f);
         ImGui::DragFloat("Power", &Renderer::GetInstance()->ssao_power_, 0.01f, 0.0f, 5.0f);
-    }
-    if (ImGui::CollapsingHeader("GAUSSIAN_BLUR"))
-    {
-        ImGui::Image(reinterpret_cast<ImTextureID>(gaussian_blur->color_attachment(0)->id()),
-                     ImVec2(window_size.x, window_size.x), ImVec2(0, 1), ImVec2(1, 0));
     }
     if (ImGui::CollapsingHeader("G_BUFFER"))
     {

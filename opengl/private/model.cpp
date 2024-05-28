@@ -79,6 +79,7 @@ bool Model::LoadByAssimp(const std::string &filename)
         material->set_texture(TextureType::SPECULAR, LoadTexture(dirname, scene_material, aiTextureType_SPECULAR));
         material->set_texture(TextureType::AO, LoadTexture(dirname, scene_material, aiTextureType_AMBIENT_OCCLUSION));
         material->set_texture(TextureType::NORMAL, LoadTexture(dirname, scene_material, aiTextureType_NORMALS));
+        material->set_texture(TextureType::HEIGHT, LoadTexture(dirname, scene_material, aiTextureType_HEIGHT));
         material->set_texture(TextureType::ROUGHNESS,
                               LoadTexture(dirname, scene_material, aiTextureType_DIFFUSE_ROUGHNESS));
         // Metallic = metalness ?

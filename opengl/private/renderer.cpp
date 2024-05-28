@@ -268,6 +268,7 @@ void Renderer::PostProcessing()
     post_processing_program_->SetUniform("use_gray_scale", use_gray_scale_);
     post_processing_program_->SetUniform("use_bloom", use_bloom_);
     post_processing_program_->SetUniform("bloom_strength", bloom_strength_);
+    post_processing_program_->SetUniform("use_exposure", use_exposure_);
     post_processing_program_->SetUniform("exposure", exposure_);
     glActiveTexture(GL_TEXTURE0);
     main_framebuffer_->color_attachment(0)->Bind();
@@ -338,6 +339,10 @@ void Renderer::ApplyPSO(const GraphicsPSOPtr &pso) const
 
 void Renderer::Resize(int width, int height)
 {
+    if (width == 0 || height == 0)
+    {
+        return;
+    }
     SPDLOG_INFO("Resize window {} {}", width, height);
     width_ = width;
     height_ = height;

@@ -197,6 +197,24 @@ void Texture::SetTextureFromImage(const Image *image)
     width_ = image->width();
     height_ = image->height();
     internal_format_ = image_util::ChannelCountToRGBAFormat(image->channel_count());
+    if (image->byte_per_channel() == 4)
+    {
+        switch (image->channel_count())
+        {
+        case 1:
+            internal_format_ = GL_R16F;
+            break;
+        case 2:
+            internal_format_ = GL_RG16F;
+            break;
+        case 3:
+            internal_format_ = GL_RGB16F;
+            break;
+        case 4:
+            internal_format_ = GL_RGBA16F;
+            break;
+        }
+    }
 
     glTexImage2D(GL_TEXTURE_2D, 0, internal_format_, width_, height_, 0, format(), data_type(), image->data());
     glGenerateMipmap(GL_TEXTURE_2D);

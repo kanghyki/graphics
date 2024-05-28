@@ -3,7 +3,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-Image::Image() : width_(0), height_(0), channel_count_(0), data_(nullptr)
+Image::Image()
 {
 }
 

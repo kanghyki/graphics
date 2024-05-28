@@ -108,6 +108,22 @@ class RotationTransformComponent : public TransformComponent
     float y_rotation_speed = 20.0f;
 };
 
+class LightTT : public TransformComponent
+{
+  public:
+    LightTT()
+    {
+        transform().scale_ = glm::vec3(0.035f);
+        transform().position_ = glm::vec3(1.0f, 0.5f, 0.0f);
+    }
+    void Tick()
+    {
+        float dt = TimeManager::GetInstance()->delta_time();
+        transform().position_ = glm::rotate(glm::mat4(1.0f), dt * 3.141592f * 0.5f, glm::vec3(0.0f, 1.0f, 0.0f)) *
+                                glm::vec4(transform().position_, 1.0f);
+    }
+};
+
 CreateTestLevel::CreateTestLevel()
 {
 }
@@ -127,85 +143,67 @@ void CreateTestLevel::Create()
     auto floor_mesh = Mesh::CreateBox();
     floor_mesh->set_material(Material::Create());
     auto floor_material = floor_mesh->material();
-    floor_material->specular_alpha_ = 1.0f;
+    floor_material->albedo_color_ = glm::vec3(0.5f, 0.5f, 0.5f);
+    floor_material->specular_alpha_ = 0.0f;
     floor->GetModelComponent()->set_model(Model::Create({floor_mesh}));
-    floor->GetTransformComponent()->transform().scale_ = glm::vec3(10.0f, 0.1f, 10.0f);
+    floor->GetTransformComponent()->transform().scale_ = glm::vec3(10.0f, 0.01f, 10.0f);
     floor->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 0.0f, 0.0f);
 
     Actor *box = new Actor("Box");
     auto box_mesh = Mesh::CreateBox();
     box_mesh->set_material(Material::Create());
     auto box_material = box_mesh->material();
-    box_material->set_texture(TextureType::ALBEDO, Texture::Load(resource_path + "\\texture2d\\box.png"));
-    box_material->set_texture(TextureType::SPECULAR, Texture::Load(resource_path + "\\texture2d\\box_spec.png"));
+    box_material->specular_alpha_ = 1.0f;
     box->SetComponent(std::shared_ptr<Component>(new RotationTransformComponent()));
     box->AddModelComponent();
     box->GetModelComponent()->set_model(Model::Create({box_mesh}));
     box->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 0.5f, -0.5f);
 
+    Actor *sphere = new Actor("Sphere");
+    auto sphere_mesh = Mesh::CreateSphere(30, 30);
+    sphere_mesh->set_material(Material::Create());
+    auto sphere_material = sphere_mesh->material();
+    sphere_material->specular_alpha_ = 1.0f;
+    sphere->AddModelComponent();
+    sphere->GetModelComponent()->set_model(Model::Create({sphere_mesh}));
+    sphere->GetTransformComponent()->transform().position_ = glm::vec3(1.0f, 1.0f, 0.0f);
+    sphere->GetTransformComponent()->transform().scale_ = glm::vec3(0.6f);
+
     Actor *backpack = new Actor("Backpack");
     backpack->AddModelComponent();
     backpack->GetModelComponent()->set_model(Model::Load(resource_path + "\\model\\backpack.obj"));
-    backpack->GetTransformComponent()->transform().scale_ = glm::vec3(0.3f, 0.3f, 0.3f);
-    backpack->GetTransformComponent()->transform().position_ = glm::vec3(3.0f, 0.5f, -0.5f);
-    backpack->GetTransformComponent()->transform().rotation_ = glm::vec3(0.0f, -30.0f, 0.0f);
+    backpack->GetTransformComponent()->transform().scale_ = glm::vec3(0.1f, 0.1f, 0.1f);
+    backpack->GetTransformComponent()->transform().position_ = glm::vec3(-1.0f, 0.22f, -0.5f);
+    backpack->GetTransformComponent()->transform().rotation_ = glm::vec3(0.0f, 50.0f, 0.0f);
 
-    Actor *light_0 = new Actor("Light_red");
+    Actor *light_0 = new Actor("Light 1");
     light_0->AddLightComponent();
     light_0->AddModelComponent();
     auto red = Mesh::CreateSphere(30, 30);
     red->set_material(Material::Create());
     red->material()->set_texture(
         TextureType::EMISSIVE,
-        Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.8f, 0.0f, 0.0f, 1.0f)).get()));
+        Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.95f, 0.95f, 0.95f, 1.0f)).get()));
     light_0->GetModelComponent()->set_model(Model::Create({red}));
-    light_0->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 2.0f, -2.5f);
-    light_0->GetTransformComponent()->transform().scale_ *= 0.2;
-    light_0->GetLightComponent()->light().type_ = LightType::POINT;
-    light_0->GetLightComponent()->light().color_ = glm::vec3(0.8f, 0.0f, 0.0f);
+    light_0->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 1.5f, 0.0f);
+    light_0->GetTransformComponent()->transform().scale_ *= 0.035;
+    light_0->GetTransformComponent()->transform().rotation_ = glm::vec3(-90.0f, 0.0f, 0.0f);
+    light_0->GetLightComponent()->light().type_ = LightType::SPOT;
+    light_0->GetLightComponent()->light().color_ = glm::vec3(0.95f, 0.95f, 0.95f);
 
-    Actor *light_1 = new Actor("Light_green");
-    light_1->AddLightComponent();
-    light_1->AddModelComponent();
-    auto blue = Mesh::CreateSphere(30, 30);
-    blue->set_material(Material::Create());
-    blue->material()->set_texture(
-        TextureType::EMISSIVE,
-        Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.8f, 0.0f, 1.0f)).get()));
-    light_1->GetModelComponent()->set_model(Model::Create({blue}));
-    light_1->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 2.0f, 3.0f);
-    light_1->GetTransformComponent()->transform().scale_ *= 0.2;
-    light_1->GetLightComponent()->light().type_ = LightType::POINT;
-    light_1->GetLightComponent()->light().color_ = glm::vec3(0.0f, 0.8f, 0.0f);
-
-    Actor *light_2 = new Actor("Light_blue");
+    Actor *light_2 = new Actor("Light 2");
+    light_2->SetComponent(std::shared_ptr<Component>(new LightTT()));
     light_2->AddLightComponent();
     light_2->AddModelComponent();
     auto green = Mesh::CreateSphere(30, 30);
     green->set_material(Material::Create());
     green->material()->set_texture(
         TextureType::EMISSIVE,
-        Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.0f, 0.8f, 1.0f)).get()));
+        Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.95f, 0.95f, 0.75f, 1.0f)).get()));
     light_2->GetModelComponent()->set_model(Model::Create({green}));
-    light_2->GetTransformComponent()->transform().position_ = glm::vec3(-3.0f, 2.5f, 0.0f);
-    light_2->GetTransformComponent()->transform().scale_ *= 0.2;
     light_2->GetLightComponent()->light().type_ = LightType::POINT;
-    light_2->GetLightComponent()->light().color_ = glm::vec3(0.0f, 0.0f, 0.8f);
+    light_2->GetLightComponent()->light().color_ = glm::vec3(0.95f, 0.95f, 0.75f);
     light_2->GetLightComponent()->set_use_shadow(true);
-
-    Actor *light_3 = new Actor("Light_yellow");
-    light_3->AddLightComponent();
-    light_3->AddModelComponent();
-    auto yellow = Mesh::CreateSphere(30, 30);
-    yellow->set_material(Material::Create());
-    yellow->material()->set_texture(
-        TextureType::EMISSIVE,
-        Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.8f, 0.8f, 0.0f, 1.0f)).get()));
-    light_3->GetModelComponent()->set_model(Model::Create({yellow}));
-    light_3->GetTransformComponent()->transform().position_ = glm::vec3(3.0f, 2.0f, -3.0f);
-    light_3->GetTransformComponent()->transform().scale_ *= 0.2;
-    light_3->GetLightComponent()->light().type_ = LightType::POINT;
-    light_3->GetLightComponent()->light().color_ = glm::vec3(0.5f, 0.5f, 0.0f);
 
     Actor *cam = new Actor("Camera man");
     cam->SetComponent(std::shared_ptr<Component>(new CameraTransformComponent()));
@@ -215,15 +213,14 @@ void CreateTestLevel::Create()
 
     auto layer00 = level->AddLayer("object");
     layer00->AddActor(box);
+    layer00->AddActor(sphere);
     layer00->AddActor(floor);
     layer00->AddActor(backpack);
     auto layer01 = level->AddLayer("player");
     layer01->AddActor(cam);
     auto layer02 = level->AddLayer("light");
     layer02->AddActor(light_0);
-    layer02->AddActor(light_1);
     layer02->AddActor(light_2);
-    layer02->AddActor(light_3);
 
     auto layer03 = level->AddLayer("skybox");
     Actor *skybox = new Actor("Skybox");

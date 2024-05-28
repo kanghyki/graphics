@@ -17,6 +17,7 @@ enum class TextureType
     SPECULAR,
     AO,
     NORMAL,
+    HEIGHT,
     ROUGHNESS,
     METAILLIC,
     EMISSIVE
@@ -48,6 +49,7 @@ class Material
     float shineness_{30.0f};
     glm::vec3 albedo_color_{1.0f, 1.0f, 1.0f};
     float specular_alpha_{0.0f};
+    float height_scale_{0.1f};
     // float ao_{1.0f};
     // float metallic_{1.0f};
     // float roughness_{1.0f};
@@ -64,7 +66,7 @@ class Material
      */
     enum
     {
-        TextureSize = 7
+        TextureSize = 8
     };
     const char *texture_type_uniform_name[TextureSize] = {
         // clang-format off
@@ -72,6 +74,7 @@ class Material
             "m_specular",
             "m_ao",
             "m_normal",
+            "m_height",
             "m_roughness",
             "m_metallic",
             "m_emissive"
@@ -86,6 +89,7 @@ class Material
         uniform.m_shineness = shineness_;
         uniform.albedo_color = albedo_color_;
         uniform.specular_alpha = specular_alpha_;
+        uniform.height_scale = height_scale_;
         if (textures_[0])
         {
             uniform.use_albedo_map = true;
@@ -104,13 +108,17 @@ class Material
         }
         if (textures_[4])
         {
-            uniform.use_roughness_map = true;
+            uniform.use_height_map = true;
         }
         if (textures_[5])
         {
-            uniform.use_metallic_map = true;
+            uniform.use_roughness_map = true;
         }
         if (textures_[6])
+        {
+            uniform.use_metallic_map = true;
+        }
+        if (textures_[7])
         {
             uniform.use_emissive_map = true;
         }

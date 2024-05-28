@@ -64,12 +64,16 @@ struct Material {
     bool use_ao_map;
 
     bool use_normal_map;
+    bool use_height_map;
     bool use_roughness_map;
     bool use_metallic_map;
+
     bool use_emissive_map;
+    float specular_alpha;
+    float height_scale;
+
 
     vec3 albedo_color;
-    float specular_alpha;
 };
 layout(binding = 4, std140) uniform Materialu {
     Material material;
@@ -78,6 +82,7 @@ uniform sampler2D m_albedo;
 uniform sampler2D m_specular;
 uniform sampler2D m_ao;
 uniform sampler2D m_normal;
+uniform sampler2D m_height;
 uniform sampler2D m_roughness;
 uniform sampler2D m_metallic;
 uniform sampler2D m_emissive;

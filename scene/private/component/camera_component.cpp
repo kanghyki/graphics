@@ -60,12 +60,11 @@ void CameraComponent::Render()
 
     // RenderShadowMap();
     RenderShading();
-    RenderSkybox();
+    // RenderSkybox();
 }
 
 void CameraComponent::RenderShadowMap()
 {
-    // render shadowmap
     for (Actor *actor : shadow_lights_)
     {
         actor->GetLightComponent()->depth_map()->Bind();

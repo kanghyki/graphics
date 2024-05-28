@@ -64,12 +64,16 @@ struct MaterialUniform
     int use_ao_map;
 
     int use_normal_map;
+    int use_height_map;
     int use_roughness_map;
     int use_metallic_map;
+
     int use_emissive_map;
+    float specular_alpha;
+    float height_scale;
+    unsigned char __p0[4];
 
     glm::vec3 albedo_color;
-    float specular_alpha;
 };
 
 #endif

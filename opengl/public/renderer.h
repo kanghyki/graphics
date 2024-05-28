@@ -137,6 +137,7 @@ class Renderer
     bool use_gray_scale_{false};
     bool use_bloom_{false};
     float bloom_strength_{1.0f};
+    bool use_exposure_{false};
     float exposure_{1.0f};
     int blur_time_{5};
 

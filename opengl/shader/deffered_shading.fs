@@ -33,7 +33,7 @@ void main()
     mat.shininess = material.shininess;
 
     vec3 lighting = emissive;
-     lighting += use_ssao ? mat.albedo *  0.1 * texture(SSAO, texCoord).r : mat.albedo *  0.1;
+    lighting += use_ssao ? mat.albedo *  0.1 * texture(SSAO, texCoord).r : mat.albedo *  0.1;
     for (int i = 0; i < l_light_count; ++i)
     {
         if (l_lights[i].type == DIRECTIONAL)

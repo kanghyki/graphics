@@ -286,6 +286,7 @@ void SceneUI::ModelDetail()
                         ImGui::DragFloat("Shininess", &mesh->material()->shineness_, 0.01f, 0.0f, 100.0f);
                         ImGui::ColorEdit3("Albedo", glm::value_ptr(mesh->material()->albedo_color_));
                         ImGui::DragFloat("Specular alpha", &mesh->material()->specular_alpha_, 0.01f, 0.0f, 1.0f);
+                        ImGui::DragFloat("Height scale", &mesh->material()->height_scale_, 0.01f, 0.0f, 1.0f);
                         ImGui::Text("ALBEDO");
                         MeshTextureDetail(mesh, TextureType::ALBEDO);
                         ImGui::Text("Specular");
@@ -294,6 +295,8 @@ void SceneUI::ModelDetail()
                         MeshTextureDetail(mesh, TextureType::AO);
                         ImGui::Text("Normal");
                         MeshTextureDetail(mesh, TextureType::NORMAL);
+                        ImGui::Text("Height");
+                        MeshTextureDetail(mesh, TextureType::HEIGHT);
                         ImGui::Text("Roughness");
                         MeshTextureDetail(mesh, TextureType::ROUGHNESS);
                         ImGui::Text("Metaillic");
