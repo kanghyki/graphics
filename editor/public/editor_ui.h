@@ -1,6 +1,7 @@
 #ifndef INCLUDED_EDITOR_UI_H
 #define INCLUDED_EDITOR_UI_H
 
+#include "imgui_override.tpp"
 #include <imgui.h>
 #include <memory>
 #include <vector>

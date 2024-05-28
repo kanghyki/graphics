@@ -188,8 +188,8 @@ void CreateTestLevel::Create()
     light_0->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 1.5f, 0.0f);
     light_0->GetTransformComponent()->transform().scale_ *= 0.035;
     light_0->GetTransformComponent()->transform().rotation_ = glm::vec3(-90.0f, 0.0f, 0.0f);
-    light_0->GetLightComponent()->light().type_ = LightType::SPOT;
-    light_0->GetLightComponent()->light().color_ = glm::vec3(0.95f, 0.95f, 0.95f);
+    light_0->GetLightComponent()->set_type(LightType::SPOT);
+    light_0->GetLightComponent()->set_color(glm::vec3(0.95f, 0.95f, 0.95f));
 
     Actor *light_2 = new Actor("Light 2");
     light_2->SetComponent(std::shared_ptr<Component>(new LightTT()));
@@ -201,8 +201,8 @@ void CreateTestLevel::Create()
         TextureType::EMISSIVE,
         Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.95f, 0.95f, 0.75f, 1.0f)).get()));
     light_2->GetModelComponent()->set_model(Model::Create({green}));
-    light_2->GetLightComponent()->light().type_ = LightType::POINT;
-    light_2->GetLightComponent()->light().color_ = glm::vec3(0.95f, 0.95f, 0.75f);
+    light_2->GetLightComponent()->set_type(LightType::POINT);
+    light_2->GetLightComponent()->set_color(glm::vec3(0.95f, 0.95f, 0.75f));
     light_2->GetLightComponent()->set_use_shadow(true);
 
     Actor *cam = new Actor("Camera man");

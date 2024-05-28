@@ -224,25 +224,30 @@ void SceneUI::LightDetail()
             }
             return;
         }
-        Light &light = comp->light();
-        ImGui::RadioButton("Directional", (int *)&light.type_, (int)LightType::DIRECTIONAL);
+        ImGui::RadioButton<LightType>("Directional", comp.get(), &LightComponent::type, &LightComponent::set_type,
+                                      (int)LightType::DIRECTIONAL);
         ImGui::SameLine();
-        ImGui::RadioButton("Point", (int *)&light.type_, (int)LightType::POINT);
+        ImGui::RadioButton<LightType>("Point", comp.get(), &LightComponent::type, &LightComponent::set_type,
+                                      (int)LightType::POINT);
         ImGui::SameLine();
-        ImGui::RadioButton("Spot", (int *)&light.type_, (int)LightType::SPOT);
-        ImGui::Text("%10s : x(%.3f), y(%.3f), z(%.3f)", "Direction", light.direction().x, light.direction().y,
-                    light.direction().z);
-        ImGui::ColorEdit3("color", glm::value_ptr(light.color_));
-        ImGui::DragFloat("strength", &light.strength_, 0.01f, 0.0f, 100.0f);
-        ImGui::DragFloat("falloff_start", &light.falloff_start_, 0.01f, 0.0f, 180.0f);
-        ImGui::DragFloat("falloff_end", &light.falloff_end_, 0.01f, 0.0f, 180.0f);
-        ImGui::DragFloat("spot_power", &light.spot_power_, 0.01f, 0.0f, 180.0f);
+        ImGui::RadioButton<LightType>("Spot", comp.get(), &LightComponent::type, &LightComponent::set_type,
+                                      (int)LightType::SPOT);
+        ImGui::Text("%10s : x(%.3f), y(%.3f), z(%.3f)", "Direction", comp->direction().x, comp->direction().y,
+                    comp->direction().z);
+        ImGui::ColorEdit3("color", comp.get(), &LightComponent::color, &LightComponent::set_color);
+        ImGui::SliderFloat("strength", comp.get(), &LightComponent::strength, &LightComponent::set_strength, 0.0f,
+                           100.0f);
+        ImGui::SliderFloat("falloff_start", comp.get(), &LightComponent::falloff_start,
+                           &LightComponent::set_falloff_start, 0.0f, 100.0f);
+        ImGui::SliderFloat("falloff_end", comp.get(), &LightComponent::falloff_end, &LightComponent::set_falloff_end,
+                           0.0f, 100.0f);
+        ImGui::SliderFloat("spot_power", comp.get(), &LightComponent::spot_power, &LightComponent::set_spot_power, 0.0f,
+                           100.0f);
         ImGui::Separator();
         if (comp->depth_map())
         {
             ImGui::Image(reinterpret_cast<ImTextureID>(comp->depth_map()->texture()->id()), ImVec2(100, 100));
         }
-
         if (ImGui::Button("Remove##2"))
         {
             actor_selected->RemoveComponent(ComponentType::LIGHT);

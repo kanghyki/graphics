@@ -79,18 +79,17 @@ void CameraComponent::RenderShadowMap()
         auto light_view = glm::lookAt(light_position, light_position + light_direction,
                                       glm::vec3(glm::vec4(light_direction, 0.0f) * rm));
         glm::mat4 light_projection;
-        if (actor->GetLightComponent()->light().type_ == LightType::DIRECTIONAL)
+        if (actor->GetLightComponent()->type() == LightType::DIRECTIONAL)
         {
             light_projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 20.0f);
         }
         else
         {
-            light_projection = glm::perspective(glm::radians((actor->GetLightComponent()->light().falloff_start_ +
-                                                              actor->GetLightComponent()->light().falloff_end_) *
-                                                             2.0f),
-                                                1.0f, 1.0f, 20.0f);
+            light_projection = glm::perspective(
+                glm::radians((actor->GetLightComponent()->falloff_start() + actor->GetLightComponent()->falloff_end()) *
+                             2.0f),
+                1.0f, 1.0f, 20.0f);
         }
-        shadow_pso->program_->Use();
         shadow_pso->program_->SetUniform("view", light_view);
         shadow_pso->program_->SetUniform("proj", light_projection);
 
@@ -107,7 +106,6 @@ void CameraComponent::RenderShading()
     Renderer::GetInstance()->GetFramebuffer(FramebufferType::G_BUFFER)->Bind();
     GraphicsPSOPtr g_buffer_pso = Renderer::GetInstance()->GetPSO(PsoType::G_BUFFER);
     Renderer::GetInstance()->ApplyPSO(g_buffer_pso);
-    g_buffer_pso->program_->Use();
     for (Actor *actor : models_)
     {
         actor->Render(g_buffer_pso->program_);
@@ -123,7 +121,6 @@ void CameraComponent::RenderSkybox()
     Renderer::GetInstance()->GetFramebuffer(FramebufferType::MAIN)->Bind();
     GraphicsPSOPtr skybox_pso = Renderer::GetInstance()->GetPSO(PsoType::SKYBOX);
     Renderer::GetInstance()->ApplyPSO(skybox_pso);
-    skybox_pso->program_->Use();
     for (Actor *actor : skymaps_)
     {
         actor->Render(skybox_pso->program_);

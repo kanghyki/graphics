@@ -12,7 +12,6 @@ LightComponent::~LightComponent()
 
 void LightComponent::Tick()
 {
-    light_.transform_ = GetTransformComponent()->transform();
-
-    LightManager::GetInstance()->AddLight(light_.ToData());
+    transform_ = GetTransformComponent()->transform();
+    LightManager::GetInstance()->AddLight(ToData());
 }

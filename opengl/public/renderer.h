@@ -221,6 +221,7 @@ class Renderer
     ShaderPtr linear_blur_vs_;
     ShaderPtr linear_blur_fs_;
     ProgramPtr linear_blur_program_;
+    GraphicsPSOPtr linear_blur_pso_;
 
   private:
     /* Uniform buffer object */

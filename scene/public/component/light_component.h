@@ -15,21 +15,31 @@ enum class LightType
     SPOT
 };
 
-class Light
+class LightComponent : public Component
 {
   public:
-    Light()
+    LightComponent();
+    ~LightComponent();
+
+    bool use_shadow() const
     {
+        return use_shadow_;
     }
-    ~Light()
+    void set_use_shadow(bool b)
     {
+        use_shadow_ = true;
+        depthmap_ = DepthMap::Create(1024, 1024);
+    }
+    DepthMapPtr depth_map()
+    {
+        return depthmap_;
     }
 
     LightData ToData() const
     {
         LightData data;
+        memset(&data, 0, sizeof(LightData));
 
-        // memset(&data, 0, sizeof(LightData));
         data.type = static_cast<int>(type_);
         data.falloff_start = falloff_start_;
         data.falloff_end = falloff_end_;
@@ -51,48 +61,53 @@ class Light
     {
         return transform_.direction();
     }
-
-    Transform transform_;
-    glm::vec3 color_{1.0f, 1.0f, 1.0f};
-    float strength_{1.0f};
-    float spot_power_{1.0f};
-    float falloff_start_{0.0f};
-    float falloff_end_{10.0f};
-
-    LightType type_{LightType::DIRECTIONAL};
-};
-
-class LightComponent : public Component
-{
-  public:
-    LightComponent();
-    ~LightComponent();
-
-    Light &light()
+    LightType type() const
     {
-        return light_;
+        return type_;
     }
-    const Light &light() const
+    void set_type(LightType type)
     {
-        return light_;
+        type_ = type;
     }
-    bool use_shadow() const
+    glm::vec3 color() const
     {
-        return use_shadow_;
+        return color_;
     }
-    void set_use_shadow(bool b)
+    void set_color(const glm::vec3 &color)
     {
-        use_shadow_ = true;
-        depthmap_ = DepthMap::Create(1024, 1024);
-        depthmap3d_ = DepthMap::Create(1024, 1024, 1024);
+        color_ = color;
     }
-    DepthMapPtr depth_map()
+    float strength() const
     {
-        if (light_.type_ == LightType::POINT)
-        {
-            return depthmap3d_;
-        }
-        return depthmap_;
+        return strength_;
+    }
+    void set_strength(float strength)
+    {
+        strength_ = strength;
+    }
+    float spot_power() const
+    {
+        return spot_power_;
+    }
+    void set_spot_power(float spot_power)
+    {
+        spot_power_ = spot_power;
+    }
+    float falloff_start() const
+    {
+        return falloff_start_;
+    }
+    void set_falloff_start(float falloff_start)
+    {
+        falloff_start_ = falloff_start;
+    }
+    float falloff_end() const
+    {
+        return falloff_end_;
+    }
+    void set_falloff_end(float falloff_end)
+    {
+        falloff_end_ = falloff_end;
     }
 
   private:
@@ -101,13 +116,18 @@ class LightComponent : public Component
 
     void Tick() override;
 
-    Light light_;
+    Transform transform_;
+
+    LightType type_{LightType::DIRECTIONAL};
+    glm::vec3 color_{1.0f, 1.0f, 1.0f};
+    float strength_{1.0f};
+    float spot_power_{1.0f};
+    float falloff_start_{0.0f};
+    float falloff_end_{10.0f};
 
     /* For shadow */
     bool use_shadow_{false};
-
     DepthMapPtr depthmap_{nullptr};
-    DepthMapPtr depthmap3d_{nullptr};
 };
 
 #endif

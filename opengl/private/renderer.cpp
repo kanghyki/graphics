@@ -106,6 +106,8 @@ void Renderer::Init()
     linear_blur_vs_ = Shader::CreateFromFile(shader_dir + "linear_blur.vs", GL_VERTEX_SHADER);
     linear_blur_fs_ = Shader::CreateFromFile(shader_dir + "linear_blur.fs", GL_FRAGMENT_SHADER);
     linear_blur_program_ = Program::Create({linear_blur_vs_, linear_blur_fs_});
+    linear_blur_pso_ = GraphicsPSO::Create();
+    linear_blur_pso_->program_ = linear_blur_program_;
 
     std::vector<glm::vec3> ssao_noise(16);
     for (size_t i = 0; i < ssao_noise.size(); ++i)
@@ -172,7 +174,6 @@ void Renderer::RenderSSAO()
     }
     ssao_framebuffer_->Bind();
     ApplyPSO(ssao_pso_);
-    ssao_program_->Use();
     ssao_program_->SetUniform("model", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
     glActiveTexture(GL_TEXTURE0);
     g_buffer_->color_attachment(0)->Bind();
@@ -196,7 +197,7 @@ void Renderer::RenderSSAO()
     plane_mesh_->Draw(nullptr);
 
     ssao_blur_framebuffer_->Bind();
-    linear_blur_program_->Use();
+    ApplyPSO(linear_blur_pso_);
     glActiveTexture(GL_TEXTURE0);
     ssao_framebuffer_->color_attachment(0)->Bind();
     linear_blur_program_->SetUniform("tex", 0);
@@ -208,7 +209,6 @@ void Renderer::RenderDeffered()
 {
     main_framebuffer_->Bind();
     ApplyPSO(deffered_shading_pso_);
-    deffered_shading_program_->Use();
     deffered_shading_program_->SetUniform("model", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
     glActiveTexture(GL_TEXTURE0);
     g_buffer_->color_attachment(0)->Bind();
@@ -244,7 +244,6 @@ void Renderer::PostProcessing()
         ApplyPSO(gaussian_blur_pso_);
         bool horizontal = true;
         auto model = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f));
-        gaussian_blur_program_->Use();
         gaussian_blur_program_->SetUniform("transform", model);
 
         for (unsigned int i = 0; i < blur_time_ * 2; i++)
@@ -262,7 +261,6 @@ void Renderer::PostProcessing()
 
     Framebuffer::BindToDefault();
     ApplyPSO(post_processing_pso_);
-    post_processing_program_->Use();
     post_processing_program_->SetUniform("model", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
     post_processing_program_->SetUniform("gamma", gamma_);
     post_processing_program_->SetUniform("use_gray_scale", use_gray_scale_);
@@ -335,6 +333,7 @@ void Renderer::ApplyPSO(const GraphicsPSOPtr &pso) const
      * Polygon
      */
     glPolygonMode(GL_FRONT_AND_BACK, pso->rasterizer_state_.polygon_mode);
+    pso->program_->Use();
 }
 
 void Renderer::Resize(int width, int height)
