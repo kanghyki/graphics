@@ -34,15 +34,32 @@ void LightManager::Tick()
                     &lights_.l_lights);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     lights_.count = 0;
+    shadow_2d_count_ = 0;
 }
 
-void LightManager::AddLight(const LightData &light)
+void LightManager::AddLight(LightComponent *light)
 {
     if (lights_.count >= LightsUniform::LIGHT_MAX)
     {
         SPDLOG_WARN("MAXIMUM LIGHT");
         return;
     }
-    lights_.l_lights[lights_.count] = light;
-    ++lights_.count;
+    switch (light->type())
+    {
+    case LightType::DIRECTIONAL:
+    case LightType::SPOT:
+        if (shadow_2d_count_ >= LightsUniform::SHADOW_2D_MAX)
+        {
+            SPDLOG_WARN("MAXIMUM 2D SHADOW");
+            break;
+        }
+        light->set_shadow_id(shadow_2d_count_);
+        ++shadow_2d_count_;
+        break;
+    case LightType::POINT:
+        break;
+    default:
+        break;
+    }
+    lights_.l_lights[lights_.count++] = light->ToData();
 }

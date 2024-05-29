@@ -26,6 +26,7 @@ ProgramPtr Program::Create(const std::vector<ShaderPtr> &shaders)
 
 void Program::Use() const
 {
+    active_texture_count_ = 0;
     glUseProgram(id_);
 }
 
@@ -96,4 +97,12 @@ void Program::SetUniform(const std::string &name, const std::vector<glm::mat4> &
 {
     uint32_t loc = GetUniformLocation(name);
     glUniformMatrix4fv(loc, value.size(), GL_FALSE, glm::value_ptr(*(value.data())));
+}
+
+void Program::ActivateTexture(const std::string &name, const BaseTexture *texture) const
+{
+    glActiveTexture(GL_TEXTURE0 + active_texture_count_);
+    texture->Bind();
+    SetUniform(name, active_texture_count_);
+    ++active_texture_count_;
 }

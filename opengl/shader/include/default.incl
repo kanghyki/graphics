@@ -23,6 +23,9 @@ layout(binding = 1, std140) uniform Matrices {
 |             Light                 |
 |                                   |
 \***********************************/
+#define DIRECTIONAL (0)
+#define POINT (1)
+#define SPOT (2)
 struct Light {
     int     type;
     float   falloff_start;
@@ -30,15 +33,26 @@ struct Light {
     float   spot_power;
 
     vec3    position;
+    int     shadow_id;
+
     vec3    color;
     float   strength;
+
     vec3    direction;
+    bool    use_shadow;
+
+    mat4    view;
+    mat4    proj;
 };
-#define LIGHT_MAX 64
+
+#define LIGHT_MAX (64)
 layout(binding = 2, std140) uniform Lights {
     int     l_light_count;
     Light   l_lights[LIGHT_MAX];
 };
+
+#define SHADOW_2D_MAX (8)
+uniform sampler2D l_shadow[SHADOW_2D_MAX];
 
 
 /***********************************\

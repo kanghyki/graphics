@@ -13,17 +13,48 @@ class TransformComponent : public Component
 
     void Tick() override;
 
-    void set_transform(const Transform &t)
+    glm::vec3 position() const
     {
-        transform_ = t;
+        return transform_.position();
     }
-    const Transform &transform() const
+    void set_position(const glm::vec3 &position)
     {
-        return transform_;
+        transform_.set_position(position);
     }
-    Transform &transform()
+
+    glm::vec3 scale() const
     {
-        return transform_;
+        return transform_.scale();
+    }
+    void set_scale(const glm::vec3 &scale)
+    {
+        transform_.set_scale(scale);
+    }
+
+    glm::vec3 rotation() const
+    {
+        return transform_.rotation();
+    }
+    void set_rotation(const glm::vec3 &rotation)
+    {
+        transform_.set_rotation(rotation);
+    }
+
+    glm::mat4 CalcModelMatrix() const
+    {
+        return transform_.CalcModelMatrix();
+    }
+    glm::mat4 CalcScaleMatrix() const
+    {
+        return transform_.CalcScaleMatrix();
+    }
+    glm::mat4 CalcRotateMatrix() const
+    {
+        return transform_.CalcRotateMatrix();
+    }
+    glm::mat4 CalcTranslateMatrix() const
+    {
+        return transform_.CalcTranslateMatrix();
     }
 
   private:

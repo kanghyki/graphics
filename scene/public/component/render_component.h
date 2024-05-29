@@ -10,7 +10,7 @@ class RenderComponent : public Component
     RenderComponent(ComponentType type);
     virtual ~RenderComponent();
 
-    virtual void Render(ProgramPtr program) = 0;
+    virtual void Render(const Program *program) = 0;
 
   private:
     RenderComponent(const RenderComponent &);

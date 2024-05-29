@@ -9,9 +9,9 @@ class CameraComponent;
 class LightComponent;
 class ModelComponent;
 class SkyboxComponent;
-#define OWNER_COMPONENT_GETTER_DECL(className) std::shared_ptr<className> Get##className() const;
+#define OWNER_COMPONENT_GETTER_DECL(className) className *Get##className() const;
 #define OWNER_COMPONENT_GETTER_IMPL(className)                                                                         \
-    std::shared_ptr<className> Component::Get##className() const                                                       \
+    className *Component::Get##className() const                                                                       \
     {                                                                                                                  \
         return owner_->Get##className();                                                                               \
     }

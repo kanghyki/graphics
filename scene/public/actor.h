@@ -12,11 +12,11 @@ class CameraComponent;
 class LightComponent;
 class ModelComponent;
 class SkyboxComponent;
-#define COMPONENT_GETTER_DECL(ENUM_TYPE_NAME, className) std::shared_ptr<className> Get##className();
+#define COMPONENT_GETTER_DECL(ENUM_TYPE_NAME, className) className *Get##className();
 #define COMPONENT_GETTER_IMPL(ENUM_TYPE_NAME, className)                                                               \
-    std::shared_ptr<className> Actor::Get##className()                                                                 \
+    className *Actor::Get##className()                                                                                 \
     {                                                                                                                  \
-        return std::reinterpret_pointer_cast<className>(GetComponent(ComponentType::ENUM_TYPE_NAME));                  \
+        return reinterpret_cast<className *>(GetComponent(ComponentType::ENUM_TYPE_NAME));                             \
     };
 
 class RenderComponent;
@@ -29,7 +29,7 @@ class Actor
 
     void Tick();
     void FinalTick();
-    void Render(ProgramPtr program);
+    void Render(const Program *program);
 
     uint32_t id() const
     {
@@ -63,7 +63,7 @@ class Actor
     Actor(const Actor &c);
     Actor &operator=(const Actor &c);
 
-    std::shared_ptr<Component> GetComponent(ComponentType type);
+    Component *GetComponent(ComponentType type);
 
     static uint32_t s_id_;
 

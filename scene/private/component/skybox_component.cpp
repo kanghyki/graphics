@@ -10,10 +10,8 @@ SkyboxComponent::~SkyboxComponent()
 {
 }
 
-void SkyboxComponent::Render(ProgramPtr program)
+void SkyboxComponent::Render(const Program *program)
 {
-    glActiveTexture(GL_TEXTURE0);
-    cube_texture_->Bind();
-    program->SetUniform("cubemap", 0);
-    Renderer::GetInstance()->box_mesh()->Draw(program.get());
+    program->ActivateTexture("cubemap", cube_texture_.get());
+    Renderer::GetInstance()->box_mesh()->Draw(program);
 }

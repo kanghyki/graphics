@@ -173,17 +173,11 @@ void Renderer::RenderSSAO()
         return;
     }
     ssao_framebuffer_->Bind();
-    ApplyPSO(ssao_pso_);
+    ApplyPSO(ssao_pso_.get());
     ssao_program_->SetUniform("model", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
-    glActiveTexture(GL_TEXTURE0);
-    g_buffer_->color_attachment(0)->Bind();
-    ssao_program_->SetUniform("gPosition", 0);
-    glActiveTexture(GL_TEXTURE1);
-    g_buffer_->color_attachment(1)->Bind();
-    ssao_program_->SetUniform("gNormal", 1);
-    glActiveTexture(GL_TEXTURE2);
-    ssao_noise_texture_->Bind();
-    ssao_program_->SetUniform("texNoise", 2);
+    ssao_program_->ActivateTexture("gPosition", g_buffer_->color_attachment(0));
+    ssao_program_->ActivateTexture("gNormal", g_buffer_->color_attachment(1));
+    ssao_program_->ActivateTexture("texNoise", ssao_noise_texture_.get());
     ssao_program_->SetUniform("noiseScale", glm::vec2((float)width_ / (float)ssao_noise_texture_->width(),
                                                       (float)height_ / (float)ssao_noise_texture_->height()));
     ssao_program_->SetUniform("radius", ssao_radius_);
@@ -197,51 +191,17 @@ void Renderer::RenderSSAO()
     plane_mesh_->Draw(nullptr);
 
     ssao_blur_framebuffer_->Bind();
-    ApplyPSO(linear_blur_pso_);
-    glActiveTexture(GL_TEXTURE0);
-    ssao_framebuffer_->color_attachment(0)->Bind();
-    linear_blur_program_->SetUniform("tex", 0);
+    ApplyPSO(linear_blur_pso_.get());
+    linear_blur_pso_->program_->ActivateTexture("tex", ssao_framebuffer_->color_attachment(0));
     linear_blur_program_->SetUniform("model", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
     plane_mesh_->Draw(nullptr);
-}
-
-void Renderer::RenderDeffered()
-{
-    main_framebuffer_->Bind();
-    ApplyPSO(deffered_shading_pso_);
-    deffered_shading_program_->SetUniform("model", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
-    glActiveTexture(GL_TEXTURE0);
-    g_buffer_->color_attachment(0)->Bind();
-    deffered_shading_program_->SetUniform("gPosition", 0);
-    glActiveTexture(GL_TEXTURE1);
-    g_buffer_->color_attachment(1)->Bind();
-    deffered_shading_program_->SetUniform("gNormal", 1);
-    glActiveTexture(GL_TEXTURE2);
-    g_buffer_->color_attachment(2)->Bind();
-    deffered_shading_program_->SetUniform("gAlbedoSpec", 2);
-    glActiveTexture(GL_TEXTURE3);
-    g_buffer_->color_attachment(3)->Bind();
-    deffered_shading_program_->SetUniform("gEmissive", 3);
-
-    deffered_shading_program_->SetUniform("use_ssao", use_ssao_);
-    if (use_ssao_)
-    {
-        glActiveTexture(GL_TEXTURE4);
-        ssao_blur_framebuffer_->color_attachment(0)->Bind();
-        deffered_shading_program_->SetUniform("SSAO", 4);
-    }
-    plane_mesh_->Draw(nullptr);
-
-    g_buffer_->Bind(GL_READ_FRAMEBUFFER);
-    main_framebuffer_->Bind(GL_DRAW_FRAMEBUFFER);
-    glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 }
 
 void Renderer::PostProcessing()
 {
     if (use_bloom_)
     {
-        ApplyPSO(gaussian_blur_pso_);
+        ApplyPSO(gaussian_blur_pso_.get());
         bool horizontal = true;
         auto model = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f));
         gaussian_blur_program_->SetUniform("transform", model);
@@ -250,17 +210,16 @@ void Renderer::PostProcessing()
         {
             gaussian_blur_framebuffer_[horizontal]->Bind();
             gaussian_blur_program_->SetUniform("horizontal", horizontal);
-            glActiveTexture(GL_TEXTURE0);
-            i == 0 ? main_framebuffer_->color_attachment(1)->Bind()
-                   : gaussian_blur_framebuffer_[!horizontal]->color_attachment(0)->Bind();
-            gaussian_blur_program_->SetUniform("image", 0);
+            const BaseTexture *tex = i == 0 ? main_framebuffer_->color_attachment(1)
+                                            : gaussian_blur_framebuffer_[!horizontal]->color_attachment(0);
+            gaussian_blur_program_->ActivateTexture("image", tex);
             plane_mesh_->Draw(gaussian_blur_program_.get());
             horizontal = !horizontal;
         }
     }
 
     Framebuffer::BindToDefault();
-    ApplyPSO(post_processing_pso_);
+    ApplyPSO(post_processing_pso_.get());
     post_processing_program_->SetUniform("model", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
     post_processing_program_->SetUniform("gamma", gamma_);
     post_processing_program_->SetUniform("use_gray_scale", use_gray_scale_);
@@ -268,16 +227,12 @@ void Renderer::PostProcessing()
     post_processing_program_->SetUniform("bloom_strength", bloom_strength_);
     post_processing_program_->SetUniform("use_exposure", use_exposure_);
     post_processing_program_->SetUniform("exposure", exposure_);
-    glActiveTexture(GL_TEXTURE0);
-    main_framebuffer_->color_attachment(0)->Bind();
-    post_processing_program_->SetUniform("main_texture", 0);
-    glActiveTexture(GL_TEXTURE1);
-    gaussian_blur_framebuffer_[0]->color_attachment(0)->Bind();
-    post_processing_program_->SetUniform("blured_texture", 1);
+    post_processing_program_->ActivateTexture("main_texture", main_framebuffer_->color_attachment(0));
+    post_processing_program_->ActivateTexture("blured_texture", gaussian_blur_framebuffer_[0]->color_attachment(0));
     plane_mesh_->Draw(nullptr);
 }
 
-void Renderer::ApplyPSO(const GraphicsPSOPtr &pso) const
+void Renderer::ApplyPSO(const GraphicsPSO *pso) const
 {
     /*
      * cull face

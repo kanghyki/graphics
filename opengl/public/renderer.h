@@ -12,6 +12,7 @@ enum class PsoType
 {
     MAIN,
     G_BUFFER,
+    DEFFERED_SHADING,
     SKYBOX,
     DEPTH_MAP,
     OMNI_DEPTH_MAP,
@@ -44,10 +45,9 @@ class Renderer
     void Init();
     void ClearFramebuffer();
     void RenderSSAO();
-    void RenderDeffered();
     void PostProcessing();
 
-    void ApplyPSO(const GraphicsPSOPtr &pso) const;
+    void ApplyPSO(const GraphicsPSO *pso) const;
     void Resize(int width, int height);
 
     int width()
@@ -71,52 +71,54 @@ class Renderer
         return box_mesh_;
     }
 
-    GraphicsPSOPtr GetPSO(PsoType type)
+    GraphicsPSO *GetPSO(PsoType type)
     {
         switch (type)
         {
         case PsoType::G_BUFFER:
-            return g_buffer_pso_;
+            return g_buffer_pso_.get();
+        case PsoType::DEFFERED_SHADING:
+            return deffered_shading_pso_.get();
         case PsoType::SKYBOX:
-            return skybox_pso_;
+            return skybox_pso_.get();
         case PsoType::DEPTH_MAP:
-            return depth_map_pso_;
+            return depth_map_pso_.get();
         case PsoType::OMNI_DEPTH_MAP:
-            return omni_depth_map_pso_;
+            return omni_depth_map_pso_.get();
         case PsoType::SSAO:
-            return ssao_pso_;
+            return ssao_pso_.get();
         }
         return nullptr;
     }
-    FramebufferPtr GetFramebuffer(FramebufferType type)
+    Framebuffer *GetFramebuffer(FramebufferType type)
     {
         switch (type)
         {
         case FramebufferType::MAIN:
-            return main_framebuffer_;
+            return main_framebuffer_.get();
         case FramebufferType::G_BUFFER:
-            return g_buffer_;
+            return g_buffer_.get();
         case FramebufferType::GAUSSIAN_BLUR:
-            return gaussian_blur_framebuffer_[0];
+            return gaussian_blur_framebuffer_[0].get();
         case FramebufferType::SSAO:
-            return ssao_framebuffer_;
+            return ssao_framebuffer_.get();
         }
         return nullptr;
     }
-    BufferPtr GetUBO(UBOType type)
+    Buffer *GetUBO(UBOType type)
     {
         switch (type)
         {
         case UBOType::CAMERA:
-            return camera_ubo_;
+            return camera_ubo_.get();
         case UBOType::MATRICES:
-            return matrices_ubo_;
+            return matrices_ubo_.get();
         case UBOType::LIGHT:
-            return lights_ubo_;
+            return lights_ubo_.get();
         case UBOType::GLOBAL:
-            return global_ubo_;
+            return global_ubo_.get();
         case UBOType::MATERIAL:
-            return material_ubo_;
+            return material_ubo_.get();
         }
         return nullptr;
     }

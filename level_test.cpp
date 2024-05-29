@@ -20,47 +20,49 @@ class CameraTransformComponent : public TransformComponent
   public:
     CameraTransformComponent()
     {
-        transform().position_ = {0.0f, 1.0f, 5.0f};
+        set_position(glm::vec3(0.0f, 1.0f, 5.0f));
     }
     void Tick() override
     {
         float dt = TimeManager::GetInstance()->delta_time();
 
-        glm::vec3 camera_front =
-            glm::rotate(glm::mat4(1.0f), glm::radians(transform().rotation_.x), glm::vec3(0.0f, 1.0f, 0.0f)) *
-            glm::rotate(glm::mat4(1.0f), glm::radians(transform().rotation_.y), glm::vec3(1.0f, 0.0f, 0.0f)) *
-            transform().direction_;
+        glm::vec3 camera_front = glm::rotate(glm::mat4(1.0f), glm::radians(rotation().x), glm::vec3(0.0f, 1.0f, 0.0f)) *
+                                 glm::rotate(glm::mat4(1.0f), glm::radians(rotation().y), glm::vec3(1.0f, 0.0f, 0.0f)) *
+                                 glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+        glm::vec3 pp = position();
         if (KEY_HOLD(Key::W))
         {
-            transform().position_ += dt * speed * camera_front;
+            pp += dt * speed * camera_front;
         }
         if (KEY_HOLD(Key::S))
         {
-            transform().position_ -= dt * speed * camera_front;
+            pp -= dt * speed * camera_front;
         }
         glm::vec3 camera_right = glm::normalize(glm::cross(glm::vec3(0.0, 1.0, 0.0), -camera_front));
         if (KEY_HOLD(Key::A))
         {
-            transform().position_ -= dt * speed * camera_right;
+            pp -= dt * speed * camera_right;
         }
         if (KEY_HOLD(Key::D))
         {
-            transform().position_ += dt * speed * camera_right;
+            pp += dt * speed * camera_right;
         }
         glm::vec3 camera_up = glm::normalize(glm::cross(-camera_front, camera_right));
         if (KEY_HOLD(Key::Q))
         {
-            transform().position_ += dt * speed * camera_up;
+            pp += dt * speed * camera_up;
         }
         if (KEY_HOLD(Key::E))
         {
-            transform().position_ -= dt * speed * camera_up;
+            pp -= dt * speed * camera_up;
         }
+        set_position(pp);
         if (MOUSE_HOLD(Mouse::RIGHT))
         {
             glm::vec2 delta = InputManager::GetInstance()->delta_cursor();
-            float &yaw_ = transform().rotation_.x;
-            float &pitch_ = transform().rotation_.y;
+            glm::vec3 rr = rotation();
+            float &yaw_ = rr.x;
+            float &pitch_ = rr.y;
             yaw_ -= delta.x * rot_speed_;
             pitch_ -= delta.y * rot_speed_;
 
@@ -73,6 +75,7 @@ class CameraTransformComponent : public TransformComponent
                 pitch_ = 89.0f;
             if (pitch_ < -89.0f)
                 pitch_ = -89.0f;
+            set_rotation(rr);
         }
     }
 
@@ -86,21 +89,24 @@ class RotationTransformComponent : public TransformComponent
   public:
     RotationTransformComponent()
     {
-        transform().scale_ = glm::vec3(0.5f);
+        set_scale(glm::vec3(0.5f));
     }
     void Tick()
     {
         float dt = TimeManager::GetInstance()->delta_time();
-        transform().rotation_.x += x_rotation_speed * dt;
-        if (transform().rotation_.x >= 360.0f)
+
+        glm::vec3 rr = rotation();
+        rr.x += x_rotation_speed * dt;
+        if (rr.x >= 360.0f)
         {
-            transform().rotation_.x -= 360.0f;
+            rr.x -= 360.0f;
         }
-        transform().rotation_.y += y_rotation_speed * dt;
-        if (transform().rotation_.y >= 360.0f)
+        rr.y += y_rotation_speed * dt;
+        if (rr.y >= 360.0f)
         {
-            transform().rotation_.y -= 360.0f;
+            rr.y -= 360.0f;
         }
+        set_rotation(rr);
     }
 
   private:
@@ -113,14 +119,12 @@ class LightTT : public TransformComponent
   public:
     LightTT()
     {
-        transform().scale_ = glm::vec3(0.035f);
-        transform().position_ = glm::vec3(1.0f, 0.5f, 0.0f);
     }
     void Tick()
     {
         float dt = TimeManager::GetInstance()->delta_time();
-        transform().position_ = glm::rotate(glm::mat4(1.0f), dt * 3.141592f * 0.5f, glm::vec3(0.0f, 1.0f, 0.0f)) *
-                                glm::vec4(transform().position_, 1.0f);
+        set_position(glm::rotate(glm::mat4(1.0f), dt * 3.141592f * 0.5f, glm::vec3(0.0f, 1.0f, 0.0f)) *
+                     glm::vec4(position(), 1.0f));
     }
 };
 
@@ -146,8 +150,8 @@ void CreateTestLevel::Create()
     floor_material->albedo_color_ = glm::vec3(0.5f, 0.5f, 0.5f);
     floor_material->specular_alpha_ = 0.0f;
     floor->GetModelComponent()->set_model(Model::Create({floor_mesh}));
-    floor->GetTransformComponent()->transform().scale_ = glm::vec3(10.0f, 0.01f, 10.0f);
-    floor->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 0.0f, 0.0f);
+    floor->GetTransformComponent()->set_scale(glm::vec3(10.0f, 0.01f, 10.0f));
+    floor->GetTransformComponent()->set_position(glm::vec3(0.0f, 0.0f, 0.0f));
 
     Actor *box = new Actor("Box");
     auto box_mesh = Mesh::CreateBox();
@@ -157,7 +161,7 @@ void CreateTestLevel::Create()
     box->SetComponent(std::shared_ptr<Component>(new RotationTransformComponent()));
     box->AddModelComponent();
     box->GetModelComponent()->set_model(Model::Create({box_mesh}));
-    box->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 0.5f, -0.5f);
+    box->GetTransformComponent()->set_position(glm::vec3(0.0f, 0.5f, -0.5f));
 
     Actor *sphere = new Actor("Sphere");
     auto sphere_mesh = Mesh::CreateSphere(30, 30);
@@ -166,15 +170,15 @@ void CreateTestLevel::Create()
     sphere_material->specular_alpha_ = 1.0f;
     sphere->AddModelComponent();
     sphere->GetModelComponent()->set_model(Model::Create({sphere_mesh}));
-    sphere->GetTransformComponent()->transform().position_ = glm::vec3(1.0f, 1.0f, 0.0f);
-    sphere->GetTransformComponent()->transform().scale_ = glm::vec3(0.6f);
+    sphere->GetTransformComponent()->set_position(glm::vec3(1.0f, 1.0f, 0.0f));
+    sphere->GetTransformComponent()->set_scale(glm::vec3(0.6f));
 
     Actor *backpack = new Actor("Backpack");
     backpack->AddModelComponent();
     backpack->GetModelComponent()->set_model(Model::Load(resource_path + "\\model\\backpack.obj"));
-    backpack->GetTransformComponent()->transform().scale_ = glm::vec3(0.1f, 0.1f, 0.1f);
-    backpack->GetTransformComponent()->transform().position_ = glm::vec3(-1.0f, 0.22f, -0.5f);
-    backpack->GetTransformComponent()->transform().rotation_ = glm::vec3(0.0f, 50.0f, 0.0f);
+    backpack->GetTransformComponent()->set_scale(glm::vec3(0.1f, 0.1f, 0.1f));
+    backpack->GetTransformComponent()->set_position(glm::vec3(-1.0f, 0.22f, -0.5f));
+    backpack->GetTransformComponent()->set_rotation(glm::vec3(0.0f, 50.0f, 0.0f));
 
     Actor *light_0 = new Actor("Light 1");
     light_0->AddLightComponent();
@@ -185,10 +189,11 @@ void CreateTestLevel::Create()
         TextureType::EMISSIVE,
         Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.95f, 0.95f, 0.95f, 1.0f)).get()));
     light_0->GetModelComponent()->set_model(Model::Create({red}));
-    light_0->GetTransformComponent()->transform().position_ = glm::vec3(0.0f, 1.5f, 0.0f);
-    light_0->GetTransformComponent()->transform().scale_ *= 0.035;
-    light_0->GetTransformComponent()->transform().rotation_ = glm::vec3(-90.0f, 0.0f, 0.0f);
+    light_0->GetTransformComponent()->set_position(glm::vec3(0.0f, 2.5f, 0.0f));
+    light_0->GetTransformComponent()->set_scale(glm::vec3(0.035f));
+    light_0->GetTransformComponent()->set_rotation(glm::vec3(-90.0f, 0.0f, 0.0f));
     light_0->GetLightComponent()->set_type(LightType::SPOT);
+    light_0->GetLightComponent()->set_use_shadow(true);
     light_0->GetLightComponent()->set_color(glm::vec3(0.95f, 0.95f, 0.95f));
 
     Actor *light_2 = new Actor("Light 2");
@@ -201,15 +206,16 @@ void CreateTestLevel::Create()
         TextureType::EMISSIVE,
         Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.95f, 0.95f, 0.75f, 1.0f)).get()));
     light_2->GetModelComponent()->set_model(Model::Create({green}));
-    light_2->GetLightComponent()->set_type(LightType::POINT);
+    light_2->GetLightComponent()->set_type(LightType::SPOT);
     light_2->GetLightComponent()->set_color(glm::vec3(0.95f, 0.95f, 0.75f));
     light_2->GetLightComponent()->set_use_shadow(true);
+    light_2->GetTransformComponent()->set_rotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+    light_2->GetTransformComponent()->set_position(glm::vec3(1.0f, 2.5f, 0.0f));
+    light_2->GetTransformComponent()->set_scale(glm::vec3(0.035f));
 
     Actor *cam = new Actor("Camera man");
     cam->SetComponent(std::shared_ptr<Component>(new CameraTransformComponent()));
     cam->AddCameraComponent();
-    cam->GetCameraComponent()->set_render({Renderer::GetInstance()->GetPSO(PsoType::G_BUFFER),
-                                           Renderer::GetInstance()->GetFramebuffer(FramebufferType::MAIN)});
 
     auto layer00 = level->AddLayer("object");
     layer00->AddActor(box);
@@ -240,7 +246,7 @@ void CreateTestLevel::Create()
     });
     skybox->AddSkyboxComponent();
     skybox->GetSkyboxComponent()->set_cube_texture(cube_texture);
-    skybox->GetTransformComponent()->transform().scale_ = glm::vec3(200.0f);
+    skybox->GetTransformComponent()->set_scale(glm::vec3(200.0f));
     layer03->AddActor(skybox);
 
     LevelManager::GetInstance()->SetCurrentLevel(level->name());

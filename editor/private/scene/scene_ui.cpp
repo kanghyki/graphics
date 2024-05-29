@@ -1,6 +1,5 @@
 #include "scene_ui.h"
 #include "actor.h"
-#include "camera.h"
 #include "camera_component.h"
 #include "layer.h"
 #include "level.h"
@@ -163,10 +162,10 @@ void SceneUI::ActorDetail()
 
 void SceneUI::CameraDetail()
 {
-    std::shared_ptr<CameraComponent> comp = actor_selected->GetCameraComponent();
+    CameraComponent *cc = actor_selected->GetCameraComponent();
     if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (!comp)
+        if (!cc)
         {
             if (ImGui::Button("Create##0"))
             {
@@ -174,11 +173,10 @@ void SceneUI::CameraDetail()
             }
             return;
         }
-        Camera &camera = comp->camera();
-        ImGui::DragFloat("FOV Y", &camera.fov_y_, 0.01f);
-        ImGui::DragFloat("Aspect", &camera.aspect_, 0.01f);
-        ImGui::DragFloat("Near plane", &camera.near_plane_, 0.01f);
-        ImGui::DragFloat("Far plane", &camera.far_plane_, 0.01f);
+        ImGui::DragFloat("FOV Y", cc, &CameraComponent::fov_y, &CameraComponent::set_fov_y, 0.01f);
+        ImGui::DragFloat("Aspect", cc, &CameraComponent::aspect, &CameraComponent::set_aspect, 0.01f);
+        ImGui::DragFloat("Near plane", cc, &CameraComponent::near_plane, &CameraComponent::set_near_plane, 0.01f);
+        ImGui::DragFloat("Far plane", cc, &CameraComponent::far_plane, &CameraComponent::set_far_plane, 0.01f);
         if (ImGui::Button("Remove##0"))
         {
             actor_selected->RemoveComponent(ComponentType::CAMERA);
@@ -189,10 +187,10 @@ void SceneUI::CameraDetail()
 void SceneUI::TransformDetail()
 {
 
-    std::shared_ptr<TransformComponent> comp = actor_selected->GetTransformComponent();
+    TransformComponent *tc = actor_selected->GetTransformComponent();
     if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (!comp)
+        if (!tc)
         {
             if (ImGui::Button("Create##1"))
             {
@@ -200,10 +198,9 @@ void SceneUI::TransformDetail()
             }
             return;
         }
-        Transform &transform = comp->transform();
-        ImGui::DragFloat3("Position", glm::value_ptr(transform.position_), 0.01f);
-        ImGui::DragFloat3("Scale", glm::value_ptr(transform.scale_), 0.01f);
-        ImGui::DragFloat3("Rotation", glm::value_ptr(transform.rotation_), 0.01f);
+        ImGui::DragFloat3("Position", tc, &TransformComponent::position, &TransformComponent::set_position, 0.02f);
+        ImGui::DragFloat3("Scale", tc, &TransformComponent::scale, &TransformComponent::set_scale, 0.02f);
+        ImGui::DragFloat3("Rotation", tc, &TransformComponent::rotation, &TransformComponent::set_rotation, 0.02f);
         if (ImGui::Button("Remove##1"))
         {
             actor_selected->RemoveComponent(ComponentType::TRANSFORM);
@@ -213,7 +210,7 @@ void SceneUI::TransformDetail()
 
 void SceneUI::LightDetail()
 {
-    std::shared_ptr<LightComponent> comp = actor_selected->GetLightComponent();
+    LightComponent *comp = actor_selected->GetLightComponent();
     if (ImGui::CollapsingHeader("Light", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (!comp)
@@ -224,24 +221,24 @@ void SceneUI::LightDetail()
             }
             return;
         }
-        ImGui::RadioButton<LightType>("Directional", comp.get(), &LightComponent::type, &LightComponent::set_type,
+        ImGui::Checkbox("Shadow", comp, &LightComponent::use_shadow, &LightComponent::set_use_shadow);
+        ImGui::RadioButton<LightType>("Directional", comp, &LightComponent::type, &LightComponent::set_type,
                                       (int)LightType::DIRECTIONAL);
         ImGui::SameLine();
-        ImGui::RadioButton<LightType>("Point", comp.get(), &LightComponent::type, &LightComponent::set_type,
+        ImGui::RadioButton<LightType>("Point", comp, &LightComponent::type, &LightComponent::set_type,
                                       (int)LightType::POINT);
         ImGui::SameLine();
-        ImGui::RadioButton<LightType>("Spot", comp.get(), &LightComponent::type, &LightComponent::set_type,
+        ImGui::RadioButton<LightType>("Spot", comp, &LightComponent::type, &LightComponent::set_type,
                                       (int)LightType::SPOT);
         ImGui::Text("%10s : x(%.3f), y(%.3f), z(%.3f)", "Direction", comp->direction().x, comp->direction().y,
                     comp->direction().z);
-        ImGui::ColorEdit3("color", comp.get(), &LightComponent::color, &LightComponent::set_color);
-        ImGui::SliderFloat("strength", comp.get(), &LightComponent::strength, &LightComponent::set_strength, 0.0f,
-                           100.0f);
-        ImGui::SliderFloat("falloff_start", comp.get(), &LightComponent::falloff_start,
-                           &LightComponent::set_falloff_start, 0.0f, 100.0f);
-        ImGui::SliderFloat("falloff_end", comp.get(), &LightComponent::falloff_end, &LightComponent::set_falloff_end,
+        ImGui::ColorEdit3("color", comp, &LightComponent::color, &LightComponent::set_color);
+        ImGui::SliderFloat("strength", comp, &LightComponent::strength, &LightComponent::set_strength, 0.0f, 100.0f);
+        ImGui::SliderFloat("falloff_start", comp, &LightComponent::falloff_start, &LightComponent::set_falloff_start,
                            0.0f, 100.0f);
-        ImGui::SliderFloat("spot_power", comp.get(), &LightComponent::spot_power, &LightComponent::set_spot_power, 0.0f,
+        ImGui::SliderFloat("falloff_end", comp, &LightComponent::falloff_end, &LightComponent::set_falloff_end, 0.0f,
+                           100.0f);
+        ImGui::SliderFloat("spot_power", comp, &LightComponent::spot_power, &LightComponent::set_spot_power, 0.0f,
                            100.0f);
         ImGui::Separator();
         if (comp->depth_map())
@@ -257,7 +254,7 @@ void SceneUI::LightDetail()
 
 void SceneUI::ModelDetail()
 {
-    std::shared_ptr<ModelComponent> comp = actor_selected->GetModelComponent();
+    ModelComponent *comp = actor_selected->GetModelComponent();
     if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (!comp)

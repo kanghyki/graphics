@@ -29,20 +29,24 @@ struct LightData
     float spot_power;
 
     glm::vec3 position;
-    unsigned char __p0[4];
+    int shadow_id;
 
     glm::vec3 color;
     float strength;
 
     glm::vec3 direction;
-    unsigned char __p2[4];
+    int use_shadow;
+
+    glm::mat4 view;
+    glm::mat4 proj;
 };
 
 struct LightsUniform
 {
     enum
     {
-        LIGHT_MAX = 64
+        LIGHT_MAX = 64,
+        SHADOW_2D_MAX = 8
     };
     int count{0};
     unsigned char __p0[12];

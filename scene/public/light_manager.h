@@ -13,7 +13,7 @@ class LightManager
 
     void Init();
     void Tick();
-    void AddLight(const LightData &light);
+    void AddLight(LightComponent *light);
 
   private:
     LightManager();
@@ -23,6 +23,7 @@ class LightManager
     static LightManager *instance_;
 
     LightsUniform lights_;
+    uint32_t shadow_2d_count_{0};
 };
 
 #endif

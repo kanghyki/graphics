@@ -39,11 +39,11 @@ class Framebuffer : public BaseFramebuffer
     static FramebufferPtr Create(const std::vector<BaseTexturePtr> color_attachments);
     ~Framebuffer();
 
-    const BaseTexturePtr color_attachment(int i) const
+    const BaseTexture *color_attachment(int i) const
     {
         if (i >= 0 && i < color_attachments_.size())
         {
-            return color_attachments_[i];
+            return color_attachments_[i].get();
         }
 
         return nullptr;

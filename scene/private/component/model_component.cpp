@@ -10,7 +10,7 @@ ModelComponent::~ModelComponent()
 {
 }
 
-void ModelComponent::Render(ProgramPtr program)
+void ModelComponent::Render(const Program *program)
 {
     if (!model_)
     {
@@ -18,7 +18,7 @@ void ModelComponent::Render(ProgramPtr program)
     }
     Renderer::GetInstance()->GetUBO(UBOType::MATRICES)->Bind();
     glBufferSubData(GL_UNIFORM_BUFFER, offsetof(MatricesUniform, t_model), sizeof(glm::mat4),
-                    glm::value_ptr(GetTransformComponent()->transform().CalcModelMatrix()));
+                    glm::value_ptr(GetTransformComponent()->CalcModelMatrix()));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    model_->Draw(program.get());
+    model_->Draw(program);
 }

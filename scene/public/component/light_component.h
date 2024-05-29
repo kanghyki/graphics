@@ -1,7 +1,6 @@
 #ifndef INCLUDED_LIGHT_COMPONENT_H
 #define INCLUDED_LIGHT_COMPONENT_H
 
-#include "camera.h"
 #include "component.h"
 #include "framebuffer.h"
 #include "libmath.h"
@@ -21,20 +20,6 @@ class LightComponent : public Component
     LightComponent();
     ~LightComponent();
 
-    bool use_shadow() const
-    {
-        return use_shadow_;
-    }
-    void set_use_shadow(bool b)
-    {
-        use_shadow_ = true;
-        depthmap_ = DepthMap::Create(1024, 1024);
-    }
-    DepthMapPtr depth_map()
-    {
-        return depthmap_;
-    }
-
     LightData ToData() const
     {
         LightData data;
@@ -50,17 +35,39 @@ class LightComponent : public Component
         data.strength = strength_;
         data.direction = direction();
 
+        data.use_shadow = use_shadow_;
+        if (use_shadow_)
+        {
+            data.shadow_id = shadow_id_;
+            data.view = CalcView();
+            data.proj = CalcProj();
+        }
+
         return data;
     }
 
-    glm::vec3 position() const
+    glm::mat4 CalcView() const
     {
-        return transform_.position_;
+        glm::mat4 rr = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        return glm::lookAt(position(), position() + direction(), glm::vec3(rr * glm::vec4(direction(), 1.0f)));
     }
-    glm::vec3 direction() const
+
+    glm::mat4 CalcProj() const
     {
-        return transform_.direction();
+        switch (type_)
+        {
+        case LightType::DIRECTIONAL:
+        case LightType::POINT:
+        case LightType::SPOT:
+            return glm::perspective(glm::radians(120.0f), 1.0f, 0.5f, falloff_end_ * 2.0f);
+        default:
+            return glm::mat4(1.0f);
+        }
     }
+
+    glm::vec3 position() const;
+    glm::vec3 direction() const;
+
     LightType type() const
     {
         return type_;
@@ -69,6 +76,7 @@ class LightComponent : public Component
     {
         type_ = type;
     }
+
     glm::vec3 color() const
     {
         return color_;
@@ -77,6 +85,7 @@ class LightComponent : public Component
     {
         color_ = color;
     }
+
     float strength() const
     {
         return strength_;
@@ -85,6 +94,7 @@ class LightComponent : public Component
     {
         strength_ = strength;
     }
+
     float spot_power() const
     {
         return spot_power_;
@@ -93,6 +103,7 @@ class LightComponent : public Component
     {
         spot_power_ = spot_power;
     }
+
     float falloff_start() const
     {
         return falloff_start_;
@@ -101,6 +112,7 @@ class LightComponent : public Component
     {
         falloff_start_ = falloff_start;
     }
+
     float falloff_end() const
     {
         return falloff_end_;
@@ -110,13 +122,53 @@ class LightComponent : public Component
         falloff_end_ = falloff_end;
     }
 
+    bool use_shadow() const
+    {
+        return use_shadow_;
+    }
+
+    void set_use_shadow(bool b)
+    {
+        use_shadow_ = b;
+        if (!b)
+        {
+            depthmap_ = nullptr;
+            return;
+        }
+        switch (type_)
+        {
+        case LightType::DIRECTIONAL:
+        case LightType::SPOT:
+            depthmap_ = DepthMap::Create(1280, 1280);
+            break;
+        case LightType::POINT:
+            depthmap_ = DepthMap::Create(1280, 1280, 1280);
+            break;
+        default:
+            break;
+        }
+    }
+
+    DepthMap *depth_map()
+    {
+        return depthmap_.get();
+    }
+
+    uint32_t shadow_id()
+    {
+        return shadow_id_;
+    }
+
+    void set_shadow_id(uint32_t id)
+    {
+        shadow_id_ = id;
+    }
+
   private:
     LightComponent(const LightComponent &);
     LightComponent &operator=(const LightComponent &);
 
     void Tick() override;
-
-    Transform transform_;
 
     LightType type_{LightType::DIRECTIONAL};
     glm::vec3 color_{1.0f, 1.0f, 1.0f};
@@ -124,10 +176,9 @@ class LightComponent : public Component
     float spot_power_{1.0f};
     float falloff_start_{0.0f};
     float falloff_end_{10.0f};
-
-    /* For shadow */
     bool use_shadow_{false};
     DepthMapPtr depthmap_{nullptr};
+    uint32_t shadow_id_{0};
 };
 
 #endif

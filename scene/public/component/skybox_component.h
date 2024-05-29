@@ -10,7 +10,7 @@ class SkyboxComponent : public RenderComponent
     SkyboxComponent();
     ~SkyboxComponent();
 
-    void Render(ProgramPtr program) override;
+    void Render(const Program *program) override;
 
     void set_cube_texture(CubeTexturePtr cube_texture)
     {

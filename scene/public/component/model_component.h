@@ -10,7 +10,7 @@ class ModelComponent : public RenderComponent
     ModelComponent();
     ~ModelComponent();
 
-    void Render(ProgramPtr program) override;
+    void Render(const Program *program) override;
 
     ModelPtr model()
     {

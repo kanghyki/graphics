@@ -34,7 +34,7 @@ void Actor::FinalTick()
     }
 }
 
-void Actor::Render(ProgramPtr program)
+void Actor::Render(const Program *program)
 {
     if (render_component_)
     {
@@ -74,9 +74,9 @@ void Actor::RemoveComponent(ComponentType type)
     components_[static_cast<int>(type)] = nullptr;
 }
 
-std::shared_ptr<Component> Actor::GetComponent(ComponentType type)
+Component *Actor::GetComponent(ComponentType type)
 {
-    return components_[static_cast<int>(type)];
+    return components_[static_cast<int>(type)].get();
 }
 
 void Actor::AddCameraComponent()

@@ -4,6 +4,7 @@
 #include "libmath.h"
 #include "ptr.h"
 #include "shader.h"
+#include "texture.h"
 #include <vector>
 
 CLASS_PTR(Program);
@@ -24,6 +25,12 @@ class Program
     void SetUniform(const std::string &name, const glm::mat4 &value) const;
     void SetUniform(const std::string &name, const std::vector<glm::mat4> &value) const;
 
+    void ActivateTexture(const std::string &name, const BaseTexture *texture) const;
+    void ResetTextureCount() const
+    {
+        active_texture_count_ = 0;
+    }
+
     const uint32_t id() const
     {
         return id_;
@@ -37,6 +44,8 @@ class Program
     bool Link(const std::vector<ShaderPtr> &shaders);
 
     uint32_t id_;
+
+    mutable int active_texture_count_{0};
 };
 
 #endif
