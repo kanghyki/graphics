@@ -4,9 +4,9 @@
 #include "level_manager.h"
 #include "libmath.h"
 #include "light_component.h"
+#include "light_manager.h"
 #include "renderer.h"
 #include "transform_component.h"
-#include <spdlog/spdlog.h>
 
 CameraComponent::CameraComponent() : Component(ComponentType::CAMERA)
 {
@@ -21,6 +21,7 @@ void CameraComponent::Tick()
     shadow_lights_.clear();
     models_.clear();
     skymaps_.clear();
+    terrians_.clear();
 
     aspect_ = Renderer::GetInstance()->aspect();
     CameraManager::GetInstance()->SetMainCamera(this);
@@ -38,6 +39,10 @@ void CameraComponent::Tick()
         if (actor->GetModelComponent())
         {
             models_.push_back(actor);
+        }
+        if (actor->GetTerrainComponent())
+        {
+            terrians_.push_back(actor);
         }
     }
 }
@@ -59,9 +64,23 @@ void CameraComponent::Render()
                     glm::value_ptr(CalcPerspectiveProjectionMatrix()));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+    RenderTerrain();
     RenderShadowMap();
     RenderShading();
     RenderSkybox();
+}
+
+void CameraComponent::RenderTerrain()
+{
+    Renderer::GetInstance()->GetFramebuffer(FramebufferType::G_BUFFER)->Bind();
+    GraphicsPSO *pso = Renderer::GetInstance()->GetPSO(PsoType::TERRAIN);
+    Renderer::GetInstance()->ApplyPSO(pso);
+    pso->program_->Use();
+    for (Actor *actor : terrians_)
+    {
+        actor->Render(pso->program_.get());
+    }
+    glUseProgram(0);
 }
 
 void CameraComponent::RenderShadowMap()
@@ -70,27 +89,25 @@ void CameraComponent::RenderShadowMap()
     for (Actor *actor : shadow_lights_)
     {
         LightComponent *lc = actor->GetLightComponent();
-        switch (lc->type())
+        if (lc->type() == LightType::DIRECTIONAL)
         {
-        case LightType::DIRECTIONAL:
-            RenderCSM(actor);
-            break;
-        case LightType::POINT:
-            RenderPointShadowMap(actor);
-            break;
-        case LightType::SPOT:
-            RenderSpotShadowMap(actor);
-            break;
-        default:
-            break;
+            RenderDirectionalShadowMap(lc);
+        }
+        else if (lc->type() == LightType::POINT)
+        {
+            RenderPointShadowMap(lc);
+        }
+        else if (lc->type() == LightType::SPOT)
+        {
+            RenderSpotShadowMap(lc);
         }
     }
     glViewport(0, 0, Renderer::GetInstance()->width(), Renderer::GetInstance()->height());
+    LightManager::GetInstance()->UpdateUBO();
 }
 
-void CameraComponent::RenderSpotShadowMap(Actor *actor)
+void CameraComponent::RenderSpotShadowMap(LightComponent *lc)
 {
-    LightComponent *lc = actor->GetLightComponent();
     lc->depth_map()->Bind();
     glClear(GL_DEPTH_BUFFER_BIT);
     GraphicsPSO *pso = Renderer::GetInstance()->GetPSO(PsoType::DEPTH_MAP);
@@ -109,24 +126,25 @@ void CameraComponent::RenderSpotShadowMap(Actor *actor)
     glUseProgram(0);
 }
 
-void CameraComponent::RenderPointShadowMap(Actor *actor)
+void CameraComponent::RenderPointShadowMap(LightComponent *lc)
 {
-    LightComponent *lc = actor->GetLightComponent();
     lc->depth_map()->Bind();
     glClear(GL_DEPTH_BUFFER_BIT);
     GraphicsPSO *pso = Renderer::GetInstance()->GetPSO(PsoType::OMNI_DEPTH_MAP);
     Renderer::GetInstance()->ApplyPSO(pso);
 
+    glm::vec3 pos = lc->position();
     glm::mat4 proj = glm::perspective(glm::radians(90.0f), 1.0f, lc->near_plane(), lc->far_plane());
-    std::vector<glm::mat4> t(6, glm::mat4(1.0f));
-    t[0] = proj * glm::lookAt(lc->position(), lc->position() + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-    t[1] = proj * glm::lookAt(lc->position(), lc->position() + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-    t[2] = proj * glm::lookAt(lc->position(), lc->position() + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
-    t[3] = proj * glm::lookAt(lc->position(), lc->position() + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
-    t[4] = proj * glm::lookAt(lc->position(), lc->position() + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
-    t[5] = proj * glm::lookAt(lc->position(), lc->position() + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+    std::vector<glm::mat4> transform;
+    transform.reserve(6);
+    transform.push_back(proj * glm::lookAt(pos, pos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+    transform.push_back(proj * glm::lookAt(pos, pos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+    transform.push_back(proj * glm::lookAt(pos, pos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+    transform.push_back(proj * glm::lookAt(pos, pos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+    transform.push_back(proj * glm::lookAt(pos, pos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+    transform.push_back(proj * glm::lookAt(pos, pos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 
-    pso->program_->SetUniform("light_transform", t);
+    pso->program_->SetUniform("light_transform", transform);
     pso->program_->SetUniform("far_plane", lc->far_plane());
     pso->program_->SetUniform("light_position", lc->position());
     for (Actor *model : models_)
@@ -140,8 +158,24 @@ void CameraComponent::RenderPointShadowMap(Actor *actor)
     glUseProgram(0);
 }
 
-void CameraComponent::RenderCSM(Actor *actor)
+void CameraComponent::RenderDirectionalShadowMap(LightComponent *lc)
 {
+    lc->depth_map()->Bind();
+    glClear(GL_DEPTH_BUFFER_BIT);
+    GraphicsPSO *pso = Renderer::GetInstance()->GetPSO(PsoType::CASCADE_SHADOW_MAP);
+    Renderer::GetInstance()->ApplyPSO(pso);
+
+    auto matrices = lc->CalcLightPVMatrices(fov_y(), aspect(), near_plane(), far_plane(), CalcViewMatrix());
+    pso->program_->SetUniform("light_matrices", matrices);
+
+    for (Actor *model : models_)
+    {
+        if (!model->GetLightComponent())
+        {
+            pso->program_->SetUniform("model", model->GetTransformComponent()->CalcModelMatrix());
+            model->Render(pso->program_.get());
+        }
+    }
     glUseProgram(0);
 }
 
@@ -195,6 +229,7 @@ void CameraComponent::RenderShading()
         LightComponent *lc = shadow_light->GetLightComponent();
         if (lc->type() == LightType::DIRECTIONAL)
         {
+            pso->program_->ActivateTexture("l_shadow_array", lc->depth_map()->texture());
         }
         else if (lc->type() == LightType::POINT)
         {

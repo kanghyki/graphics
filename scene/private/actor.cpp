@@ -50,6 +50,7 @@ void Actor::SetComponent(std::shared_ptr<Component> component)
     {
     case ComponentType::MODEL:
     case ComponentType::SKYBOX:
+    case ComponentType::TERRAIN:
         render_component_ = std::static_pointer_cast<RenderComponent>(component);
         break;
     default:
@@ -61,14 +62,13 @@ void Actor::RemoveComponent(ComponentType type)
 {
     if (type == ComponentType::TRANSFORM)
     {
-        if (GetCameraComponent() || GetLightComponent() || GetModelComponent())
+        if (GetCameraComponent() || GetLightComponent() || GetModelComponent() || GetTerrainComponent())
         {
             return;
         }
     }
-    if (type == ComponentType::MODEL)
+    if (type == ComponentType::MODEL || type == ComponentType::SKYBOX || type == ComponentType::TERRAIN)
     {
-
         render_component_ = nullptr;
     }
     components_[static_cast<int>(type)] = nullptr;
@@ -104,6 +104,10 @@ void Actor::AddLightComponent()
 
 void Actor::AddModelComponent()
 {
+    if (render_component_)
+    {
+        return;
+    }
     if (!components_[static_cast<int>(ComponentType::TRANSFORM)])
     {
         Actor::AddTransformComponent();
@@ -113,6 +117,10 @@ void Actor::AddModelComponent()
 
 void Actor::AddSkyboxComponent()
 {
+    if (render_component_)
+    {
+        return;
+    }
     if (!components_[static_cast<int>(ComponentType::TRANSFORM)])
     {
         Actor::AddTransformComponent();
@@ -120,8 +128,22 @@ void Actor::AddSkyboxComponent()
     SetComponent(ComponentFactory().Generate(ComponentType::SKYBOX));
 }
 
+void Actor::AddTerrainComponent()
+{
+    if (render_component_)
+    {
+        return;
+    }
+    if (!components_[static_cast<int>(ComponentType::TRANSFORM)])
+    {
+        Actor::AddTransformComponent();
+    }
+    SetComponent(ComponentFactory().Generate(ComponentType::TERRAIN));
+}
+
 COMPONENT_GETTER_IMPL(TRANSFORM, TransformComponent)
 COMPONENT_GETTER_IMPL(CAMERA, CameraComponent)
 COMPONENT_GETTER_IMPL(LIGHT, LightComponent)
 COMPONENT_GETTER_IMPL(MODEL, ModelComponent)
 COMPONENT_GETTER_IMPL(SKYBOX, SkyboxComponent)
+COMPONENT_GETTER_IMPL(TERRAIN, TerrainComponent)

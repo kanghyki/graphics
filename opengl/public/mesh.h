@@ -2,30 +2,21 @@
 #define INCLUDED_MESH_H
 
 #include "buffer.h"
-#include "libmath.h"
 #include "material.h"
+#include "mesh_geometry.h"
 #include "program.h"
 #include "ptr.h"
+#include "vertex.h"
 #include "vertex_array.h"
 #include <vector>
-
-struct Vertex
-{
-    glm::vec3 position;
-    glm::vec3 normal;
-    glm::vec2 uv;
-    glm::vec3 tangent;
-};
 
 CLASS_PTR(Mesh);
 class Mesh
 {
   public:
     static MeshPtr Create(const std::vector<Vertex> &vertices, const std::vector<uint32_t> &indices,
-                          uint32_t primitive_type);
-    static MeshPtr CreateBox();
-    static MeshPtr CreateSphere(uint32_t slice, uint32_t stack);
-    static MeshPtr CreatePlane();
+                          uint32_t primitive_type = GL_TRIANGLES);
+    static MeshPtr Create(MeshGeometry::Data data, uint32_t primitive_type = GL_TRIANGLES);
     static void ComputeTangents(std::vector<Vertex> &vertices, const std::vector<uint32_t> &indices);
     ~Mesh();
 

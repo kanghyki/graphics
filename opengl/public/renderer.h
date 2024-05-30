@@ -16,7 +16,9 @@ enum class PsoType
     SKYBOX,
     DEPTH_MAP,
     OMNI_DEPTH_MAP,
-    SSAO
+    CASCADE_SHADOW_MAP,
+    SSAO,
+    TERRAIN
 };
 
 enum class FramebufferType
@@ -24,7 +26,8 @@ enum class FramebufferType
     MAIN,
     G_BUFFER,
     GAUSSIAN_BLUR,
-    SSAO
+    SSAO,
+    SSAO_BLURRED
 };
 
 enum class UBOType
@@ -85,8 +88,12 @@ class Renderer
             return depth_map_pso_.get();
         case PsoType::OMNI_DEPTH_MAP:
             return omni_depth_map_pso_.get();
+        case PsoType::CASCADE_SHADOW_MAP:
+            return csm_pso_.get();
         case PsoType::SSAO:
             return ssao_pso_.get();
+        case PsoType::TERRAIN:
+            return terrain_pso_.get();
         }
         return nullptr;
     }
@@ -102,6 +109,8 @@ class Renderer
             return gaussian_blur_framebuffer_[0].get();
         case FramebufferType::SSAO:
             return ssao_framebuffer_.get();
+        case FramebufferType::SSAO_BLURRED:
+            return ssao_blur_framebuffer_.get();
         }
         return nullptr;
     }
@@ -129,10 +138,12 @@ class Renderer
         if (b)
         {
             g_buffer_pso_->rasterizer_state_.polygon_mode = GL_LINE;
+            terrain_pso_->rasterizer_state_.polygon_mode = GL_LINE;
         }
         else
         {
             g_buffer_pso_->rasterizer_state_.polygon_mode = GL_FILL;
+            terrain_pso_->rasterizer_state_.polygon_mode = GL_FILL;
         }
     }
     float gamma_{1.0f};
@@ -142,6 +153,11 @@ class Renderer
     bool use_exposure_{false};
     float exposure_{1.0f};
     int blur_time_{5};
+
+    bool use_ssao_{true};
+    int ssao_sample_size_{64};
+    float ssao_radius_{1.0f};
+    float ssao_power_{1.0f};
 
   private:
     Renderer();
@@ -191,6 +207,13 @@ class Renderer
     ProgramPtr omni_depth_map_program_;
     GraphicsPSOPtr omni_depth_map_pso_;
 
+    /* Cascade shadow map */
+    ShaderPtr csm_vs_;
+    ShaderPtr csm_fs_;
+    ShaderPtr csm_gs_;
+    ProgramPtr csm_program_;
+    GraphicsPSOPtr csm_pso_;
+
     /* Gaussian blur */
     FramebufferPtr gaussian_blur_framebuffer_[2];
     ShaderPtr gaussian_blur_vs_;
@@ -211,14 +234,8 @@ class Renderer
     ProgramPtr ssao_program_;
     GraphicsPSOPtr ssao_pso_;
     TexturePtr ssao_noise_texture_;
-    std::vector<glm::vec3> ssao_sample_;
-
-  public:
-    bool use_ssao_{true};
     const int SSAO_SAMPLE_MAX = 64;
-    int ssao_sample_size_{64};
-    float ssao_radius_{1.0f};
-    float ssao_power_{1.0f};
+    std::vector<glm::vec3> ssao_sample_;
 
     FramebufferPtr ssao_blur_framebuffer_;
     ShaderPtr linear_blur_vs_;
@@ -226,7 +243,14 @@ class Renderer
     ProgramPtr linear_blur_program_;
     GraphicsPSOPtr linear_blur_pso_;
 
-  private:
+    /* Terrain */
+    ShaderPtr terrain_vs_;
+    ShaderPtr terrain_tc_;
+    ShaderPtr terrain_te_;
+    ShaderPtr terrain_fs_;
+    ProgramPtr terrain_program_;
+    GraphicsPSOPtr terrain_pso_;
+
     /* Uniform buffer object */
     BufferPtr camera_ubo_;
     BufferPtr matrices_ubo_;

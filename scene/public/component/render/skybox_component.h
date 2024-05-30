@@ -17,11 +17,21 @@ class SkyboxComponent : public RenderComponent
         cube_texture_ = cube_texture;
     }
 
+    bool activate() const
+    {
+        return activate_;
+    }
+    void set_activate(bool activate)
+    {
+        activate_ = activate;
+    }
+
   private:
     SkyboxComponent(const SkyboxComponent &rhs);
     SkyboxComponent &operator=(const SkyboxComponent &rhs);
 
     CubeTexturePtr cube_texture_;
+    bool activate_{true};
 };
 
 #endif

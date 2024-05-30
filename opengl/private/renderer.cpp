@@ -28,8 +28,8 @@ void Renderer::Init()
     std::string shader_dir(SHADER_PATH);
     glViewport(0, 0, width_, height_);
 
-    plane_mesh_ = Mesh::CreatePlane();
-    box_mesh_ = Mesh::CreateBox();
+    plane_mesh_ = Mesh::Create(MeshGeometry::GeneratePlane());
+    box_mesh_ = Mesh::Create(MeshGeometry::GenerateBox());
 
     main_framebuffer_ = Framebuffer::Create(
         {Texture::Create(width_, height_, GL_RGBA16F), Texture::Create(width_, height_, GL_RGBA16F)});
@@ -76,6 +76,15 @@ void Renderer::Init()
     omni_depth_map_pso_ = GraphicsPSO::Create();
     omni_depth_map_pso_->program_ = omni_depth_map_program_;
     omni_depth_map_pso_->rasterizer_state_.cull_face_ = GL_FRONT;
+
+    /* Cascade shadow map */
+    csm_vs_ = Shader::CreateFromFile(shader_dir + "csm.vs", GL_VERTEX_SHADER);
+    csm_fs_ = Shader::CreateFromFile(shader_dir + "csm.fs", GL_FRAGMENT_SHADER);
+    csm_gs_ = Shader::CreateFromFile(shader_dir + "csm.gs", GL_GEOMETRY_SHADER);
+    csm_program_ = Program::Create({csm_vs_, csm_fs_, csm_gs_});
+    csm_pso_ = GraphicsPSO::Create();
+    csm_pso_->program_ = csm_program_;
+    csm_pso_->rasterizer_state_.cull_face_ = GL_FRONT;
 
     /* Gaussian blur */
     gaussian_blur_framebuffer_[0] = Framebuffer::Create({Texture::Create(width_, height_, GL_RGBA16F)});
@@ -136,6 +145,15 @@ void Renderer::Init()
         float scale = (1.0f - t2) * 0.1f + t2 * 1.0f;
         ssao_sample_[i] = sample * scale;
     }
+
+    /* Terrain */
+    terrain_vs_ = Shader::CreateFromFile(shader_dir + "terrain.vs", GL_VERTEX_SHADER);
+    terrain_tc_ = Shader::CreateFromFile(shader_dir + "terrain.tc", GL_TESS_CONTROL_SHADER);
+    terrain_te_ = Shader::CreateFromFile(shader_dir + "terrain.te", GL_TESS_EVALUATION_SHADER);
+    terrain_fs_ = Shader::CreateFromFile(shader_dir + "terrain.fs", GL_FRAGMENT_SHADER);
+    terrain_program_ = Program::Create({terrain_vs_, terrain_tc_, terrain_te_, terrain_fs_});
+    terrain_pso_ = GraphicsPSO::Create();
+    terrain_pso_->program_ = terrain_program_;
 
     /* Uniform buffer object */
     camera_ubo_ = Buffer::Create(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, NULL, sizeof(CameraUniform), 1);
@@ -208,7 +226,7 @@ void Renderer::PostProcessing()
         auto model = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f));
         gaussian_blur_program_->SetUniform("transform", model);
 
-        for (unsigned int i = 0; i < blur_time_ * 2; i++)
+        for (int i = 0; i < blur_time_ * 2; ++i)
         {
             gaussian_blur_framebuffer_[horizontal]->Bind();
             gaussian_blur_program_->SetUniform("horizontal", horizontal);

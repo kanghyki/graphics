@@ -34,9 +34,15 @@ void ResourceManager::Init()
     }
 
     /* Model */
-    models_.push_back({"box", Model::Create({Mesh::CreateBox()})});
-    models_.push_back({"sphere", Model::Create({Mesh::CreateSphere(30, 30)})});
-    models_.push_back({"plane", Model::Create({Mesh::CreatePlane()})});
+    MeshPtr box = Mesh::Create(MeshGeometry::GenerateBox());
+    box->set_material(Material::Create());
+    MeshPtr sphere = Mesh::Create(MeshGeometry::GenerateSphere(30, 30));
+    sphere->set_material(Material::Create());
+    MeshPtr plane = Mesh::Create(MeshGeometry::GeneratePlane());
+    plane->set_material(Material::Create());
+    models_.push_back({"box", Model::Create({box})});
+    models_.push_back({"sphere", Model::Create({sphere})});
+    models_.push_back({"plane", Model::Create({plane})});
     for (const auto &entry : std::filesystem::directory_iterator(path + "model"))
     {
         if (entry.is_regular_file())

@@ -14,9 +14,11 @@ target_include_directories(${PROJECT_NAME}
 PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/public
     ${CMAKE_CURRENT_SOURCE_DIR}/public/component
+    ${CMAKE_CURRENT_SOURCE_DIR}/public/component/render
 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/private
     ${CMAKE_CURRENT_SOURCE_DIR}/private/component
+    ${CMAKE_CURRENT_SOURCE_DIR}/private/component/render
 )
 
 target_link_libraries(${PROJECT_NAME}

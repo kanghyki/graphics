@@ -34,7 +34,7 @@ void main()
     {
         if (l_lights[i].type == DIRECTIONAL)
         {
-            lighting += ComputeDirectionalLight(l_lights[i], mat, normal, to_eye);
+            lighting += ComputeDirectionalLight(l_lights[i], mat, frag_pos, normal, to_eye);
         }
         else if (l_lights[i].type == POINT)
         {

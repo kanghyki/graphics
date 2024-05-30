@@ -30,6 +30,8 @@ class SceneUI : public EditorUI, public ResourceUIObserver
     void LightDetail();
     void ModelDetail();
     void MeshTextureDetail(MeshPtr mesh, TextureType type);
+    void SkyboxDetail();
+    void TerrainDetail();
 
     Level *level_current{nullptr};
     Layer *layer_selected{nullptr};

@@ -12,6 +12,9 @@ SkyboxComponent::~SkyboxComponent()
 
 void SkyboxComponent::Render(const Program *program)
 {
-    program->ActivateTexture("cubemap", cube_texture_.get());
-    Renderer::GetInstance()->box_mesh()->Draw(program);
+    if (cube_texture_ && activate_)
+    {
+        program->ActivateTexture("cubemap", cube_texture_.get());
+        Renderer::GetInstance()->box_mesh()->Draw(program);
+    }
 }

@@ -12,6 +12,7 @@ class CameraComponent;
 class LightComponent;
 class ModelComponent;
 class SkyboxComponent;
+class TerrainComponent;
 #define COMPONENT_GETTER_DECL(ENUM_TYPE_NAME, className) className *Get##className();
 #define COMPONENT_GETTER_IMPL(ENUM_TYPE_NAME, className)                                                               \
     className *Actor::Get##className()                                                                                 \
@@ -52,12 +53,14 @@ class Actor
     void AddLightComponent();
     void AddModelComponent();
     void AddSkyboxComponent();
+    void AddTerrainComponent();
 
     COMPONENT_GETTER_DECL(TRANSFORM, TransformComponent)
     COMPONENT_GETTER_DECL(CAMERA, CameraComponent)
     COMPONENT_GETTER_DECL(LIGHT, LightComponent)
     COMPONENT_GETTER_DECL(MODEL, ModelComponent)
     COMPONENT_GETTER_DECL(SKYBOX, SkyboxComponent)
+    COMPONENT_GETTER_DECL(TERRAIN, TerrainComponent)
 
   private:
     Actor(const Actor &c);

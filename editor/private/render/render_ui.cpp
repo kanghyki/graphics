@@ -29,10 +29,11 @@ void RenderUI::RenderImpl()
 void DrawFramebuffers()
 {
     auto window_size = ImGui::GetWindowSize();
-    const auto &main = Renderer::GetInstance()->GetFramebuffer(FramebufferType::MAIN);
-    const auto &g_buffer = Renderer::GetInstance()->GetFramebuffer(FramebufferType::G_BUFFER);
-    const auto &gaussian_blur = Renderer::GetInstance()->GetFramebuffer(FramebufferType::GAUSSIAN_BLUR);
-    const auto &ssao = Renderer::GetInstance()->GetFramebuffer(FramebufferType::SSAO);
+    Framebuffer *main = Renderer::GetInstance()->GetFramebuffer(FramebufferType::MAIN);
+    Framebuffer *g_buffer = Renderer::GetInstance()->GetFramebuffer(FramebufferType::G_BUFFER);
+    Framebuffer *gaussian_blur = Renderer::GetInstance()->GetFramebuffer(FramebufferType::GAUSSIAN_BLUR);
+    Framebuffer *ssao = Renderer::GetInstance()->GetFramebuffer(FramebufferType::SSAO);
+    Framebuffer *ssao_blurred = Renderer::GetInstance()->GetFramebuffer(FramebufferType::SSAO_BLURRED);
 
     if (ImGui::CollapsingHeader("OPTION", ImGuiTreeNodeFlags_DefaultOpen))
     {
@@ -78,8 +79,7 @@ void DrawFramebuffers()
         const char *buffer_name[2] = {"Origin", "Blurred"};
         static int buffer_selected = 0;
         ImGui::Combo("##SSAO", &buffer_selected, buffer_name, 2);
-        auto texture = buffer_selected == 0 ? ssao->color_attachment(0)
-                                            : Renderer::GetInstance()->ssao_blur_framebuffer_->color_attachment(0);
+        auto texture = buffer_selected == 0 ? ssao->color_attachment(0) : ssao_blurred->color_attachment(0);
         ImGui::Image(reinterpret_cast<ImTextureID>(texture->id()), ImVec2(window_size.x, window_size.x), ImVec2(0, 1),
                      ImVec2(1, 0));
         ImGui::DragInt("Sample size", &Renderer::GetInstance()->ssao_sample_size_, 0.1f, 1, 64);

@@ -100,4 +100,19 @@ class CubeTexture : public BaseTexture
     int length_{0};
 };
 
+CLASS_PTR(TextureArray);
+class TextureArray : public BaseTexture
+{
+  public:
+    static TextureArrayPtr Create(int width, int height, int size, uint32_t internal_format);
+    ~TextureArray();
+
+  private:
+    TextureArray();
+
+    void SetTextureArrayFormat(int width, int height, int size, uint32_t internal_format);
+
+    int size_{0};
+};
+
 #endif

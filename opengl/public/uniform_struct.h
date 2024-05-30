@@ -42,6 +42,10 @@ struct LightData
 
     float far_plane;
     unsigned char __p0[12];
+
+    float cascade_distance[4 * 4];
+
+    glm::mat4 csm_matrix[5];
 };
 
 struct LightsUniform

@@ -94,6 +94,7 @@ uint32_t BaseTexture::format() const
 {
     switch (internal_format_)
     {
+    case GL_DEPTH_COMPONENT32F:
     case GL_DEPTH_COMPONENT:
         return GL_DEPTH_COMPONENT;
     case GL_RED:
@@ -130,6 +131,7 @@ uint32_t BaseTexture::data_type() const
     case GL_RGBA16F:
     case GL_RGBA32F:
     case GL_DEPTH_COMPONENT:
+    case GL_DEPTH_COMPONENT32F:
         return GL_FLOAT;
     case GL_RED:
     case GL_R:
@@ -326,10 +328,51 @@ void CubeTexture::SetCubemapFormat(int width, int height, int length, uint32_t i
     length_ = length;
     internal_format_ = internal_format;
 
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, internal_format_, height_, length_, 0, format(), data_type(), NULL);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, internal_format_, height_, length_, 0, format(), data_type(), NULL);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, internal_format_, width_, height_, 0, format(), data_type(), NULL);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, internal_format_, width_, height_, 0, format(), data_type(), NULL);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, internal_format_, length_, width_, 0, format(), data_type(), NULL);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, internal_format_, length_, width_, 0, format(), data_type(), NULL);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, internal_format_, height_, length_, 0, format(), data_type(),
+                 nullptr);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, internal_format_, height_, length_, 0, format(), data_type(),
+                 nullptr);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, internal_format_, width_, height_, 0, format(), data_type(),
+                 nullptr);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, internal_format_, width_, height_, 0, format(), data_type(),
+                 nullptr);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, internal_format_, length_, width_, 0, format(), data_type(),
+                 nullptr);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, internal_format_, length_, width_, 0, format(), data_type(),
+                 nullptr);
+}
+
+/*
+ * TextureArray
+ */
+
+TextureArray::TextureArray() : BaseTexture(GL_TEXTURE_2D_ARRAY)
+{
+}
+
+TextureArray::~TextureArray()
+{
+}
+
+TextureArrayPtr TextureArray::Create(int width, int height, int size, uint32_t internal_format)
+{
+    auto texture = TextureArrayPtr(new TextureArray());
+
+    texture->Bind();
+    texture->SetFilter(GL_NEAREST, GL_NEAREST);
+    texture->SetWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
+    texture->SetBorderColor(glm::vec4(1.0f));
+    texture->SetTextureArrayFormat(width, height, size, internal_format);
+
+    return std::move(texture);
+}
+
+void TextureArray::SetTextureArrayFormat(int width, int height, int size, uint32_t internal_format)
+{
+    width_ = width;
+    height_ = height;
+    size_ = size;
+    internal_format_ = internal_format;
+
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, internal_format_, width_, height_, size, 0, format(), data_type(), nullptr);
 }

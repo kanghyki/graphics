@@ -9,8 +9,10 @@
 #include "light_component.h"
 #include "material.h"
 #include "model_component.h"
+#include "random_number_generator.h"
 #include "renderer.h"
 #include "skybox_component.h"
+#include "terrain_component.h"
 #include "time_manager.h"
 #include "transform_component.h"
 #include <spdlog/spdlog.h>
@@ -55,6 +57,14 @@ class CameraTransformComponent : public TransformComponent
         if (KEY_HOLD(Key::E))
         {
             pp -= dt * speed * camera_up;
+        }
+        if (KEY_TAB(Key::LEFT_SHIFT))
+        {
+            speed = 50.0f;
+        }
+        if (KEY_AWAY(Key::LEFT_SHIFT))
+        {
+            speed = 1.0f;
         }
         set_position(pp);
         if (MOUSE_HOLD(Mouse::RIGHT))
@@ -117,15 +127,18 @@ class RotationTransformComponent : public TransformComponent
 class LightTT : public TransformComponent
 {
   public:
-    LightTT()
+    LightTT(float r) : r_(r)
     {
     }
     void Tick()
     {
         float dt = TimeManager::GetInstance()->delta_time();
-        set_position(glm::rotate(glm::mat4(1.0f), dt * 3.141592f * 0.5f, glm::vec3(0.0f, 1.0f, 0.0f)) *
+        set_position(glm::rotate(glm::mat4(1.0f), dt * 3.141592f * r_, glm::vec3(0.0f, 1.0f, 0.0f)) *
                      glm::vec4(position(), 1.0f));
     }
+
+  private:
+    float r_;
 };
 
 CreateTestLevel::CreateTestLevel()
@@ -141,10 +154,13 @@ void CreateTestLevel::Create()
 
     Level *level = LevelManager::GetInstance()->AddLevel("test_level");
 
+    MeshGeometry::Data box_data = MeshGeometry::GenerateBox();
+    MeshGeometry::Data sphere_data = MeshGeometry::GenerateSphere(30, 30);
+
     std::string resource_path(RESOURCE_DIR_PATH);
     Actor *floor = new Actor("Floor");
     floor->AddModelComponent();
-    auto floor_mesh = Mesh::CreateBox();
+    auto floor_mesh = Mesh::Create(box_data);
     floor_mesh->set_material(Material::Create());
     auto floor_material = floor_mesh->material();
     floor_material->albedo_color_ = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -154,17 +170,17 @@ void CreateTestLevel::Create()
     floor->GetTransformComponent()->set_position(glm::vec3(0.0f, 0.0f, 0.0f));
 
     Actor *box = new Actor("Box");
-    auto box_mesh = Mesh::CreateBox();
+    auto box_mesh = Mesh::Create(box_data);
     box_mesh->set_material(Material::Create());
     auto box_material = box_mesh->material();
     box_material->specular_alpha_ = 1.0f;
     box->SetComponent(std::shared_ptr<Component>(new RotationTransformComponent()));
     box->AddModelComponent();
     box->GetModelComponent()->set_model(Model::Create({box_mesh}));
-    box->GetTransformComponent()->set_position(glm::vec3(0.0f, 0.9f, -0.5f));
+    box->GetTransformComponent()->set_position(glm::vec3(0.0f, 1.2f, 0.0f));
 
     Actor *sphere = new Actor("Sphere");
-    auto sphere_mesh = Mesh::CreateSphere(30, 30);
+    auto sphere_mesh = Mesh::Create(sphere_data);
     sphere_mesh->set_material(Material::Create());
     auto sphere_material = sphere_mesh->material();
     sphere_material->specular_alpha_ = 1.0f;
@@ -173,40 +189,46 @@ void CreateTestLevel::Create()
     sphere->GetTransformComponent()->set_position(glm::vec3(1.0f, 1.0f, 0.0f));
     sphere->GetTransformComponent()->set_scale(glm::vec3(0.6f));
 
-    Actor *light_0 = new Actor("Light 1");
-    light_0->AddLightComponent();
-    light_0->AddModelComponent();
-    auto red = Mesh::CreateSphere(30, 30);
-    red->set_material(Material::Create());
-    red->material()->set_texture(
-        TextureType::EMISSIVE,
-        Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.95f, 0.95f, 0.95f, 1.0f)).get()));
-    light_0->GetModelComponent()->set_model(Model::Create({red}));
-    light_0->GetTransformComponent()->set_position(glm::vec3(0.0f, 2.5f, 0.0f));
-    light_0->GetTransformComponent()->set_scale(glm::vec3(0.035f));
-    light_0->GetTransformComponent()->set_rotation(glm::vec3(-90.0f, 0.0f, 0.0f));
-    light_0->GetLightComponent()->set_type(LightType::SPOT);
-    light_0->GetLightComponent()->set_use_shadow(true);
-    light_0->GetLightComponent()->set_color(glm::vec3(0.95f, 0.95f, 0.95f));
+    auto layer02 = level->AddLayer("light");
+    Actor *ld = new Actor("Light");
+    ld->AddLightComponent();
+    ld->GetTransformComponent()->set_rotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+    ld->GetLightComponent()->set_type(LightType::DIRECTIONAL);
+    ld->GetLightComponent()->set_use_shadow(true);
+    layer02->AddActor(ld);
+    for (int i = 0; i < 1; ++i)
+    {
+        Actor *l = new Actor("Light");
+        RandomNumberGenerator rng;
+        glm::vec3 random_color = glm::vec3(rng.Uniform(0.3f, 0.6f), rng.Uniform(0.3f, 0.6f), rng.Uniform(0.3f, 0.6f));
+        glm::vec3 random_position =
+            glm::vec3(rng.Uniform(-5.0f, 5.0f), rng.Uniform(0.5f, 5.0f), rng.Uniform(-5.0f, 5.0f));
+        l->SetComponent(std::shared_ptr<Component>(new LightTT((float)rng.Uniform(0.1f, 0.4f))));
+        l->AddLightComponent();
+        l->AddModelComponent();
+        auto m = Mesh::Create(box_data);
+        m->set_material(Material::Create());
+        m->material()->set_texture(
+            TextureType::EMISSIVE,
+            Texture::Create(
+                Image::CreateSingleColorImage(
+                    4, 4, glm::vec4(rng.Uniform(0.8f, 1.0f), rng.Uniform(0.8f, 1.0f), rng.Uniform(0.8f, 1.0f), 1.0f))
+                    .get()));
+        l->GetModelComponent()->set_model(Model::Create({m}));
+        l->GetLightComponent()->set_type(LightType::POINT);
+        l->GetLightComponent()->set_color(random_color);
+        l->GetLightComponent()->set_use_shadow(true);
+        l->GetTransformComponent()->set_position(random_position);
+        l->GetTransformComponent()->set_scale(glm::vec3((float)rng.Uniform(0.05f, 0.15f)));
+        layer02->AddActor(l);
+    }
+    auto layer05 = level->AddLayer("terrian");
+    Actor *terrian = new Actor("Terrian");
+    terrian->AddTerrainComponent();
+    terrian->GetTerrainComponent()->set_height_map(Texture::Load("../../asset/texture2d/heightmap.png"));
+    layer05->AddActor(terrian);
 
-    Actor *light_2 = new Actor("Light 2");
-    light_2->SetComponent(std::shared_ptr<Component>(new LightTT()));
-    light_2->AddLightComponent();
-    light_2->AddModelComponent();
-    auto green = Mesh::CreateSphere(30, 30);
-    green->set_material(Material::Create());
-    green->material()->set_texture(
-        TextureType::EMISSIVE,
-        Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.95f, 0.95f, 0.75f, 1.0f)).get()));
-    light_2->GetModelComponent()->set_model(Model::Create({green}));
-    light_2->GetLightComponent()->set_type(LightType::POINT);
-    light_2->GetLightComponent()->set_color(glm::vec3(0.95f, 0.95f, 0.75f));
-    light_2->GetLightComponent()->set_use_shadow(true);
-    light_2->GetTransformComponent()->set_rotation(glm::vec3(-90.0f, 0.0f, 0.0f));
-    light_2->GetTransformComponent()->set_position(glm::vec3(1.0f, 2.0f, 0.0f));
-    light_2->GetTransformComponent()->set_scale(glm::vec3(0.035f));
-
-    Actor *cam = new Actor("Camera man");
+    Actor *cam = new Actor("Cam");
     cam->SetComponent(std::shared_ptr<Component>(new CameraTransformComponent()));
     cam->AddCameraComponent();
 
@@ -216,18 +238,15 @@ void CreateTestLevel::Create()
     layer00->AddActor(floor);
     auto layer01 = level->AddLayer("player");
     layer01->AddActor(cam);
-    auto layer02 = level->AddLayer("light");
-    layer02->AddActor(light_0);
-    layer02->AddActor(light_2);
 
     auto layer03 = level->AddLayer("skybox");
     Actor *skybox = new Actor("Skybox");
-    auto cubeRight = Image::Load("../../asset/cube_texture/0/right.jpg", false);
-    auto cubeLeft = Image::Load("../../asset/cube_texture/0/left.jpg", false);
-    auto cubeTop = Image::Load("../../asset/cube_texture/0/top.jpg", false);
-    auto cubeBottom = Image::Load("../../asset/cube_texture/0/bottom.jpg", false);
-    auto cubeFront = Image::Load("../../asset/cube_texture/0/front.jpg", false);
-    auto cubeBack = Image::Load("../../asset/cube_texture/0/back.jpg", false);
+    auto cubeRight = Image::Load("../../asset/cube_texture/2/right.jpg", false);
+    auto cubeLeft = Image::Load("../../asset/cube_texture/2/left.jpg", false);
+    auto cubeTop = Image::Load("../../asset/cube_texture/2/top.jpg", false);
+    auto cubeBottom = Image::Load("../../asset/cube_texture/2/bottom.jpg", false);
+    auto cubeFront = Image::Load("../../asset/cube_texture/2/front.jpg", false);
+    auto cubeBack = Image::Load("../../asset/cube_texture/2/back.jpg", false);
     auto cube_texture = CubeTexture::Create({
         cubeRight.get(),
         cubeLeft.get(),

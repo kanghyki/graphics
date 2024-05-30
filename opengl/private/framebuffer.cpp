@@ -98,11 +98,11 @@ void Framebuffer::AttachTexture()
  * Depthmap
  */
 
-DepthMapPtr DepthMap::Create(int width, int height, int length)
+DepthMapPtr DepthMap::Create(BaseTexturePtr texture)
 {
     auto depth_map = DepthMapPtr(new DepthMap());
 
-    if (!depth_map->SetTexture(width, height, length) || !depth_map->Init())
+    if (!depth_map->SetTexture(texture) || !depth_map->Init())
     {
         return nullptr;
     }
@@ -118,14 +118,9 @@ DepthMap::~DepthMap()
 {
 }
 
-bool DepthMap::SetTexture(int width, int height, int length)
+bool DepthMap::SetTexture(BaseTexturePtr texture)
 {
-    length == -1 ? texture_ = Texture::Create(width, height, GL_DEPTH_COMPONENT)
-                 : texture_ = CubeTexture::Create(width, height, length, GL_DEPTH_COMPONENT);
-    if (!texture_)
-    {
-        return false;
-    }
+    texture_ = texture;
     texture_->SetFilter(GL_NEAREST, GL_NEAREST);
     texture_->SetWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
     texture_->SetBorderColor(glm::vec4(1.0f));

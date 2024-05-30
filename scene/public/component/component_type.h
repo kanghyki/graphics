@@ -9,6 +9,7 @@ enum class ComponentType
     /* Render component */
     MODEL,
     SKYBOX,
+    TERRAIN,
     EOL
 };
 

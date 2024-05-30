@@ -66,13 +66,13 @@ CLASS_PTR(DepthMap);
 class DepthMap : public BaseFramebuffer
 {
   public:
-    static DepthMapPtr Create(int width, int height, int length = -1);
+    static DepthMapPtr Create(BaseTexturePtr texture);
     static DepthMap *empty()
     {
         static DepthMapPtr d = nullptr;
         if (!d)
         {
-            d = DepthMap::Create(1, 1);
+            d = DepthMap::Create(Texture::Create(1, 1, GL_DEPTH_COMPONENT));
         }
         return d.get();
     }
@@ -81,7 +81,7 @@ class DepthMap : public BaseFramebuffer
         static DepthMapPtr d = nullptr;
         if (!d)
         {
-            d = DepthMap::Create(1, 1, 1);
+            d = DepthMap::Create(CubeTexture::Create(1, 1, 1, GL_DEPTH_COMPONENT));
         }
         return d.get();
     }
@@ -95,7 +95,7 @@ class DepthMap : public BaseFramebuffer
   private:
     DepthMap();
 
-    bool SetTexture(int width, int height, int length);
+    bool SetTexture(BaseTexturePtr texture);
     void AttachTexture() override;
 
     BaseTexturePtr texture_;

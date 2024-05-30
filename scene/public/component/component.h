@@ -9,6 +9,7 @@ class CameraComponent;
 class LightComponent;
 class ModelComponent;
 class SkyboxComponent;
+class TerrainComponent;
 #define OWNER_COMPONENT_GETTER_DECL(className) className *Get##className() const;
 #define OWNER_COMPONENT_GETTER_IMPL(className)                                                                         \
     className *Component::Get##className() const                                                                       \
@@ -38,6 +39,7 @@ class Component
     OWNER_COMPONENT_GETTER_DECL(LightComponent)
     OWNER_COMPONENT_GETTER_DECL(ModelComponent)
     OWNER_COMPONENT_GETTER_DECL(SkyboxComponent)
+    OWNER_COMPONENT_GETTER_DECL(TerrainComponent)
 
   private:
     Component(const Component &);

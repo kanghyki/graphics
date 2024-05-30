@@ -22,6 +22,7 @@ class NoInherit
 };
 
 class Actor;
+class LightComponent;
 class CameraComponent : public Component, private NoInherit
 {
   public:
@@ -75,23 +76,25 @@ class CameraComponent : public Component, private NoInherit
     CameraComponent(const CameraComponent &);
     CameraComponent &operator=(const CameraComponent &);
 
+    void RenderTerrain();
     void RenderShadowMap();
-    void RenderSpotShadowMap(Actor *actor);
-    void RenderPointShadowMap(Actor *actor);
-    void RenderCSM(Actor *actor);
+    void RenderSpotShadowMap(LightComponent *lc);
+    void RenderPointShadowMap(LightComponent *lc);
+    void RenderDirectionalShadowMap(LightComponent *lc);
 
     void RenderSkybox();
     void RenderShading();
 
-    float fov_y_{45.0f};
+    float fov_y_{90.0f};
     float aspect_{1.0f};
     float near_plane_{0.01f};
-    float far_plane_{200.0f};
+    float far_plane_{500.0f};
 
     // uint32_t layer_mask_;
     std::vector<Actor *> shadow_lights_;
     std::vector<Actor *> skymaps_;
     std::vector<Actor *> models_;
+    std::vector<Actor *> terrians_;
 };
 
 #endif

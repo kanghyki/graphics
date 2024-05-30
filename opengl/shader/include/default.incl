@@ -26,6 +26,7 @@ layout(binding = 1, std140) uniform Matrices {
 #define DIRECTIONAL (0)
 #define POINT (1)
 #define SPOT (2)
+#define CASCADE_COUNT (4)
 struct Light {
     int     type;
     float   falloff_start;
@@ -45,6 +46,10 @@ struct Light {
     mat4    proj;
 
     float   far_plane;
+
+    float   cascade_distance[4];
+
+    mat4    csm_matrix[5];
 };
 
 #define LIGHT_MAX (64)
@@ -57,6 +62,7 @@ layout(binding = 2, std140) uniform Lights {
 #define SHADOW_CUBE_MAX (8)
 uniform sampler2D l_shadow[SHADOW_2D_MAX];
 uniform samplerCube l_shadow_cube[SHADOW_CUBE_MAX];
+uniform sampler2DArray l_shadow_array;
 
 /***********************************\
 |                                   |

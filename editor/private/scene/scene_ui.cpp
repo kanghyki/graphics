@@ -6,6 +6,8 @@
 #include "level_manager.h"
 #include "light_component.h"
 #include "model_component.h"
+#include "skybox_component.h"
+#include "terrain_component.h"
 #include "transform_component.h"
 #include <spdlog/spdlog.h>
 
@@ -156,6 +158,8 @@ void SceneUI::ActorDetail()
         TransformDetail();
         LightDetail();
         ModelDetail();
+        SkyboxDetail();
+        TerrainDetail();
     }
     ImGui::End();
 }
@@ -357,6 +361,54 @@ void SceneUI::MeshTextureDetail(MeshPtr mesh, TextureType type)
         if (ImGui::Button(label.c_str()))
         {
             mesh->material()->set_texture(type, texture2d_selected);
+        }
+    }
+}
+
+void SceneUI::SkyboxDetail()
+{
+    SkyboxComponent *skybox_component = actor_selected->GetSkyboxComponent();
+
+    if (ImGui::CollapsingHeader("Skybox", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (skybox_component)
+        {
+            ImGui::Checkbox("Activate", skybox_component, &SkyboxComponent::activate, &SkyboxComponent::set_activate);
+            if (ImGui::Button("Remove##skyboxremove"))
+            {
+                actor_selected->RemoveComponent(ComponentType::SKYBOX);
+            }
+        }
+        else
+        {
+            if (ImGui::Button("Create##skyboxcreate"))
+            {
+                actor_selected->AddSkyboxComponent();
+            }
+        }
+    }
+}
+
+void SceneUI::TerrainDetail()
+{
+    TerrainComponent *terrain_component = actor_selected->GetTerrainComponent();
+    if (ImGui::CollapsingHeader("Terrain", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (terrain_component)
+        {
+            ImGui::DragFloat("Height scale", terrain_component, &TerrainComponent::height_scale,
+                             &TerrainComponent::set_height_scale, 0.01f);
+            if (ImGui::Button("Remove##terrainremove"))
+            {
+                actor_selected->RemoveComponent(ComponentType::TERRAIN);
+            }
+        }
+        else
+        {
+            if (ImGui::Button("Create##terraincreate"))
+            {
+                actor_selected->AddTerrainComponent();
+            }
         }
     }
 }
