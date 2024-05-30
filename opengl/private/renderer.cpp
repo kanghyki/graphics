@@ -71,7 +71,8 @@ void Renderer::Init()
     /* Omni-Depth map */
     omni_depth_map_vs_ = Shader::CreateFromFile(shader_dir + "omni_depth_map.vs", GL_VERTEX_SHADER);
     omni_depth_map_fs_ = Shader::CreateFromFile(shader_dir + "omni_depth_map.fs", GL_FRAGMENT_SHADER);
-    omni_depth_map_program_ = Program::Create({omni_depth_map_vs_, omni_depth_map_fs_});
+    omni_depth_map_gs_ = Shader::CreateFromFile(shader_dir + "omni_depth_map.gs", GL_GEOMETRY_SHADER);
+    omni_depth_map_program_ = Program::Create({omni_depth_map_vs_, omni_depth_map_fs_, omni_depth_map_gs_});
     omni_depth_map_pso_ = GraphicsPSO::Create();
     omni_depth_map_pso_->program_ = omni_depth_map_program_;
     omni_depth_map_pso_->rasterizer_state_.cull_face_ = GL_FRONT;
@@ -195,6 +196,7 @@ void Renderer::RenderSSAO()
     linear_blur_pso_->program_->ActivateTexture("tex", ssao_framebuffer_->color_attachment(0));
     linear_blur_program_->SetUniform("model", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
     plane_mesh_->Draw(nullptr);
+    glUseProgram(0);
 }
 
 void Renderer::PostProcessing()
@@ -230,6 +232,7 @@ void Renderer::PostProcessing()
     post_processing_program_->ActivateTexture("main_texture", main_framebuffer_->color_attachment(0));
     post_processing_program_->ActivateTexture("blured_texture", gaussian_blur_framebuffer_[0]->color_attachment(0));
     plane_mesh_->Draw(nullptr);
+    glUseProgram(0);
 }
 
 void Renderer::ApplyPSO(const GraphicsPSO *pso) const

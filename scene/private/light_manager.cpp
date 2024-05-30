@@ -35,6 +35,7 @@ void LightManager::Tick()
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     lights_.count = 0;
     shadow_2d_count_ = 0;
+    shadow_3d_count_ = 0;
 }
 
 void LightManager::AddLight(LightComponent *light)
@@ -44,22 +45,36 @@ void LightManager::AddLight(LightComponent *light)
         SPDLOG_WARN("MAXIMUM LIGHT");
         return;
     }
-    switch (light->type())
+    if (light->use_shadow())
     {
-    case LightType::DIRECTIONAL:
-    case LightType::SPOT:
-        if (shadow_2d_count_ >= LightsUniform::SHADOW_2D_MAX)
+        switch (light->type())
         {
-            SPDLOG_WARN("MAXIMUM 2D SHADOW");
+        case LightType::DIRECTIONAL:
+        case LightType::SPOT:
+            if (shadow_2d_count_ >= LightsUniform::SHADOW_2D_MAX)
+            {
+                SPDLOG_WARN("MAXIMUM 2D SHADOW");
+                break;
+            }
+            light->set_shadow_id(shadow_2d_count_);
+            ++shadow_2d_count_;
+            break;
+        case LightType::POINT:
+            if (shadow_3d_count_ >= LightsUniform::SHADOW_CUBE_MAX)
+            {
+                SPDLOG_WARN("MAXIMUM 3D SHADOW");
+                break;
+            }
+            light->set_shadow_id(shadow_3d_count_);
+            ++shadow_3d_count_;
+            break;
+        default:
             break;
         }
-        light->set_shadow_id(shadow_2d_count_);
-        ++shadow_2d_count_;
-        break;
-    case LightType::POINT:
-        break;
-    default:
-        break;
+    }
+    else
+    {
+        light->set_shadow_id(-1);
     }
     lights_.l_lights[lights_.count++] = light->ToData();
 }

@@ -187,6 +187,7 @@ class Renderer
     /* Omni-Depth map */
     ShaderPtr omni_depth_map_vs_;
     ShaderPtr omni_depth_map_fs_;
+    ShaderPtr omni_depth_map_gs_;
     ProgramPtr omni_depth_map_program_;
     GraphicsPSOPtr omni_depth_map_pso_;
 

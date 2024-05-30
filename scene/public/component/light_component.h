@@ -39,8 +39,15 @@ class LightComponent : public Component
         if (use_shadow_)
         {
             data.shadow_id = shadow_id_;
-            data.view = CalcView();
-            data.proj = CalcProj();
+            if (type_ == LightType::SPOT)
+            {
+                data.view = CalcView();
+                data.proj = CalcProj();
+            }
+            else if (type_ == LightType::POINT)
+            {
+                data.far_plane = far_plane();
+            }
         }
 
         return data;
@@ -56,10 +63,10 @@ class LightComponent : public Component
     {
         switch (type_)
         {
+        case LightType::SPOT:
+            return glm::perspective(glm::radians(120.0f), 1.0f, near_plane(), far_plane());
         case LightType::DIRECTIONAL:
         case LightType::POINT:
-        case LightType::SPOT:
-            return glm::perspective(glm::radians(120.0f), 1.0f, 0.5f, falloff_end_ * 2.0f);
         default:
             return glm::mat4(1.0f);
         }
@@ -75,6 +82,11 @@ class LightComponent : public Component
     void set_type(LightType type)
     {
         type_ = type;
+        if (use_shadow_)
+        {
+            set_use_shadow(false);
+            set_use_shadow(true);
+        }
     }
 
     glm::vec3 color() const
@@ -132,17 +144,17 @@ class LightComponent : public Component
         use_shadow_ = b;
         if (!b)
         {
-            depthmap_ = nullptr;
+            depth_map_ = nullptr;
             return;
         }
         switch (type_)
         {
         case LightType::DIRECTIONAL:
         case LightType::SPOT:
-            depthmap_ = DepthMap::Create(1280, 1280);
+            depth_map_ = DepthMap::Create(1280, 1280);
             break;
         case LightType::POINT:
-            depthmap_ = DepthMap::Create(1280, 1280, 1280);
+            depth_map_ = DepthMap::Create(1280, 1280, 1280);
             break;
         default:
             break;
@@ -151,10 +163,10 @@ class LightComponent : public Component
 
     DepthMap *depth_map()
     {
-        return depthmap_.get();
+        return depth_map_.get();
     }
 
-    uint32_t shadow_id()
+    uint32_t shadow_id() const
     {
         return shadow_id_;
     }
@@ -162,6 +174,16 @@ class LightComponent : public Component
     void set_shadow_id(uint32_t id)
     {
         shadow_id_ = id;
+    }
+
+    float near_plane() const
+    {
+        return 0.1f;
+    }
+
+    float far_plane() const
+    {
+        return falloff_end_ * 10.0f;
     }
 
   private:
@@ -177,7 +199,7 @@ class LightComponent : public Component
     float falloff_start_{0.0f};
     float falloff_end_{10.0f};
     bool use_shadow_{false};
-    DepthMapPtr depthmap_{nullptr};
+    DepthMapPtr depth_map_{nullptr};
     uint32_t shadow_id_{0};
 };
 

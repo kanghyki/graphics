@@ -25,10 +25,15 @@ class Program
     void SetUniform(const std::string &name, const glm::mat4 &value) const;
     void SetUniform(const std::string &name, const std::vector<glm::mat4> &value) const;
 
-    void ActivateTexture(const std::string &name, const BaseTexture *texture) const;
+    int ActivateTexture(const std::string &name, const BaseTexture *texture) const;
+    int ActivateTexture(const BaseTexture *texture) const;
     void ResetTextureCount() const
     {
         active_texture_count_ = 0;
+    }
+    int active_texture_count() const
+    {
+        return active_texture_count_;
     }
 
     const uint32_t id() const

@@ -76,6 +76,10 @@ class CameraComponent : public Component, private NoInherit
     CameraComponent &operator=(const CameraComponent &);
 
     void RenderShadowMap();
+    void RenderSpotShadowMap(Actor *actor);
+    void RenderPointShadowMap(Actor *actor);
+    void RenderCSM(Actor *actor);
+
     void RenderSkybox();
     void RenderShading();
 

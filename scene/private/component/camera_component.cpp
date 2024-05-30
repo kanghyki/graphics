@@ -2,6 +2,7 @@
 #include "actor.h"
 #include "camera_manager.h"
 #include "level_manager.h"
+#include "libmath.h"
 #include "light_component.h"
 #include "renderer.h"
 #include "transform_component.h"
@@ -60,7 +61,7 @@ void CameraComponent::Render()
 
     RenderShadowMap();
     RenderShading();
-    // RenderSkybox();
+    RenderSkybox();
 }
 
 void CameraComponent::RenderShadowMap()
@@ -68,24 +69,80 @@ void CameraComponent::RenderShadowMap()
     glViewport(0, 0, 1280, 1280);
     for (Actor *actor : shadow_lights_)
     {
-        actor->GetLightComponent()->depth_map()->Bind();
-        glClear(GL_DEPTH_BUFFER_BIT);
-        GraphicsPSO *depth_map_pso = Renderer::GetInstance()->GetPSO(PsoType::DEPTH_MAP);
-        Renderer::GetInstance()->ApplyPSO(depth_map_pso);
-
         LightComponent *lc = actor->GetLightComponent();
-        int width = lc->depth_map()->texture()->width();
-        int height = lc->depth_map()->texture()->height();
-
-        depth_map_pso->program_->SetUniform("view", lc->CalcView());
-        depth_map_pso->program_->SetUniform("proj", lc->CalcProj());
-        for (Actor *model : models_)
+        switch (lc->type())
         {
-            depth_map_pso->program_->SetUniform("model", model->GetTransformComponent()->CalcModelMatrix());
-            model->Render(nullptr);
+        case LightType::DIRECTIONAL:
+            RenderCSM(actor);
+            break;
+        case LightType::POINT:
+            RenderPointShadowMap(actor);
+            break;
+        case LightType::SPOT:
+            RenderSpotShadowMap(actor);
+            break;
+        default:
+            break;
         }
     }
     glViewport(0, 0, Renderer::GetInstance()->width(), Renderer::GetInstance()->height());
+}
+
+void CameraComponent::RenderSpotShadowMap(Actor *actor)
+{
+    LightComponent *lc = actor->GetLightComponent();
+    lc->depth_map()->Bind();
+    glClear(GL_DEPTH_BUFFER_BIT);
+    GraphicsPSO *pso = Renderer::GetInstance()->GetPSO(PsoType::DEPTH_MAP);
+    Renderer::GetInstance()->ApplyPSO(pso);
+
+    pso->program_->SetUniform("view", lc->CalcView());
+    pso->program_->SetUniform("proj", lc->CalcProj());
+    for (Actor *model : models_)
+    {
+        if (!model->GetLightComponent())
+        {
+            pso->program_->SetUniform("model", model->GetTransformComponent()->CalcModelMatrix());
+            model->Render(pso->program_.get());
+        }
+    }
+    glUseProgram(0);
+}
+
+void CameraComponent::RenderPointShadowMap(Actor *actor)
+{
+    LightComponent *lc = actor->GetLightComponent();
+    lc->depth_map()->Bind();
+    glClear(GL_DEPTH_BUFFER_BIT);
+    GraphicsPSO *pso = Renderer::GetInstance()->GetPSO(PsoType::OMNI_DEPTH_MAP);
+    Renderer::GetInstance()->ApplyPSO(pso);
+
+    glm::mat4 proj = glm::perspective(glm::radians(90.0f), 1.0f, lc->near_plane(), lc->far_plane());
+    std::vector<glm::mat4> t(6, glm::mat4(1.0f));
+    t[0] = proj * glm::lookAt(lc->position(), lc->position() + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+    t[1] = proj * glm::lookAt(lc->position(), lc->position() + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+    t[2] = proj * glm::lookAt(lc->position(), lc->position() + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+    t[3] = proj * glm::lookAt(lc->position(), lc->position() + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+    t[4] = proj * glm::lookAt(lc->position(), lc->position() + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+    t[5] = proj * glm::lookAt(lc->position(), lc->position() + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+
+    pso->program_->SetUniform("light_transform", t);
+    pso->program_->SetUniform("far_plane", lc->far_plane());
+    pso->program_->SetUniform("light_position", lc->position());
+    for (Actor *model : models_)
+    {
+        if (!model->GetLightComponent())
+        {
+            pso->program_->SetUniform("model", model->GetTransformComponent()->CalcModelMatrix());
+            model->Render(pso->program_.get());
+        }
+    }
+    glUseProgram(0);
+}
+
+void CameraComponent::RenderCSM(Actor *actor)
+{
+    glUseProgram(0);
 }
 
 void CameraComponent::RenderShading()
@@ -106,6 +163,7 @@ void CameraComponent::RenderShading()
     main_fb->Bind();
     GraphicsPSO *pso = Renderer::GetInstance()->GetPSO(PsoType::DEFFERED_SHADING);
     Renderer::GetInstance()->ApplyPSO(pso);
+
     pso->program_->SetUniform("model", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
     pso->program_->ActivateTexture("gPosition", g_buffer->color_attachment(0));
     pso->program_->ActivateTexture("gNormal", g_buffer->color_attachment(1));
@@ -118,13 +176,39 @@ void CameraComponent::RenderShading()
         pso->program_->ActivateTexture(
             "SSAO", Renderer::GetInstance()->GetFramebuffer(FramebufferType::SSAO)->color_attachment(0));
     }
+
+    int empty = pso->program_->ActivateTexture(DepthMap::empty()->texture());
+    for (int i = 0; i < LightsUniform::SHADOW_2D_MAX; ++i)
+    {
+        const std::string &name = fmt::format("l_shadow[{}]", i);
+        pso->program_->SetUniform(name, empty);
+    }
+    int empty_cube = pso->program_->ActivateTexture(DepthMap::empty_cube()->texture());
+    for (int i = 0; i < LightsUniform::SHADOW_CUBE_MAX; ++i)
+    {
+        const std::string &name = fmt::format("l_shadow_cube[{}]", i);
+        pso->program_->SetUniform(name, empty_cube);
+    }
+
     for (Actor *shadow_light : shadow_lights_)
     {
         LightComponent *lc = shadow_light->GetLightComponent();
-        auto name = fmt::format("l_shadow[{}]", lc->shadow_id());
-        pso->program_->ActivateTexture(name, lc->depth_map()->texture());
+        if (lc->type() == LightType::DIRECTIONAL)
+        {
+        }
+        else if (lc->type() == LightType::POINT)
+        {
+            const std::string &name = fmt::format("l_shadow_cube[{}]", lc->shadow_id());
+            pso->program_->ActivateTexture(name, lc->depth_map()->texture());
+        }
+        else if (lc->type() == LightType::SPOT)
+        {
+            const std::string &name = fmt::format("l_shadow[{}]", lc->shadow_id());
+            pso->program_->ActivateTexture(name, lc->depth_map()->texture());
+        }
     }
     Renderer::GetInstance()->plane_mesh()->Draw(nullptr);
+    glUseProgram(0);
 
     g_buffer->Bind(GL_READ_FRAMEBUFFER);
     main_fb->Bind(GL_DRAW_FRAMEBUFFER);

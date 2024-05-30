@@ -43,6 +43,8 @@ struct Light {
 
     mat4    view;
     mat4    proj;
+
+    float   far_plane;
 };
 
 #define LIGHT_MAX (64)
@@ -52,8 +54,9 @@ layout(binding = 2, std140) uniform Lights {
 };
 
 #define SHADOW_2D_MAX (8)
+#define SHADOW_CUBE_MAX (8)
 uniform sampler2D l_shadow[SHADOW_2D_MAX];
-
+uniform samplerCube l_shadow_cube[SHADOW_CUBE_MAX];
 
 /***********************************\
 |                                   |

@@ -24,6 +24,7 @@ class LightManager
 
     LightsUniform lights_;
     uint32_t shadow_2d_count_{0};
+    uint32_t shadow_3d_count_{0};
 };
 
 #endif

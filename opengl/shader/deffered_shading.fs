@@ -40,7 +40,7 @@ void main()
         {
             lighting += ComputePointLight(l_lights[i], mat, frag_pos, normal, to_eye);
         }
-        else
+        else if (l_lights[i].type == SPOT)
         {
             lighting += ComputeSpotLight(l_lights[i], mat, frag_pos, normal, to_eye);
         }

@@ -161,7 +161,7 @@ void CreateTestLevel::Create()
     box->SetComponent(std::shared_ptr<Component>(new RotationTransformComponent()));
     box->AddModelComponent();
     box->GetModelComponent()->set_model(Model::Create({box_mesh}));
-    box->GetTransformComponent()->set_position(glm::vec3(0.0f, 0.5f, -0.5f));
+    box->GetTransformComponent()->set_position(glm::vec3(0.0f, 0.9f, -0.5f));
 
     Actor *sphere = new Actor("Sphere");
     auto sphere_mesh = Mesh::CreateSphere(30, 30);
@@ -172,13 +172,6 @@ void CreateTestLevel::Create()
     sphere->GetModelComponent()->set_model(Model::Create({sphere_mesh}));
     sphere->GetTransformComponent()->set_position(glm::vec3(1.0f, 1.0f, 0.0f));
     sphere->GetTransformComponent()->set_scale(glm::vec3(0.6f));
-
-    Actor *backpack = new Actor("Backpack");
-    backpack->AddModelComponent();
-    backpack->GetModelComponent()->set_model(Model::Load(resource_path + "\\model\\backpack.obj"));
-    backpack->GetTransformComponent()->set_scale(glm::vec3(0.1f, 0.1f, 0.1f));
-    backpack->GetTransformComponent()->set_position(glm::vec3(-1.0f, 0.22f, -0.5f));
-    backpack->GetTransformComponent()->set_rotation(glm::vec3(0.0f, 50.0f, 0.0f));
 
     Actor *light_0 = new Actor("Light 1");
     light_0->AddLightComponent();
@@ -206,11 +199,11 @@ void CreateTestLevel::Create()
         TextureType::EMISSIVE,
         Texture::Create(Image::CreateSingleColorImage(4, 4, glm::vec4(0.95f, 0.95f, 0.75f, 1.0f)).get()));
     light_2->GetModelComponent()->set_model(Model::Create({green}));
-    light_2->GetLightComponent()->set_type(LightType::SPOT);
+    light_2->GetLightComponent()->set_type(LightType::POINT);
     light_2->GetLightComponent()->set_color(glm::vec3(0.95f, 0.95f, 0.75f));
     light_2->GetLightComponent()->set_use_shadow(true);
     light_2->GetTransformComponent()->set_rotation(glm::vec3(-90.0f, 0.0f, 0.0f));
-    light_2->GetTransformComponent()->set_position(glm::vec3(1.0f, 2.5f, 0.0f));
+    light_2->GetTransformComponent()->set_position(glm::vec3(1.0f, 2.0f, 0.0f));
     light_2->GetTransformComponent()->set_scale(glm::vec3(0.035f));
 
     Actor *cam = new Actor("Camera man");
@@ -221,7 +214,6 @@ void CreateTestLevel::Create()
     layer00->AddActor(box);
     layer00->AddActor(sphere);
     layer00->AddActor(floor);
-    layer00->AddActor(backpack);
     auto layer01 = level->AddLayer("player");
     layer01->AddActor(cam);
     auto layer02 = level->AddLayer("light");

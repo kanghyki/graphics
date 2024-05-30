@@ -99,10 +99,19 @@ void Program::SetUniform(const std::string &name, const std::vector<glm::mat4> &
     glUniformMatrix4fv(loc, value.size(), GL_FALSE, glm::value_ptr(*(value.data())));
 }
 
-void Program::ActivateTexture(const std::string &name, const BaseTexture *texture) const
+int Program::ActivateTexture(const std::string &name, const BaseTexture *texture) const
 {
     glActiveTexture(GL_TEXTURE0 + active_texture_count_);
     texture->Bind();
     SetUniform(name, active_texture_count_);
-    ++active_texture_count_;
+
+    return active_texture_count_++;
+}
+
+int Program::ActivateTexture(const BaseTexture *texture) const
+{
+    glActiveTexture(GL_TEXTURE0 + active_texture_count_);
+    texture->Bind();
+
+    return active_texture_count_++;
 }

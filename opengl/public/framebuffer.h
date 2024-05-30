@@ -67,6 +67,24 @@ class DepthMap : public BaseFramebuffer
 {
   public:
     static DepthMapPtr Create(int width, int height, int length = -1);
+    static DepthMap *empty()
+    {
+        static DepthMapPtr d = nullptr;
+        if (!d)
+        {
+            d = DepthMap::Create(1, 1);
+        }
+        return d.get();
+    }
+    static DepthMap *empty_cube()
+    {
+        static DepthMapPtr d = nullptr;
+        if (!d)
+        {
+            d = DepthMap::Create(1, 1, 1);
+        }
+        return d.get();
+    }
     ~DepthMap();
 
     BaseTexture *texture()

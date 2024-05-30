@@ -39,6 +39,9 @@ struct LightData
 
     glm::mat4 view;
     glm::mat4 proj;
+
+    float far_plane;
+    unsigned char __p0[12];
 };
 
 struct LightsUniform
@@ -46,7 +49,8 @@ struct LightsUniform
     enum
     {
         LIGHT_MAX = 64,
-        SHADOW_2D_MAX = 8
+        SHADOW_2D_MAX = 8,
+        SHADOW_CUBE_MAX = 8
     };
     int count{0};
     unsigned char __p0[12];
@@ -78,6 +82,7 @@ struct MaterialUniform
     unsigned char __p0[4];
 
     glm::vec3 albedo_color;
+    unsigned char __p1[4];
 };
 
 #endif
