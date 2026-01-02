@@ -4,6 +4,11 @@ A modern C++17 graphics engine built with OpenGL, featuring a deferred rendering
 
 ## Showcase
 
+![graphics](https://github.com/user-attachments/assets/f8013490-235f-49e9-9e70-c9043436b56f)
+
+**CSM**
+<img width="1602" height="932" alt="csm" src="https://github.com/user-attachments/assets/2668e743-b69a-4d9f-81d5-838b54a62ca4" />
+
 ## Features
 
 ### Rendering
