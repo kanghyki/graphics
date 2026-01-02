@@ -3,6 +3,7 @@ build
 
 # vscode
 .vscode
+.vs
 
 # ctags
 tags

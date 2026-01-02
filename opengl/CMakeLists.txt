@@ -10,6 +10,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(Dependency.cmake)
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/private/*.cpp)
+# Add GLAD source if it exists
+if(EXISTS ${GLAD_SOURCE})
+    list(APPEND SOURCE_FILES ${GLAD_SOURCE})
+endif()
 add_library(${PROJECT_NAME} ${SOURCE_FILES})
 
 target_compile_definitions(${PROJECT_NAME}

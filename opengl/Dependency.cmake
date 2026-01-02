@@ -1,4 +1,5 @@
 include(ExternalProject)
+include(FetchContent)
 
 set(EXTERNAL_INSTALL_DIR ${PROJECT_BINARY_DIR}/install)
 set(EXTERNAL_INCLUDE_DIR ${EXTERNAL_INSTALL_DIR}/include)
@@ -7,7 +8,7 @@ set(EXTERNAL_LIBRARY_DIR ${EXTERNAL_INSTALL_DIR}/lib)
 ExternalProject_Add(
     dep_glfw
     GIT_REPOSITORY "https://github.com/glfw/glfw.git"
-    GIT_TAG "3.3.2"
+    GIT_TAG "3.4"
     GIT_SHALLOW 1
     UPDATE_COMMAND ""
     PATCH_COMMAND ""
@@ -21,20 +22,25 @@ ExternalProject_Add(
 set(EXTERNAL_PROJECTS ${EXTERNAL_PROJECTS} dep_glfw)
 set(EXTERNAL_LIBRARYS ${EXTERNAL_LIBRARYS} glfw3)
 
+# Generate GLAD using Python
 ExternalProject_Add(
-    dep_glad
-    GIT_REPOSITORY "https://github.com/Dav1dde/glad"
-    GIT_TAG "v0.1.34"
+    dep_glad_generator
+    GIT_REPOSITORY "https://github.com/Dav1dde/glad.git"
+    GIT_TAG "v0.1.36"
     GIT_SHALLOW 1
     UPDATE_COMMAND ""
     PATCH_COMMAND ""
-    CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_DIR}
-        -DGLAD_INSTALL=ON
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ${CMAKE_COMMAND} -E env python -m glad --out-path=${EXTERNAL_INSTALL_DIR} --api=gl=3.3 --generator=c --spec=gl --no-loader
+    BUILD_IN_SOURCE 1
+    INSTALL_COMMAND ""
     TEST_COMMAND ""
     )
-set(EXTERNAL_PROJECTS ${EXTERNAL_PROJECTS} dep_glad)
-set(EXTERNAL_LIBRARYS ${EXTERNAL_LIBRARYS} glad)
+set(EXTERNAL_PROJECTS ${EXTERNAL_PROJECTS} dep_glad_generator)
+
+# Add GLAD source files to be compiled with the project
+set(GLAD_INCLUDE_DIR ${EXTERNAL_INSTALL_DIR}/include)
+set(GLAD_SOURCE ${EXTERNAL_INSTALL_DIR}/src/glad.c)
 
 ExternalProject_Add(
     dep_stb
@@ -58,7 +64,7 @@ set(EXTERNAL_PROJECTS ${EXTERNAL_PROJECTS} dep_stb)
 ExternalProject_Add(
   dep_assimp
   GIT_REPOSITORY "https://github.com/assimp/assimp"
-  GIT_TAG "v5.0.1"
+  GIT_TAG "v5.4.3"
   GIT_SHALLOW 1
   UPDATE_COMMAND ""
   PATCH_COMMAND ""
@@ -74,14 +80,12 @@ ExternalProject_Add(
 set(EXTERNAL_PROJECTS ${EXTERNAL_PROJECTS} dep_assimp)
 if (WIN32)
 set(EXTERNAL_LIBRARYS ${EXTERNAL_LIBRARYS}
-  assimp-vc143-mt$<$<CONFIG:Debug>:d>
+  assimp-vc143-mt
   zlibstatic$<$<CONFIG:Debug>:d>
-  IrrXML$<$<CONFIG:Debug>:d>
 )
 else ()
 set(EXTERNAL_LIBRARYS ${EXTERNAL_LIBRARYS}
   assimp
   zlibstatic
-  IrrXML
 )
 endif()

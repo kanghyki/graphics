@@ -11,6 +11,10 @@ if (APPLE)
     set(CMAKE_CXX_FLAGS "-framework Cocoa -framework IOKit -framework OpenGL -g")
 endif()
 
+if (MSVC)
+    add_compile_options(/utf-8)
+endif()
+
 add_executable(${PROJECT_NAME}
     main.cpp
     level_test.cpp
